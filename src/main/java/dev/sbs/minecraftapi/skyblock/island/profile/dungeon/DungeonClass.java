@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data.dungeon;
+package dev.sbs.minecraftapi.skyblock.island.profile.dungeon;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.NumberUtil;

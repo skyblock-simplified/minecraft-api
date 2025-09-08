@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data.dungeon;
+package dev.sbs.minecraftapi.skyblock.island.profile.dungeon;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 
 @Getter
 @NoArgsConstructor
-public class DungeonData implements PostInit {
+public class DungeonProfile implements PostInit {
 
     @SerializedName("dungeon_types")
     @Getter(AccessLevel.NONE)

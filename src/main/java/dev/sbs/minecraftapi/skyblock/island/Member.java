@@ -11,14 +11,14 @@ import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.skyblock.island.crimson_isle.CrimsonIsle;
 import dev.sbs.minecraftapi.skyblock.island.crimson_isle.TrophyFishing;
-import dev.sbs.minecraftapi.skyblock.island.data.PlayerData;
-import dev.sbs.minecraftapi.skyblock.island.data.dungeon.DungeonData;
-import dev.sbs.minecraftapi.skyblock.island.data.pet.PetData;
-import dev.sbs.minecraftapi.skyblock.island.data.skill.SkillData;
-import dev.sbs.minecraftapi.skyblock.island.data.slayer.SlayerData;
 import dev.sbs.minecraftapi.skyblock.island.mining.ForgeItem;
 import dev.sbs.minecraftapi.skyblock.island.mining.GlaciteTunnels;
 import dev.sbs.minecraftapi.skyblock.island.mining.Mining;
+import dev.sbs.minecraftapi.skyblock.island.profile.PlayerData;
+import dev.sbs.minecraftapi.skyblock.island.profile.dungeon.DungeonProfile;
+import dev.sbs.minecraftapi.skyblock.island.profile.pet.PetProfile;
+import dev.sbs.minecraftapi.skyblock.island.profile.skill.SkillProfile;
+import dev.sbs.minecraftapi.skyblock.island.profile.slayer.SlayerProfile;
 import dev.sbs.minecraftapi.skyblock.type.Weight;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,12 +53,12 @@ public class Member implements PostInit {
     @SerializedName("player_data")
     private @NotNull PlayerData playerData = new PlayerData();
     @SerializedName("slayer")
-    private @NotNull SlayerData slayerData = new SlayerData();
-    private transient SkillData skillData;
+    private @NotNull SlayerProfile slayerData = new SlayerProfile();
+    private transient SkillProfile skillData;
     @SerializedName("dungeons")
-    private @NotNull DungeonData dungeonData = new DungeonData();
+    private @NotNull DungeonProfile dungeonData = new DungeonProfile();
     @SerializedName("pet_data")
-    private @NotNull PetData petData = new PetData();
+    private @NotNull PetProfile petData = new PetProfile();
 
     // Locations
     private @NotNull Rift rift = new Rift();
@@ -103,7 +103,7 @@ public class Member implements PostInit {
     public void postInit() {
         this.accessoryBag.initialize(this);
         this.trophyFish = new TrophyFishing(this.trophyFishMap);
-        this.skillData = new SkillData(this.getPlayerData().getSkillExperience(), this);
+        this.skillData = new SkillProfile(this.getPlayerData().getSkillExperience(), this);
 
         this.collectionUnlocked = this.getCollection()
             .stream()

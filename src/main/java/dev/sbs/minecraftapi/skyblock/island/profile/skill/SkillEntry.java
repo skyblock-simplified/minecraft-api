@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data.skill;
+package dev.sbs.minecraftapi.skyblock.island.profile.skill;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.NumberUtil;

@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data.skill;
+package dev.sbs.minecraftapi.skyblock.island.profile.skill;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
@@ -12,11 +12,11 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @RequiredArgsConstructor
-public class SkillData {
+public class SkillProfile {
 
     private final @NotNull ConcurrentList<SkillEntry> skills;
 
-    public SkillData(@NotNull ConcurrentMap<String, Double> skillExperience, @NotNull Member member) {
+    public SkillProfile(@NotNull ConcurrentMap<String, Double> skillExperience, @NotNull Member member) {
         this.skills = skillExperience.stream()
             .mapKey(id -> id.replace("SKILL_", ""))
             .map((id, experience) -> new SkillEntry(id, experience, member))

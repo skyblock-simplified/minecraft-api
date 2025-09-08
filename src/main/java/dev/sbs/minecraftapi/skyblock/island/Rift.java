@@ -7,8 +7,8 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.io.gson.SerializedPath;
 import dev.sbs.minecraftapi.skyblock.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.island.data.pet.Pet;
-import dev.sbs.minecraftapi.skyblock.island.data.slayer.SlayerProgress;
+import dev.sbs.minecraftapi.skyblock.island.profile.pet.PetEntry;
+import dev.sbs.minecraftapi.skyblock.island.profile.slayer.SlayerEntry;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -93,7 +93,7 @@ public class Rift {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class SlayerQuest extends SlayerProgress.Quest {
+    public static class SlayerQuest extends SlayerEntry.Quest {
 
         @SerializedName("combat_xp")
         private int combatXP;
@@ -377,7 +377,7 @@ public class Rift {
         @Accessors(fluent = true)
         @SerializedName("unlocked_pet")
         private boolean hasUnlockedPet;
-        private Optional<Pet> montezuma = Optional.empty();
+        private Optional<PetEntry> montezuma = Optional.empty();
 
     }
 

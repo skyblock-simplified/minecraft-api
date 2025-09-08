@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data.slayer;
+package dev.sbs.minecraftapi.skyblock.island.profile.slayer;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 @Getter
-public class SlayerData implements PostInit {
+public class SlayerProfile implements PostInit {
 
     private final static @NotNull SlayerEntry UNKNOWN = new SlayerEntry("UNKNOWN", new BossData());
     @SerializedName("slayer_quest")

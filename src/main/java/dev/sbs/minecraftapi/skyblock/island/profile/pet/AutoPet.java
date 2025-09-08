@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data.pet;
+package dev.sbs.minecraftapi.skyblock.island.profile.pet;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
