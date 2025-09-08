@@ -2,8 +2,8 @@ package dev.sbs.minecraftapi.skyblock.island.mining;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.data.Item;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
+import dev.sbs.minecraftapi.skyblock.model.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

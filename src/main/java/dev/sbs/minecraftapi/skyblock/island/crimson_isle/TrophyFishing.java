@@ -4,7 +4,7 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.data.TrophyFish;
+import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 

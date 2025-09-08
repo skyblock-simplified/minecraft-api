@@ -5,7 +5,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.data.Slayer;
+import dev.sbs.minecraftapi.skyblock.model.Slayer;
 import dev.sbs.minecraftapi.skyblock.type.Experience;
 import dev.sbs.minecraftapi.skyblock.type.Weight;
 import dev.sbs.minecraftapi.skyblock.type.Weighted;
