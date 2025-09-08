@@ -1,9 +1,8 @@
-package dev.sbs.minecraftapi.skyblock.data.json;
+package dev.sbs.minecraftapi.skyblock.model.json;
 
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
-import dev.sbs.minecraftapi.skyblock.data.MobType;
-import dev.sbs.minecraftapi.text.ChatFormat;
+import dev.sbs.minecraftapi.skyblock.model.MelodySong;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,14 +15,14 @@ import javax.persistence.Id;
 @Entity
 @JsonResource(
     path = "skyblock",
-    name = "mob_types"
+    name = "melody_songs"
 )
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class JsonMobType implements MobType, JsonModel {
+public class JsonMelodySong implements MelodySong, JsonModel {
 
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
-    private @NotNull String symbol = "";
-    private @NotNull ChatFormat format = ChatFormat.WHITE;
+    private @NotNull Difficulty difficulty = Difficulty.EASY;
+    private int intelligenceReward;
 
 }

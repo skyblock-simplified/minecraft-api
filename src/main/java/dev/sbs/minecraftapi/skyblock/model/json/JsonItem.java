@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data.json;
+package dev.sbs.minecraftapi.skyblock.model.json;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.builder.EqualsBuilder;
@@ -10,7 +10,7 @@ import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.Rarity;
-import dev.sbs.minecraftapi.skyblock.data.Item;
+import dev.sbs.minecraftapi.skyblock.model.Item;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

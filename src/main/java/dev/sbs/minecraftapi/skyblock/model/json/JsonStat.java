@@ -1,10 +1,10 @@
-package dev.sbs.minecraftapi.skyblock.data.json;
+package dev.sbs.minecraftapi.skyblock.model.json;
 
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
-import dev.sbs.minecraftapi.skyblock.data.Stat;
+import dev.sbs.minecraftapi.skyblock.model.Stat;
 import dev.sbs.minecraftapi.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;

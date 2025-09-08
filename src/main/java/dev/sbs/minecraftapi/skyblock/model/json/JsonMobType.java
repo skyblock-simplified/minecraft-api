@@ -1,8 +1,8 @@
-package dev.sbs.minecraftapi.skyblock.data.json;
+package dev.sbs.minecraftapi.skyblock.model.json;
 
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
-import dev.sbs.minecraftapi.skyblock.data.Essence;
+import dev.sbs.minecraftapi.skyblock.model.MobType;
 import dev.sbs.minecraftapi.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,13 +16,14 @@ import javax.persistence.Id;
 @Entity
 @JsonResource(
     path = "skyblock",
-    name = "essences"
+    name = "mob_types"
 )
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class JsonEssence implements Essence, JsonModel {
+public class JsonMobType implements MobType, JsonModel {
 
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
-    private @NotNull ChatFormat format = ChatFormat.LIGHT_PURPLE;
+    private @NotNull String symbol = "";
+    private @NotNull ChatFormat format = ChatFormat.WHITE;
 
 }

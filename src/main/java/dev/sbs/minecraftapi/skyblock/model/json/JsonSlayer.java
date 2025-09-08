@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data.json;
+package dev.sbs.minecraftapi.skyblock.model.json;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.builder.EqualsBuilder;
@@ -7,7 +7,7 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
-import dev.sbs.minecraftapi.skyblock.data.Slayer;
+import dev.sbs.minecraftapi.skyblock.model.Slayer;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

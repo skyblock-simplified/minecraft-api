@@ -1,9 +1,9 @@
-package dev.sbs.minecraftapi.skyblock.data.json;
+package dev.sbs.minecraftapi.skyblock.model.json;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
-import dev.sbs.minecraftapi.skyblock.data.TrophyFish;
+import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
 import dev.sbs.minecraftapi.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;

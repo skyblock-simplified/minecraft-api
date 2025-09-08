@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data;
+package dev.sbs.minecraftapi.skyblock.model;
 
 import dev.sbs.api.data.Model;
 import org.jetbrains.annotations.NotNull;
