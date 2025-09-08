@@ -14,20 +14,20 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public class SkillData {
 
-    private final @NotNull ConcurrentList<SkillProgress> skills;
+    private final @NotNull ConcurrentList<SkillEntry> skills;
 
     public SkillData(@NotNull ConcurrentMap<String, Double> skillExperience, @NotNull Member member) {
         this.skills = skillExperience.stream()
             .mapKey(id -> id.replace("SKILL_", ""))
-            .map((id, experience) -> new SkillProgress(id, experience, member))
+            .map((id, experience) -> new SkillEntry(id, experience, member))
             .collect(Concurrent.toUnmodifiableList());
     }
 
-    public @NotNull SkillProgress getSkill(@NotNull String id) {
+    public @NotNull SkillEntry getSkill(@NotNull String id) {
         return this.getSkills().matchFirstOrNull(skill -> skill.getId().equalsIgnoreCase(id));
     }
 
-    public @NotNull ConcurrentList<SkillProgress> getSkills(boolean includeCosmetic) {
+    public @NotNull ConcurrentList<SkillEntry> getSkills(boolean includeCosmetic) {
         return this.getSkills()
             .stream()
             .filter(skill -> includeCosmetic || !skill.getSkill().isCosmetic())
@@ -37,7 +37,7 @@ public class SkillData {
     public double getAverage() {
         return this.getSkills(false)
             .stream()
-            .mapToDouble(SkillProgress::getLevel)
+            .mapToDouble(SkillEntry::getLevel)
             .average()
             .orElse(0.0);
     }
@@ -45,19 +45,19 @@ public class SkillData {
     public double getExperience() {
         return this.getSkills(false)
             .stream()
-            .mapToDouble(SkillProgress::getExperience)
+            .mapToDouble(SkillEntry::getExperience)
             .sum();
     }
 
     public double getProgressPercentage() {
         return this.getSkills(false)
             .stream()
-            .mapToDouble(SkillProgress::getTotalProgressPercentage)
+            .mapToDouble(SkillEntry::getTotalProgressPercentage)
             .average()
             .orElse(0.0);
     }
 
-    public @NotNull ConcurrentMap<SkillProgress, Weight> getWeight() {
+    public @NotNull ConcurrentMap<SkillEntry, Weight> getWeight() {
         return this.getSkills(false)
             .stream()
             .map(skill -> Pair.of(skill, skill.getWeight()))

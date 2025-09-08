@@ -42,14 +42,15 @@ public class DungeonData implements PostInit {
 
     // PostInit
 
-    private transient @NotNull ConcurrentMap<Dungeon.Type, Dungeon> dungeons = Concurrent.newMap();
+    private transient @NotNull ConcurrentMap<DungeonEntry.Type, DungeonEntry> dungeons = Concurrent.newMap();
     private transient @NotNull ConcurrentMap<DungeonClass.Type, DungeonClass> classes = Concurrent.newMap();
 
     @Override
     public void postInit() {
         this.dungeonMap.stream()
             .filter(entry -> !entry.getKey().startsWith("MASTER_"))
-            .forEach((key, value) -> this.dungeons.put(Dungeon.Type.of(key), new Dungeon(
+            .forEach((key, value) -> this.dungeons.put(
+                DungeonEntry.Type.of(key), new DungeonEntry(
                 value.getExperience(), value,
                 this.dungeonMap.getOrDefault(String.format("MASTER_%s", key), new FloorData())
             )));
@@ -71,7 +72,7 @@ public class DungeonData implements PostInit {
             .orElseThrow();
     }
 
-    public @NotNull Dungeon getDungeon(@NotNull Dungeon.Type dungeonType) {
+    public @NotNull DungeonEntry getDungeon(@NotNull DungeonEntry.Type dungeonType) {
         return this.getDungeons()
             .stream()
             .filterKey(type -> type == dungeonType)
@@ -80,7 +81,7 @@ public class DungeonData implements PostInit {
             .orElseThrow();
     }
 
-    public @NotNull ConcurrentMap<Dungeon, Weight> getWeight() {
+    public @NotNull ConcurrentMap<DungeonEntry, Weight> getWeight() {
         return this.getDungeons()
             .stream()
             .map((type, dungeon) -> Pair.of(
@@ -154,7 +155,7 @@ public class DungeonData implements PostInit {
             @SerializedName("completion_ts")
             private SkyBlockDate.RealTime completionTime;
             @SerializedName("dungeon_type")
-            private @NotNull Dungeon.Type dungeonType = Dungeon.Type.UNKNOWN;
+            private @NotNull DungeonEntry.Type dungeonType = DungeonEntry.Type.UNKNOWN;
             @SerializedName("dungeon_tier")
             private int tier;
             private @NotNull ConcurrentList<Participant> participants = Concurrent.newList();

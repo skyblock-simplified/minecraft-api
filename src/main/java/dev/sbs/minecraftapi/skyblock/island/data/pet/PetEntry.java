@@ -19,7 +19,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pet implements Experience {
+public class PetEntry implements Experience {
 
     @SerializedName("uuid")
     private UUID identifier;

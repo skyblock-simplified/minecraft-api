@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 
 @Getter
-public class SlayerProgress implements Experience, Weighted {
+public class SlayerEntry implements Experience, Weighted {
 
     private final @NotNull String id;
     private final double experience;
@@ -24,7 +24,7 @@ public class SlayerProgress implements Experience, Weighted {
     private final @NotNull ConcurrentMap<Integer, Integer> kills;
     private final @NotNull ConcurrentMap<Integer, Integer> attempts;
 
-    SlayerProgress(@NotNull String id, @NotNull BossData bossData) {
+    SlayerEntry(@NotNull String id, @NotNull BossData bossData) {
         this.id = id;
         this.experience = Math.max(bossData.getExperience(), 0);
         this.claimed = bossData.getClaimed();

@@ -16,29 +16,29 @@ import java.util.Optional;
 @Getter
 public class SlayerData implements PostInit {
 
-    private final static @NotNull SlayerProgress UNKNOWN = new SlayerProgress("UNKNOWN", new BossData());
+    private final static @NotNull SlayerEntry UNKNOWN = new SlayerEntry("UNKNOWN", new BossData());
     @SerializedName("slayer_quest")
-    private final @NotNull Optional<SlayerProgress.Quest> activeQuest = Optional.empty();
+    private final @NotNull Optional<SlayerEntry.Quest> activeQuest = Optional.empty();
     @Getter(AccessLevel.NONE)
     @SerializedName("slayer_bosses")
     private @NotNull ConcurrentMap<String, BossData> slayerBosses = Concurrent.newMap();
-    private transient ConcurrentList<SlayerProgress> slayers = Concurrent.newList();
+    private transient ConcurrentList<SlayerEntry> slayers = Concurrent.newList();
 
     @Override
     public void postInit() {
         this.slayers = this.slayerBosses.stream()
-            .map(SlayerProgress::new)
+            .map(SlayerEntry::new)
             .collect(Concurrent.toUnmodifiableList());
     }
 
-    public @NotNull SlayerProgress getSlayer(@NotNull String id) {
+    public @NotNull SlayerEntry getSlayer(@NotNull String id) {
         return this.getSlayers().matchFirst(skill -> skill.getId().equalsIgnoreCase(id)).orElse(UNKNOWN);
     }
 
     public double getAverage() {
         return this.getSlayers()
             .stream()
-            .mapToDouble(SlayerProgress::getLevel)
+            .mapToDouble(SlayerEntry::getLevel)
             .average()
             .orElse(0.0);
     }
@@ -46,19 +46,19 @@ public class SlayerData implements PostInit {
     public double getExperience() {
         return this.getSlayers()
             .stream()
-            .mapToDouble(SlayerProgress::getExperience)
+            .mapToDouble(SlayerEntry::getExperience)
             .sum();
     }
 
     public double getProgressPercentage() {
         return this.getSlayers()
             .stream()
-            .mapToDouble(SlayerProgress::getTotalProgressPercentage)
+            .mapToDouble(SlayerEntry::getTotalProgressPercentage)
             .average()
             .orElse(0.0);
     }
 
-    public @NotNull ConcurrentMap<SlayerProgress, Weight> getWeight() {
+    public @NotNull ConcurrentMap<SlayerEntry, Weight> getWeight() {
         return this.getSlayers()
             .stream()
             .map(slayer -> Pair.of(slayer, slayer.getWeight()))
