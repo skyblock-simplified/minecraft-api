@@ -38,12 +38,13 @@ public class JsonItem implements Item, JsonModel {
     private @NotNull String displayName = "";
     @SerializedName("tier")
     private @NotNull Rarity rarity = Rarity.COMMON;
+    @SerializedName("category")
+    private @NotNull String categoryId = "OTHER";
     @SerializedName("soulbound")
     private @NotNull Soulbound soulboundStatus = Soulbound.NONE;
 
     // Possible Data
     private @NotNull Optional<Integer> durability = Optional.empty();
-    private @NotNull Optional<String> category = Optional.empty();
     private @NotNull Optional<String> description = Optional.empty();
     private @NotNull Optional<Color> color = Optional.empty();
     private @NotNull Optional<String> origin = Optional.empty();

@@ -5,6 +5,7 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.Model;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.GameStage;
 import dev.sbs.minecraftapi.skyblock.Rarity;
@@ -29,6 +30,16 @@ public interface Item extends Model {
 
     @NotNull Rarity getRarity();
 
+    @NotNull String getCategoryId();
+
+    default @NotNull ItemCategory getCategory() {
+        return MinecraftApi.getRepositoryOf(ItemCategory.class)
+            .findFirst(ItemCategory::getId, this.getCategoryId())
+            .orElse(MinecraftApi.getRepositoryOf(ItemCategory.class)
+                .findFirstOrNull(ItemCategory::getId, "OTHER")
+            );
+    }
+
     @NotNull Soulbound getSoulboundStatus();
 
     default @NotNull String getMinecraftId() {
@@ -40,8 +51,6 @@ public interface Item extends Model {
     // Possible Data
 
     @NotNull Optional<Integer> getDurability();
-
-    @NotNull Optional<String> getCategory();
 
     @NotNull Optional<String> getDescription();
 
@@ -208,6 +217,18 @@ public interface Item extends Model {
         NONE,
         SOLO,
         COOP;
+
+    }
+
+    enum Type {
+
+        ARMOR,
+        COLLECTIBLE,
+        CONSUMABLE,
+        EQUIPMENT,
+        OTHER,
+        TOOL,
+        WEAPON
 
     }
 
