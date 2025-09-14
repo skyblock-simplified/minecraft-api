@@ -216,7 +216,7 @@ public interface Item extends Model {
 
         NONE,
         SOLO,
-        COOP;
+        COOP
 
     }
 
