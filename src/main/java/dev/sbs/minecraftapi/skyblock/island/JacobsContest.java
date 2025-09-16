@@ -53,8 +53,7 @@ public class JacobsContest {
                     contest.collectionName = collectionName;
                     return contest;
                 })
-                .collect(Concurrent.toList())
-                .toUnmodifiableList();
+                .collect(Concurrent.toUnmodifiableList());
         }
 
         return this.contestList;
