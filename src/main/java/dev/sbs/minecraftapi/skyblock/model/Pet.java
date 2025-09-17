@@ -7,8 +7,6 @@ import dev.sbs.api.data.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.Rarity;
 import dev.sbs.minecraftapi.text.ChatFormat;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -97,7 +95,7 @@ public interface Pet extends Model {
 
         int getPrecision();
 
-        @NotNull Type getType();
+        @NotNull Stat.Type getType();
 
         default @NotNull ChatFormat getFormat() {
             return this.getStat()
@@ -112,32 +110,6 @@ public interface Pet extends Model {
             double getBase();
 
             double getScalar();
-
-        }
-
-        @Getter
-        @RequiredArgsConstructor
-        enum Type {
-
-            NONE("", ""),
-            FLAT("+", ""),
-            MULTIPLY("", "x"),
-            PERCENT("", "%"),
-            PLUS_MULTIPLY("+", "x"),
-            PLUS_PERCENT("+", "%"),
-            SECONDS("", "s");
-
-            private final @NotNull String prefix;
-            private final @NotNull String suffix;
-
-            public @NotNull String format(int level, @NotNull Value value) {
-                return String.format(
-                    "%s%s%s",
-                    this.getPrefix(),
-                    value.getBase() + (level * value.getScalar()),
-                    this.getSuffix()
-                );
-            }
 
         }
 
