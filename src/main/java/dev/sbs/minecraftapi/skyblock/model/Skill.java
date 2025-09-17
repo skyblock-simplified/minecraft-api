@@ -65,7 +65,7 @@ public interface Skill extends Model {
                     stat.getId(),
                     this.getUnlocks()
                         .indexedStream()
-                        .map((line, index, size) -> {
+                        .mapToObj((line, index, size) -> {
                             String value = "0.0";
 
                             if (line.startsWith("+") && line.endsWith(stat.getName())) // Flat
