@@ -27,7 +27,7 @@ public class SlayerProfile implements PostInit {
     @Override
     public void postInit() {
         this.slayers = this.slayerBosses.stream()
-            .map(SlayerEntry::new)
+            .mapToObj(SlayerEntry::new)
             .collect(Concurrent.toUnmodifiableList());
     }
 

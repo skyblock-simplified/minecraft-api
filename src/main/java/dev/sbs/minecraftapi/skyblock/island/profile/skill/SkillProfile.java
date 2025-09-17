@@ -19,7 +19,7 @@ public class SkillProfile {
     public SkillProfile(@NotNull ConcurrentMap<String, Double> skillExperience, @NotNull Member member) {
         this.skills = skillExperience.stream()
             .mapKey(id -> id.replace("SKILL_", ""))
-            .map((id, experience) -> new SkillEntry(id, experience, member))
+            .mapToObj((id, experience) -> new SkillEntry(id, experience, member))
             .collect(Concurrent.toUnmodifiableList());
     }
 
