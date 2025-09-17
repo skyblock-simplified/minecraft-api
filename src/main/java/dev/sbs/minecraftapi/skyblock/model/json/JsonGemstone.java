@@ -1,6 +1,8 @@
 package dev.sbs.minecraftapi.skyblock.model.json;
 
 import com.google.gson.annotations.SerializedName;
+import dev.sbs.api.builder.EqualsBuilder;
+import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.json.JsonModel;
@@ -31,5 +33,33 @@ public class JsonGemstone implements Gemstone, JsonModel {
     @SerializedName("stat")
     private @NotNull String statId = "";
     private @NotNull ConcurrentMap<Type, ConcurrentMap<ChatFormat, Double>> values = Concurrent.newMap();
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JsonGemstone that = (JsonGemstone) o;
+
+        return new EqualsBuilder()
+            .append(this.getId(), that.getId())
+            .append(this.getName(), that.getName())
+            .append(this.getSymbol(), that.getSymbol())
+            .append(this.getFormat(), that.getFormat())
+            .append(this.getStatId(), that.getStatId())
+            .append(this.getValues(), that.getValues())
+            .build();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.getId())
+            .append(this.getName())
+            .append(this.getSymbol())
+            .append(this.getFormat())
+            .append(this.getStatId())
+            .append(this.getValues())
+            .build();
+    }
 
 }

@@ -1,5 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model.json;
 
+import dev.sbs.api.builder.EqualsBuilder;
+import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.MelodySong;
@@ -24,5 +26,29 @@ public class JsonMelodySong implements MelodySong, JsonModel {
     private @NotNull String name = "";
     private @NotNull Difficulty difficulty = Difficulty.EASY;
     private int intelligenceReward;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JsonMelodySong that = (JsonMelodySong) o;
+
+        return new EqualsBuilder()
+            .append(this.getIntelligenceReward(), that.getIntelligenceReward())
+            .append(this.getId(), that.getId())
+            .append(this.getName(), that.getName())
+            .append(this.getDifficulty(), that.getDifficulty())
+            .build();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.getId())
+            .append(this.getName())
+            .append(this.getDifficulty())
+            .append(this.getIntelligenceReward())
+            .build();
+    }
 
 }

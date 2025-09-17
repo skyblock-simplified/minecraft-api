@@ -40,14 +40,18 @@ public class JsonSlayer implements Slayer, JsonModel {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
-        JsonSlayer jsonSkill = (JsonSlayer) o;
+        JsonSlayer that = (JsonSlayer) o;
 
         return new EqualsBuilder()
-            .append(this.getMaxLevel(), jsonSkill.getMaxLevel())
-            .append(this.getId(), jsonSkill.getId())
-            .append(this.getName(), jsonSkill.getName())
-            .append(this.getDescription(), jsonSkill.getDescription())
-            .append(this.getLevels(), jsonSkill.getLevels())
+            .append(this.getMaxLevel(), that.getMaxLevel())
+            .append(this.getMaxTier(), that.getMaxTier())
+            .append(this.getWeightModifier(), that.getWeightModifier())
+            .append(this.getWeightDivider(), that.getWeightDivider())
+            .append(this.getId(), that.getId())
+            .append(this.getName(), that.getName())
+            .append(this.getDescription(), that.getDescription())
+            .append(this.getMobTypeId(), that.getMobTypeId())
+            .append(this.getLevels(), that.getLevels())
             .build();
     }
 
@@ -58,6 +62,10 @@ public class JsonSlayer implements Slayer, JsonModel {
             .append(this.getName())
             .append(this.getDescription())
             .append(this.getMaxLevel())
+            .append(this.getMaxTier())
+            .append(this.getMobTypeId())
+            .append(this.getWeightModifier())
+            .append(this.getWeightDivider())
             .append(this.getLevels())
             .build();
     }

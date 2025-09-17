@@ -1,5 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model.json;
 
+import dev.sbs.api.builder.EqualsBuilder;
+import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.MobType;
@@ -25,5 +27,29 @@ public class JsonMobType implements MobType, JsonModel {
     private @NotNull String name = "";
     private @NotNull String symbol = "";
     private @NotNull ChatFormat format = ChatFormat.WHITE;
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JsonMobType that = (JsonMobType) o;
+
+        return new EqualsBuilder()
+            .append(this.getId(), that.getId())
+            .append(this.getName(), that.getName())
+            .append(this.getSymbol(), that.getSymbol())
+            .append(this.getFormat(), that.getFormat())
+            .build();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.getId())
+            .append(this.getName())
+            .append(this.getSymbol())
+            .append(this.getFormat())
+            .build();
+    }
 
 }

@@ -41,6 +41,9 @@ public class JsonSkill implements Skill, JsonModel {
 
         return new EqualsBuilder()
             .append(this.getMaxLevel(), jsonSkill.getMaxLevel())
+            .append(this.isCosmetic(), jsonSkill.isCosmetic())
+            .append(this.getWeightExponent(), jsonSkill.getWeightExponent())
+            .append(this.getWeightDivider(), jsonSkill.getWeightDivider())
             .append(this.getId(), jsonSkill.getId())
             .append(this.getName(), jsonSkill.getName())
             .append(this.getDescription(), jsonSkill.getDescription())
@@ -55,6 +58,9 @@ public class JsonSkill implements Skill, JsonModel {
             .append(this.getName())
             .append(this.getDescription())
             .append(this.getMaxLevel())
+            .append(this.isCosmetic())
+            .append(this.getWeightExponent())
+            .append(this.getWeightDivider())
             .append(this.getLevels())
             .build();
     }

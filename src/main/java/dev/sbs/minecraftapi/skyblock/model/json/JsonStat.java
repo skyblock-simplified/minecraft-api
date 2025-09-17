@@ -43,6 +43,7 @@ public class JsonStat implements Stat, JsonModel {
         return new EqualsBuilder()
             .append(this.getBase(), jsonStat.getBase())
             .append(this.getCap(), jsonStat.getCap())
+            .append(this.getAccessoryEnrichment(), jsonStat.getAccessoryEnrichment())
             .append(this.getTuningMultiplier(), jsonStat.getTuningMultiplier())
             .append(this.isVisible(), jsonStat.isVisible())
             .append(this.getId(), jsonStat.getId())
@@ -63,6 +64,7 @@ public class JsonStat implements Stat, JsonModel {
             .append(this.getCategory())
             .append(this.getBase())
             .append(this.getCap())
+            .append(this.getAccessoryEnrichment())
             .append(this.getTuningMultiplier())
             .append(this.isVisible())
             .build();
