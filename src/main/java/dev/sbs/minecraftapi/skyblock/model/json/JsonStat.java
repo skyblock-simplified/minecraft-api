@@ -28,9 +28,10 @@ public class JsonStat implements Stat, JsonModel {
     private @NotNull String symbol = "";
     private @NotNull ChatFormat format = ChatFormat.WHITE;
     private @NotNull String category = "";
-    private double base;
-    private double cap;
-    private double tuningMultiplier;
+    private double base = 0.0;
+    private double cap = 0.0;
+    private double accessoryEnrichment = 0.0;
+    private double tuningMultiplier = 0.0;
     private boolean visible;
 
     @Override

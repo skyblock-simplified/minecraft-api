@@ -22,6 +22,8 @@ public interface Stat extends Model {
 
     double getCap();
 
+    double getAccessoryEnrichment();
+
     double getTuningMultiplier();
 
     boolean isVisible();
