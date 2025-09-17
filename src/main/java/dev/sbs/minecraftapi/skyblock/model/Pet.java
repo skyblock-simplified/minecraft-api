@@ -4,6 +4,7 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.Model;
+import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.Rarity;
 import dev.sbs.minecraftapi.text.ChatFormat;
@@ -97,11 +98,7 @@ public interface Pet extends Model {
 
         @NotNull Stat.Type getType();
 
-        default @NotNull ChatFormat getFormat() {
-            return this.getStat()
-                .map(Stat::getFormat)
-                .orElse(ChatFormat.GREEN);
-        }
+        @NotNull ChatFormat getFormat();
 
         @NotNull ConcurrentMap<Rarity, Value> getValues();
 
@@ -120,7 +117,11 @@ public interface Pet extends Model {
         PET,
         MOUNT,
         MORPH,
-        GABAGOOL
+        GABAGOOL;
+
+        public @NotNull String getName() {
+            return StringUtil.capitalizeFully(this.name().replace("_", " "));
+        }
 
     }
 
