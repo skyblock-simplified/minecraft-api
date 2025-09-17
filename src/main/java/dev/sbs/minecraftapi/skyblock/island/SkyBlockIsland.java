@@ -31,9 +31,9 @@ public class SkyBlockIsland {
     private @NotNull Optional<CommunityUpgrades> communityUpgrades = Optional.empty();
     private @NotNull Optional<Banking> banking = Optional.empty();
     @SerializedName("game_mode")
-    private @NotNull Optional<GameMode> gameMode = Optional.of(GameMode.NORMAL);
+    private @NotNull GameMode gameMode = GameMode.NORMAL;
     @SerializedName("cute_name")
-    private @NotNull Optional<Profile> profile = Optional.empty();
+    private @NotNull Profile profile;
     private boolean selected;
     private @NotNull ConcurrentLinkedMap<UUID, Member> members = Concurrent.newLinkedMap();
 
