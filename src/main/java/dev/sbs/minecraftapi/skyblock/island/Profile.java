@@ -1,10 +1,16 @@
 package dev.sbs.minecraftapi.skyblock.island;
 
 import com.google.gson.annotations.SerializedName;
+import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.api.stream.StreamUtil;
+import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.api.util.StringUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 @Getter
 @RequiredArgsConstructor
@@ -51,8 +57,18 @@ public enum Profile {
     private final @NotNull String symbol;
     private final boolean usedForFruitBowl;
 
+    public static @NotNull ConcurrentMap<String, Object> CHOICES = StreamUtil.ofArrays(values())
+        .map(profile -> Pair.of(profile.name(), profile.getName()))
+        .collect(Concurrent.toWeakUnmodifiableMap());
+
     public @NotNull String getName() {
         return StringUtil.capitalizeFully(this.name().replace("_", " "));
+    }
+
+    public static @NotNull Optional<Profile> of(@NotNull String name) {
+        return StreamUtil.ofArrays(values())
+            .filter(profile -> profile.name().equalsIgnoreCase(name))
+            .findFirst();
     }
 
 }
