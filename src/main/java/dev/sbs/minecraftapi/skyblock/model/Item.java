@@ -94,11 +94,11 @@ public interface Item extends Model {
         return !this.isMuseumable();
     }
 
-    boolean isAttributable();
+    /*boolean isAttributable();
 
     default boolean notAttributable() {
         return !this.isAttributable();
-    }
+    }*/
 
     boolean isSalvageableFromRecipe();
 

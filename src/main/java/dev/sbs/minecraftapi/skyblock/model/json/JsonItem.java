@@ -67,8 +67,8 @@ public class JsonItem implements Item, JsonModel {
     private boolean unstackable;
     @SerializedName("museum")
     private boolean museumable;
-    @SerializedName("can_have_attributes")
-    private boolean attributable;
+    //@SerializedName("can_have_attributes")
+    //private boolean attributable;
     @SerializedName("salvageable_from_recipe")
     private boolean salvageableFromRecipe;
     @SerializedName("cannot_reforge")
@@ -124,7 +124,7 @@ public class JsonItem implements Item, JsonModel {
             .append(this.isGlowing(), jsonItem.isGlowing())
             .append(this.isUnstackable(), jsonItem.isUnstackable())
             .append(this.isMuseumable(), jsonItem.isMuseumable())
-            .append(this.isAttributable(), jsonItem.isAttributable())
+            //.append(this.isAttributable(), jsonItem.isAttributable())
             .append(this.isSalvageableFromRecipe(), jsonItem.isSalvageableFromRecipe())
             .append(this.isNotReforgeable(), jsonItem.isNotReforgeable())
             .append(this.getGearScore(), jsonItem.getGearScore())
@@ -188,7 +188,7 @@ public class JsonItem implements Item, JsonModel {
             .append(this.isGlowing())
             .append(this.isUnstackable())
             .append(this.isMuseumable())
-            .append(this.isAttributable())
+            //.append(this.isAttributable())
             .append(this.isSalvageableFromRecipe())
             .append(this.isNotReforgeable())
             .append(this.getGearScore())
