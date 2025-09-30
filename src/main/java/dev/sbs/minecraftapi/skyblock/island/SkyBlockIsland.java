@@ -4,12 +4,14 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.linked.ConcurrentLinkedMap;
-import dev.sbs.minecraftapi.skyblock.island.account.Banking;
-import dev.sbs.minecraftapi.skyblock.island.account.CommunityUpgrades;
+import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.skyblock.profile_stats.ProfileStats;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
@@ -35,7 +37,7 @@ public class SkyBlockIsland {
     @SerializedName("cute_name")
     private @NotNull Profile profile;
     private boolean selected;
-    private @NotNull ConcurrentLinkedMap<UUID, Member> members = Concurrent.newLinkedMap();
+    private @NotNull ConcurrentLinkedMap<UUID, SkyBlockMember> members = Concurrent.newLinkedMap();
 
     public boolean hasMember(@NotNull UUID uniqueId) {
         return this.getMembers().containsKey(uniqueId);
@@ -73,11 +75,11 @@ public class SkyBlockIsland {
             .sorted(Comparator.naturalOrder());
     }
 
-    public @NotNull ProfileStats getProfileStats(@NotNull Member member) {
+    public @NotNull ProfileStats getProfileStats(@NotNull SkyBlockMember member) {
         return this.getProfileStats(member, true);
     }
 
-    public @NotNull ProfileStats getProfileStats(@NotNull Member member, boolean calculateBonus) {
+    public @NotNull ProfileStats getProfileStats(@NotNull SkyBlockMember member, boolean calculateBonus) {
         return new ProfileStats(this, member, calculateBonus);
     }
 
@@ -94,6 +96,123 @@ public class SkyBlockIsland {
             )
             .map(Long::intValue)
             .orElse(0);
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Banking {
+
+        private double balance;
+        private @NotNull ConcurrentList<Transaction> transactions = Concurrent.newList();
+
+        @Getter
+        public static class Transaction {
+
+            private double amount;
+            private SkyBlockDate.RealTime timestamp;
+            private Transaction.Action action;
+            @Getter(AccessLevel.NONE)
+            @SerializedName("initiator_name")
+            private String initiatorName;
+
+            public String getInitiatorName() {
+                return this.initiatorName.replace("Â", ""); // API Artifact
+            }
+
+            public enum Action {
+
+                WITHDRAW,
+                DEPOSIT
+
+            }
+
+        }
+
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class CommunityUpgrades {
+
+        @SerializedName("currently_upgrading")
+        private @NotNull Optional<CommunityUpgrades.Upgrading> currentlyUpgrading = Optional.empty();
+        @SerializedName("upgrade_states")
+        private @NotNull ConcurrentList<CommunityUpgrades.Upgraded> upgraded = Concurrent.newList();
+
+        public int getHighestTier(@NotNull CommunityUpgrades.Type type) {
+            return this.getUpgraded()
+                .stream()
+                .filter(upgraded -> upgraded.getUpgrade().name().equalsIgnoreCase(type.name()))
+                .sorted((o1, o2) -> Comparator.comparing(CommunityUpgrades.Upgraded::getTier).compare(o2, o1))
+                .map(CommunityUpgrades.Upgraded::getTier)
+                .findFirst()
+                .orElse(0);
+        }
+
+        public @NotNull ConcurrentList<CommunityUpgrades.Upgraded> getUpgrades(@NotNull CommunityUpgrades.Type type) {
+            return this.getUpgraded()
+                .stream()
+                .filter(upgraded -> upgraded.getUpgrade().name().equalsIgnoreCase(type.name()))
+                .sorted((o1, o2) -> Comparator.comparing(CommunityUpgrades.Upgraded::getTier).compare(o1, o2))
+                .collect(Concurrent.toList());
+        }
+
+        @Getter
+        public static class Upgraded {
+
+            @SerializedName("upgrade")
+            private CommunityUpgrades.Type upgrade;
+            private int tier;
+            @SerializedName("started_ms")
+            private SkyBlockDate.RealTime started;
+            @SerializedName("started_by")
+            private String startedBy;
+            @SerializedName("claimed_ms")
+            private SkyBlockDate.RealTime claimed;
+            @SerializedName("claimed_by")
+            private String claimedBy;
+            @SerializedName("fasttracked")
+            private boolean fastTracked;
+
+        }
+
+        @Getter
+        public static class Upgrading {
+
+            @SerializedName("upgrade")
+            private CommunityUpgrades.Type upgrade;
+            @SerializedName("new_tier")
+            private int newTier;
+            @SerializedName("start_ms")
+            private SkyBlockDate.RealTime started;
+            @SerializedName("who_started")
+            private String startedBy;
+
+        }
+
+        @Getter
+        @RequiredArgsConstructor
+        public enum Type {
+
+            @SerializedName("minion_slots")
+            MINION_SLOTS(5),
+            @SerializedName("coins_allowance")
+            COINS_ALLOWANCE(5),
+            @SerializedName("guests_count")
+            GUESTS_COUNT(5),
+            @SerializedName("island_size")
+            ISLAND_SIZE(10),
+            @SerializedName("coop_slots")
+            COOP_SLOTS(3);
+
+            private final int maxLevel;
+
+            public @NotNull String getName() {
+                return StringUtil.capitalizeFully(this.name().replace("_", " "));
+            }
+
+        }
+
     }
 
 }
