@@ -176,13 +176,14 @@ public interface Item extends Model {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     class Attributes {
 
-        private boolean glowing;
-        private boolean unstackable;
         private boolean sellable;
         private boolean tradable;
         private boolean auctionable;
         private boolean reforgeable;
         private boolean museumable;
+        private boolean glowing;
+        private boolean unstackable;
+        private boolean dungeonable = false;
         private boolean obtainable = true;
         private @NotNull Soulbound soulbound = Soulbound.NONE;
 
