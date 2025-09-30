@@ -173,6 +173,22 @@ public interface Item extends Model {
     @NotNull ConcurrentList<ConcurrentList<ConcurrentMap<String, Object>>> getUpgradeCosts();
 
     @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    class Attributes {
+
+        private boolean glowing;
+        private boolean unstackable;
+        private boolean sellable;
+        private boolean tradable;
+        private boolean auctionable;
+        private boolean reforgeable;
+        private boolean museumable;
+        private boolean obtainable = true;
+        private @NotNull Soulbound soulbound = Soulbound.NONE;
+
+    }
+
+    @Getter
     @NoArgsConstructor(access = AccessLevel.NONE)
     class MuseumData {
 
