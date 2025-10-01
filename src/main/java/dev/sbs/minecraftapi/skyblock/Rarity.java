@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 @Getter
 @RequiredArgsConstructor
@@ -40,14 +39,14 @@ public enum Rarity {
         return Arrays.stream(values())
             .filter(rarity -> rarity.name().equalsIgnoreCase(name))
             .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("No rarity with name " + name));
+            .orElseThrow(() -> new IllegalArgumentException("No rarity with name " + name));
     }
 
     public static @NotNull Rarity of(int ordinal) {
         return Arrays.stream(values())
             .filter(rarity -> rarity.ordinal() == ordinal)
             .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("No rarity with ordinal " + ordinal));
+            .orElseThrow(() -> new IllegalArgumentException("No rarity with ordinal " + ordinal));
     }
 
 }
