@@ -4,7 +4,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import dev.sbs.api.reflection.Reflection;
 import dev.sbs.minecraftapi.skyblock.NbtContent;
 
 import java.io.IOException;
@@ -23,8 +22,6 @@ public class NbtContentTypeAdapter extends TypeAdapter<NbtContent> {
 
     @Override
     public NbtContent read(JsonReader in) throws IOException {
-        Reflection<NbtContent> nbtContentReflection = Reflection.of(NbtContent.class);
-        NbtContent nbtContent = nbtContentReflection.newInstance();
         String data;
 
         if (in.peek() == JsonToken.BEGIN_OBJECT) { // Auctions are bad
@@ -34,8 +31,7 @@ public class NbtContentTypeAdapter extends TypeAdapter<NbtContent> {
         } else
             data = in.nextString();
 
-        nbtContentReflection.setValue(String.class, nbtContent, data);
-        return nbtContent;
+        return new NbtContent(0, data);
     }
 
 }
