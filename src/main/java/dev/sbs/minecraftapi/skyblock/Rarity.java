@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,8 +25,7 @@ public enum Rarity {
     VERY_SPECIAL(ChatFormat.RED, 5, true, false),
     ULTIMATE(ChatFormat.DARK_RED, 0, false, false),
     @SerializedName(alternate = { "UNOBTAINABLE" }, value = "ADMIN")
-    ADMIN(ChatFormat.DARK_RED, 0, false, false),
-    UNKNOWN(ChatFormat.GRAY, 0, false, false);
+    ADMIN(ChatFormat.DARK_RED, 0, false, false);
 
     private final @NotNull ChatFormat format;
     private final int magicPower;
@@ -40,14 +40,14 @@ public enum Rarity {
         return Arrays.stream(values())
             .filter(rarity -> rarity.name().equalsIgnoreCase(name))
             .findFirst()
-            .orElse(UNKNOWN);
+            .orElseThrow(() -> new NoSuchElementException("No rarity with name " + name));
     }
 
     public static @NotNull Rarity of(int ordinal) {
         return Arrays.stream(values())
             .filter(rarity -> rarity.ordinal() == ordinal)
             .findFirst()
-            .orElse(UNKNOWN);
+            .orElseThrow(() -> new NoSuchElementException("No rarity with ordinal " + ordinal));
     }
 
 }
