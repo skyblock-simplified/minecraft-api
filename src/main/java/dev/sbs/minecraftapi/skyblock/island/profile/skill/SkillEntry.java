@@ -3,7 +3,7 @@ package dev.sbs.minecraftapi.skyblock.island.profile.skill;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.island.Member;
+import dev.sbs.minecraftapi.skyblock.island.SkyBlockMember;
 import dev.sbs.minecraftapi.skyblock.model.Skill;
 import dev.sbs.minecraftapi.skyblock.type.Experience;
 import dev.sbs.minecraftapi.skyblock.type.Weight;
@@ -18,13 +18,13 @@ public class SkillEntry implements Experience, Weighted {
     private final double experience;
     private final int levelSubtractor;
 
-    public SkillEntry(@NotNull String id, double experience, @NotNull Member member) {
+    public SkillEntry(@NotNull String id, double experience, @NotNull SkyBlockMember member) {
         this.id = id;
         this.experience = Math.max(experience, 0);
         this.levelSubtractor = this.calcLevelSubtractor(member);
     }
 
-    private int calcLevelSubtractor(@NotNull Member member) {
+    private int calcLevelSubtractor(@NotNull SkyBlockMember member) {
         return switch (this.getId()) {
             case "FARMING" -> 10 - member.getJacobsContest().getFarmingLevelCap();
             case "FORAGING" -> {

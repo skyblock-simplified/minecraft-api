@@ -9,19 +9,24 @@ import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
 import dev.sbs.api.mutable.MutableDouble;
 import dev.sbs.api.stream.pair.Pair;
+import dev.sbs.api.stream.pair.PairOptional;
 import dev.sbs.api.util.NumberUtil;
+import dev.sbs.api.util.Range;
+import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.island.crimson_isle.CrimsonIsle;
-import dev.sbs.minecraftapi.skyblock.island.crimson_isle.TrophyFishing;
 import dev.sbs.minecraftapi.skyblock.island.mining.ForgeItem;
 import dev.sbs.minecraftapi.skyblock.island.mining.GlaciteTunnels;
 import dev.sbs.minecraftapi.skyblock.island.mining.Mining;
 import dev.sbs.minecraftapi.skyblock.island.profile.PlayerData;
 import dev.sbs.minecraftapi.skyblock.island.profile.dungeon.DungeonProfile;
+import dev.sbs.minecraftapi.skyblock.island.profile.pet.PetEntry;
 import dev.sbs.minecraftapi.skyblock.island.profile.pet.PetProfile;
 import dev.sbs.minecraftapi.skyblock.island.profile.skill.SkillProfile;
+import dev.sbs.minecraftapi.skyblock.island.profile.slayer.SlayerEntry;
 import dev.sbs.minecraftapi.skyblock.island.profile.slayer.SlayerProfile;
+import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
 import dev.sbs.minecraftapi.skyblock.type.Weight;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,7 +35,10 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
@@ -159,6 +167,73 @@ public class SkyBlockMember implements PostInit {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class AccessoryBag {
+
+        private @NotNull Tuning tuning = new Tuning();
+        @SerializedName("selected_power")
+        private @NotNull Optional<String> selectedPower = Optional.empty();
+        @SerializedName("bag_upgrades_purchased")
+        private int bagUpgradesPurchased;
+        @SerializedName("unlocked_powers")
+        private @NotNull ConcurrentList<String> unlockedPowers = Concurrent.newList();
+        @SerializedName("highest_magical_power")
+        private int highestMagicalPower;
+        private transient NbtContent contents = new NbtContent();
+        @Accessors(fluent = true)
+        private transient boolean hasConsumedPrism;
+        private transient int abiphoneContacts;
+
+        private transient int magicalPower;
+        private transient int tuningPoints;
+        private transient double magicalPowerMultiplier;
+
+        protected void initialize(@NotNull SkyBlockMember member) {
+            this.contents = member.getInventory().getBags().getAccessories();
+            this.hasConsumedPrism = member.getRift().getAccess().hasConsumedPrism();
+            this.abiphoneContacts = member.getCrimsonIsle().getAbiphone().getContacts().size();
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Tuning implements PostInit {
+
+            @SerializedName("highest_unlocked_slot")
+            private int highestUnlockedSlot;
+            @SerializedName("refund_1")
+            @Accessors(fluent = true)
+            private boolean hasClaimedRefund;
+
+            // Slots
+            @SerializedName("slot_0")
+            private @NotNull ConcurrentMap<String, Integer> current = Concurrent.newMap();
+            @Getter(AccessLevel.NONE)
+            private @NotNull ConcurrentMap<String, Integer> slot_1 = Concurrent.newMap();
+            @Getter(AccessLevel.NONE)
+            private @NotNull ConcurrentMap<String, Integer> slot_2 = Concurrent.newMap();
+            @Getter(AccessLevel.NONE)
+            private @NotNull ConcurrentMap<String, Integer> slot_3 = Concurrent.newMap();
+            @Getter(AccessLevel.NONE)
+            private @NotNull ConcurrentMap<String, Integer> slot_4 = Concurrent.newMap();
+
+            // PostInit
+            private @NotNull ConcurrentList<ConcurrentMap<String, Integer>> slots = Concurrent.newList();
+
+            @Override
+            public void postInit() {
+                this.slots = Concurrent.newUnmodifiableList(
+                    this.slot_1,
+                    this.slot_2,
+                    this.slot_3,
+                    this.slot_4
+                );
+            }
+
+        }
+
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class BagContents {
 
         @SerializedName("fishing_bag")
@@ -179,6 +254,270 @@ public class SkyBlockMember implements PostInit {
         private @NotNull ConcurrentMap<String, Integer> deaths = Concurrent.newMap();
         @SerializedPath("milestone.last_claimed_milestone")
         private int lastClaimedMilestone;
+
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class CrimsonIsle implements PostInit {
+
+        private @NotNull Abiphone abiphone = new Abiphone();
+        private @NotNull Matriarch matriarch = new Matriarch();
+        @SerializedName("last_minibosses_killed")
+        private @NotNull ConcurrentList<String> lastMinibossesKilled = Concurrent.newList();
+
+        // Factions
+        @SerializedName("selected_faction")
+        private @NotNull Faction selectedFaction = Faction.NONE;
+        @SerializedName("mages_reputation")
+        private int mageReputation;
+        @SerializedName("barbarians_reputation")
+        private int barbarianReputation;
+
+        // Kuudra
+        private transient @NotNull Kuudra kuudra = new Kuudra();
+        @Getter(AccessLevel.NONE)
+        private @NotNull ConcurrentMap<String, Integer> kuudra_completed_tiers = Concurrent.newMap();
+        @Getter(AccessLevel.NONE)
+        @SerializedPath("kuudra_party_finder.search_settings")
+        private Kuudra.SearchSettings kuudra_search_settings = new Kuudra.SearchSettings();
+        @Getter(AccessLevel.NONE)
+        @SerializedPath("kuudra_party_finder.group_builder")
+        private Kuudra.GroupBuilder kuudra_group_builder = new Kuudra.GroupBuilder();
+
+        // Dojo
+        private transient @NotNull Dojo dojo = new Dojo();
+        @Getter(AccessLevel.NONE)
+        @SerializedName("dojo")
+        private @NotNull ConcurrentMap<String, Integer> dojoMap = Concurrent.newMap();
+
+        @Override
+        public void postInit() {
+            this.dojo = new Dojo(this.dojoMap);
+            this.kuudra = new Kuudra(
+                this.kuudra_completed_tiers,
+                this.kuudra_search_settings,
+                this.kuudra_group_builder
+            );
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Abiphone {
+
+            @SerializedName("contact_data")
+            private @NotNull ConcurrentMap<String, Abiphone.Contact> contacts = Concurrent.newMap();
+            private @NotNull ConcurrentMap<String, Integer> games = Concurrent.newMap();
+            @SerializedName("active_contacts")
+            private @NotNull ConcurrentList<String> collectedContacts = Concurrent.newList();
+
+            @SerializedPath("operator_chip.repaired_index")
+            private int repairedOperatorRelays;
+            @SerializedName("trio_contact_addons")
+            private int trioContactAddons;
+            @SerializedName("selected_ringtone")
+            private String selectedRingtone;
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.NONE)
+            public static class Contact {
+
+                @SerializedName("talked_to")
+                private boolean talkedTo;
+                @SerializedName("completed_quest")
+                private boolean questCompleted;
+                @SerializedName("dnd_enabled")
+                private boolean doNotDisturb;
+                private @NotNull ConcurrentMap<String, Object> specific = Concurrent.newMap();
+
+                // Calls
+                @SerializedName("incoming_calls_count")
+                private int incomingCalls;
+                @SerializedName("last_call")
+                private @NotNull Optional<SkyBlockDate.RealTime> lastOutgoingCall = Optional.empty();
+                @SerializedName("last_call_incoming")
+                private @NotNull Optional<SkyBlockDate.RealTime> lastIncomingCall = Optional.empty();
+
+            }
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Matriarch {
+
+            @SerializedName("pearls_collected")
+            private int lastCollectedPearls;
+            @SerializedName("last_attempt")
+            private SkyBlockDate.RealTime lastAttempt;
+            @SerializedName("recent_refreshes")
+            private ConcurrentList<SkyBlockDate.RealTime> recentRefreshes = Concurrent.newList();
+
+        }
+
+        @Getter
+        public static class Dojo {
+
+            private final @NotNull ConcurrentMap<Dojo.Type, Integer> points;
+
+            private Dojo() {
+                this(Concurrent.newMap());
+            }
+
+            private Dojo(@NotNull ConcurrentMap<String, Integer> dojo) {
+                this.points = Concurrent.newUnmodifiableMap(
+                    dojo.stream()
+                        .filter(entry -> !entry.getKey().contains("time_"))
+                        .map(entry -> Pair.of(Dojo.Type.of(entry.getKey().replace("dojo_points_", "")), entry.getValue()))
+                        .collect(Concurrent.toMap())
+                );
+            }
+
+            public int getPoints(@NotNull Dojo.Type type) {
+                return this.getPoints().getOrDefault(type, 0);
+            }
+
+            @Getter
+            @RequiredArgsConstructor
+            public enum Type {
+
+                UNKNOWN(""),
+                FORCE("mob_kb"),
+                STAMINA("wall_jump"),
+                MASTERY("archer"),
+                DISCIPLINE("sword_swap"),
+                SWIFTNESS("snake"),
+                CONTROL("fireball"),
+                TENACITY("lock_head");
+
+                private final @NotNull String internalName;
+
+                public static @NotNull Dojo.Type of(@NotNull String name) {
+                    return Arrays.stream(values())
+                        .filter(type -> type.name().equalsIgnoreCase(name) || type.getInternalName().equalsIgnoreCase(name))
+                        .findFirst()
+                        .orElse(UNKNOWN);
+                }
+
+            }
+
+        }
+
+        @Getter
+        public static class Kuudra {
+
+            private final @NotNull ConcurrentMap<Kuudra.Tier, Integer> completedTiers;
+            private final @NotNull ConcurrentMap<Kuudra.Tier, Integer> highestWave;
+            private final @NotNull Kuudra.SearchSettings searchSettings;
+            private final @NotNull Kuudra.GroupBuilder groupBuilder;
+
+            private Kuudra() {
+                this(Concurrent.newMap(), null, null);
+            }
+
+            private Kuudra(@NotNull ConcurrentMap<String, Integer> kuudraCompletedTiers, @Nullable Kuudra.SearchSettings kuudraSearchSettings, @Nullable Kuudra.GroupBuilder kuudraGroupBuilder) {
+                this.searchSettings = (kuudraSearchSettings != null ? kuudraSearchSettings : new Kuudra.SearchSettings());
+                this.groupBuilder = (kuudraGroupBuilder != null ? kuudraGroupBuilder : new Kuudra.GroupBuilder());
+
+                this.completedTiers = kuudraCompletedTiers.stream()
+                    .filter(entry -> !entry.getKey().startsWith("highest_"))
+                    .map(entry -> Pair.of(Kuudra.Tier.of(entry.getKey()), entry.getValue()))
+                    .collect(Concurrent.toUnmodifiableMap());
+
+                this.highestWave = Concurrent.newUnmodifiableMap(
+                    kuudraCompletedTiers.stream()
+                        .filter(entry -> entry.getKey().startsWith("highest_"))
+                        .map(entry -> Pair.of(Kuudra.Tier.of(entry.getKey()), entry.getValue()))
+                        .collect(Concurrent.toUnmodifiableMap())
+                );
+            }
+
+            @Getter
+            @RequiredArgsConstructor
+            public enum Tier {
+
+                UNKNOWN,
+                BASIC("NONE"),
+                HOT,
+                BURNING,
+                FIERY,
+                INFERNAL;
+
+                private final @NotNull String internalName;
+
+                Tier() {
+                    this.internalName = name();
+                }
+
+                public @NotNull String getName() {
+                    return StringUtil.capitalizeFully(this.name());
+                }
+
+                public static @NotNull Kuudra.Tier of(@NotNull String name) {
+                    return Arrays.stream(values())
+                        .filter(tier -> tier.name().equalsIgnoreCase(name) || tier.getInternalName().equalsIgnoreCase(name))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException("No tier with name " + name));
+                }
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class SearchSettings {
+
+                private @NotNull Kuudra.Tier tier = Kuudra.Tier.BASIC;
+                private @NotNull Optional<String> search = Optional.empty();
+                private @NotNull Kuudra.SearchSettings.Sort sort = Kuudra.SearchSettings.Sort.RECENTLY_CREATED;
+                @Getter(AccessLevel.NONE)
+                private @NotNull Optional<String> combat_level = Optional.empty();
+
+                public @NotNull Range<Integer> getCombatLevel() {
+                    return this.combat_level.map(range -> StringUtil.split(range, "-"))
+                        .map(parts -> Range.between(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])))
+                        .orElse(Range.between(0, 60));
+                }
+
+                public enum Sort {
+
+                    RECENTLY_CREATED,
+                    HIGHEST_COMBAT_LEVEL,
+                    LARGEST_GROUP_SIZE
+
+                }
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class GroupBuilder {
+
+                private Kuudra.Tier tier = Kuudra.Tier.BASIC;
+                private Optional<String> note = Optional.empty();
+                @SerializedName("combat_level_required")
+                private int requiredCombatLevel;
+
+            }
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Quests {
+
+            // TODO
+
+        }
+
+        public enum Faction {
+
+            NONE,
+            @SerializedName("mages")
+            MAGE,
+            @SerializedName("barbarians")
+            BARBARIAN
+
+        }
 
     }
     
@@ -438,6 +777,427 @@ public class SkyBlockMember implements PostInit {
             @SerializedName("pelt_count")
             private int peltCount;
 
+        }
+
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Rift {
+
+        private Access access = new Access();
+        @SerializedName("slayer_quest")
+        private SlayerQuest slayerQuest = new SlayerQuest();
+
+        // Locations
+        @SerializedName("wizard_tower")
+        private WizardTower wizardTower = new WizardTower();
+        @SerializedName("wyld_woods")
+        private WyldWoods wyldWoods = new WyldWoods();
+        @SerializedName("black_lagoon")
+        private BlackLagoon blackLagoon = new BlackLagoon();
+        @SerializedName("west_village")
+        private WestVillage westVillage = new WestVillage();
+        private Dreadfarm dreadfarm = new Dreadfarm();
+        @SerializedName("village_plaza")
+        private VillagePlaza villagePlaza = new VillagePlaza();
+        @SerializedName("castle")
+        private StillgoreChateau stillgoreChateau = new StillgoreChateau();
+
+        // Special Locations
+        @SerializedName("enigma")
+        private EnigmasCrib enigmasCrib = new EnigmasCrib();
+        @SerializedName("wither_cage")
+        private Porhtal porhtal = new Porhtal();
+        @SerializedName("dead_cats")
+        private DeadCats deadCats = new DeadCats();
+        @SerializedName("gallery")
+        private TimecharmGallery timecharmGallery = new TimecharmGallery();
+        @SerializedName("lifetime_purchased_boundaries")
+        private @NotNull ConcurrentList<String> purchasedBoundaries = Concurrent.newList();
+
+        // Inventories
+        @SerializedPath("inventory.inv_contents")
+        private NbtContent inventory = new NbtContent();
+        @SerializedPath("inventory.inv_armor")
+        private NbtContent armor = new NbtContent();
+        @SerializedPath("inventory.ender_chest_contents")
+        private NbtContent enderChest = new NbtContent();
+        @SerializedPath("inventory.equipment_contents")
+        private NbtContent equipment = new NbtContent();
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Access {
+
+            @SerializedName("last_free")
+            private SkyBlockDate.RealTime lastFree;
+            @SerializedName("charge_track_timestamp")
+            private SkyBlockDate.RealTime chargeTrack;
+            @Accessors(fluent = true)
+            @SerializedName("consumed_prism")
+            private boolean hasConsumedPrism;
+            private Access.Pass pass = new Access.Pass();
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Pass {
+
+                @SerializedName("issued_at")
+                private SkyBlockDate.RealTime issuedAt;
+                @SerializedName("rift_server_joins")
+                private int serverJoins;
+                @Accessors(fluent = true)
+                @SerializedName("used_prism")
+                private boolean hasUsedPrism;
+
+            }
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class SlayerQuest extends SlayerEntry.Quest {
+
+            @SerializedName("combat_xp")
+            private int combatXP;
+            @SerializedName("recent_mob_kills")
+            private @NotNull ConcurrentList<SlayerQuest.MobKill> recentMobKills = Concurrent.newList();
+            @SerializedName("last_killed_mob_island")
+            private String lastKilledMobIsland;
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class MobKill {
+
+                private int xp;
+                private SkyBlockDate.RealTime timestamp;
+
+            }
+
+        }
+
+        // Locations
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class WizardTower {
+
+            @SerializedName("wizard_quest_step")
+            private int wizardQuestStep;
+            @SerializedName("crumbs_laid_out")
+            private int crumbsLaidOut;
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class WyldWoods {
+
+            @SerializedName("talked_threebrothers")
+            private @NotNull ConcurrentList<String> talkedThreebrothers = Concurrent.newList();
+            @SerializedName("bughunter_step")
+            private int bughunterStep;
+            @Accessors(fluent = true)
+            @SerializedName("sirius_started_q_a")
+            private boolean hasStartedSiriusQA;
+            @SerializedName("sirius_q_a_chain_done")
+            private boolean siriusQAChainDone;
+            @Accessors(fluent = true)
+            @SerializedName("sirius_completed_q_a")
+            private boolean hasCompletedSiriusQA;
+            @Accessors(fluent = true)
+            @SerializedName("sirius_claimed_doubloon")
+            private boolean hasClaimedSiriusDoubloon;
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class BlackLagoon {
+
+            @Accessors(fluent = true)
+            @SerializedName("talked_to_edwin")
+            private boolean hasTalkedToEdwin;
+            @Accessors(fluent = true)
+            @SerializedName("received_science_paper")
+            private boolean hasReceivedSciencePaper;
+            @Accessors(fluent = true)
+            @SerializedName("delivered_science_paper")
+            private boolean hasDeliveredSciencePaper;
+            @SerializedName("completed_step")
+            private int completedStep;
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class WestVillage {
+
+            @SerializedName("crazy_kloon")
+            private WestVillage.CrazyKloon crazyKloon = new WestVillage.CrazyKloon();
+            private WestVillage.Mirrorverse mirrorverse = new WestVillage.Mirrorverse();
+            @SerializedName("kat_house")
+            private WestVillage.KatHouse katHouse = new WestVillage.KatHouse();
+            private WestVillage.Glyphs glyphs = new WestVillage.Glyphs();
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class CrazyKloon {
+
+                @SerializedName("selected_colors")
+                private @NotNull ConcurrentMap<String, String> selectedColors = Concurrent.newMap();
+                @Accessors(fluent = true)
+                @SerializedName("talked")
+                private boolean hasTalked;
+                @SerializedName("hacked_terminals")
+                private @NotNull ConcurrentList<String> hackedTerminals = Concurrent.newList();
+                @SerializedName("quest_complete")
+                private boolean questComplete;
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Mirrorverse {
+
+                @SerializedName("visited_rooms")
+                private @NotNull ConcurrentList<String> visitedRooms = Concurrent.newList();
+                @SerializedName("upside_down_hard")
+                private boolean upsideDownHardCompleted;
+                @SerializedName("claimed_chest_items")
+                private @NotNull ConcurrentList<String> claimedChestItems = Concurrent.newList();
+                @SerializedName("claimed_reward")
+                private boolean claimedReward;
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class KatHouse {
+
+                @SerializedName("bin_collected_mosquito")
+                private int collectedMosquito;
+                @SerializedName("bin_collected_spider")
+                private int collectedSpider;
+                @SerializedName("bin_collected_silverfish")
+                private int collectedSilverfish;
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Glyphs {
+
+                @SerializedName("claimed_wand")
+                private boolean claimedWand;
+                @SerializedName("current_glyph_delivered")
+                private boolean currentGlyphDelivered;
+                @SerializedName("current_glyph_completed")
+                private boolean currentGlyphCompleted;
+                @SerializedName("current_glyph")
+                private int currentGlyph;
+                private boolean completed;
+                @SerializedName("claimed_bracelet")
+                private boolean claimedBracelet;
+
+            }
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Dreadfarm {
+
+            @SerializedName("shania_stage")
+            private int shaniaStage;
+            @SerializedName("caducous_feeder_uses")
+            private @NotNull ConcurrentList<Instant> caducousFeederUses = Concurrent.newList();
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class VillagePlaza {
+
+            @Accessors(fluent = true)
+            @SerializedName("got_scammed")
+            private boolean hasGotScammed;
+            private VillagePlaza.Murder murder = new VillagePlaza.Murder();
+            @SerializedName("barry_center")
+            private VillagePlaza.BarryCenter barryCenter = new VillagePlaza.BarryCenter();
+            private VillagePlaza.Cowboy cowboy = new VillagePlaza.Cowboy();
+            private VillagePlaza.Lonely lonely = new VillagePlaza.Lonely();
+            private VillagePlaza.Seraphine seraphine = new VillagePlaza.Seraphine();
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Murder {
+
+                @SerializedName("step_index")
+                private int stepIndex;
+                @SerializedName("room_clues")
+                private @NotNull ConcurrentList<String> roomClues = Concurrent.newList();
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class BarryCenter {
+
+                @SerializedName("first_talk_to_barry")
+                private boolean firstTalkToBarry;
+                @SerializedName("received_reward")
+                private boolean receivedReward;
+                private @NotNull ConcurrentList<String> convinced = Concurrent.newList();
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Cowboy {
+
+                private int stage;
+                @SerializedName("hay_eaten")
+                private int hayEaten;
+                @SerializedName("rabbit_name")
+                private String rabbitName;
+                @SerializedName("exported_carrots")
+                private int exportedCarrots;
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Lonely {
+
+                @SerializedName("seconds_sitting")
+                private int secondsSitting;
+
+            }
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Seraphine {
+
+                @SerializedName("step_index")
+                private int stepIndex;
+
+            }
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class StillgoreChateau {
+
+            @Accessors(fluent = true)
+            @SerializedName("unlocked_pathway_skip")
+            private boolean hasUnlockedPathwaySkip;
+            @SerializedName("fairy_step")
+            private int fairyStep;
+            @SerializedName("grubber_stacks")
+            private int grubberStacks;
+
+        }
+
+        // Special Locations
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class EnigmasCrib {
+
+            @Accessors(fluent = true)
+            @SerializedName("bought_cloak")
+            private boolean hasBoughtCloak;
+            @SerializedName("found_souls")
+            private @NotNull ConcurrentList<String> foundSouls = Concurrent.newList();
+            @SerializedName("claimed_bonus_index")
+            private int claimedBonusIndex;
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Porhtal {
+
+            @SerializedName("killed_eyes")
+            private @NotNull ConcurrentList<String> killedEyes = Concurrent.newList();
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class DeadCats {
+
+            @Accessors(fluent = true)
+            @SerializedName("talked_to_jacquelle")
+            private boolean hasTalkedToJacquelle;
+            @Accessors(fluent = true)
+            @SerializedName("picked_up_detector")
+            private boolean hasPickedUpDetector;
+            @SerializedName("found_cats")
+            private @NotNull ConcurrentList<String> foundCats = Concurrent.newList();
+            @Accessors(fluent = true)
+            @SerializedName("unlocked_pet")
+            private boolean hasUnlockedPet;
+            private Optional<PetEntry> montezuma = Optional.empty();
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class TimecharmGallery {
+
+            @SerializedName("elise_step")
+            private int eliseStep;
+            @SerializedName("secured_trophies")
+            private @NotNull ConcurrentList<TimecharmGallery.Trophy> securedTrophies = Concurrent.newList();
+            @SerializedName("sent_trophy_dialogues")
+            private @NotNull ConcurrentList<String> sentTrophyDialogues = Concurrent.newList();
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Trophy {
+
+                private String type;
+                private Instant timestamp;
+                private int visits;
+
+            }
+
+        }
+
+    }
+
+    @Getter
+    public static class TrophyFishing {
+
+        private final @NotNull ConcurrentMap<String, ConcurrentMap<TrophyFish.Tier, Integer>> fish;
+        private final int totalCaught;
+        private final @NotNull PairOptional<String, TrophyFish.Tier> lastCaught;
+
+        public TrophyFishing(@NotNull ConcurrentMap<String, Object> trophy_fish) {
+            this.totalCaught = (int) trophy_fish.removeOrGet("total_caught", 0);
+
+            this.lastCaught = PairOptional.of(trophy_fish.getOptional("last_caught")
+                                                  .map(String::valueOf)
+                                                  .map(value -> value.split("/"))
+                                                  .map(parts -> Pair.of(parts[0], TrophyFish.Tier.valueOf(parts[1]))));
+
+            this.fish = MinecraftApi.getRepositoryOf(TrophyFish.class)
+                .stream()
+                .map(type -> Pair.of(
+                    type.getId(),
+                    trophy_fish.stream()
+                        .filter(entry -> entry.getKey().startsWith(type.getId().toLowerCase()))
+                        .map(entry -> Pair.of(
+                            TrophyFish.Tier.valueOf(entry.getKey().replace(type.getId(), "")),
+                            (int) entry.getValue()
+                        ))
+                        .collect(Concurrent.toMap())
+                ))
+                .collect(Concurrent.toMap());
         }
 
     }
