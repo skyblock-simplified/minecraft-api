@@ -7,11 +7,13 @@ import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Auction {
 
     @SerializedName("item_bytes")
@@ -53,6 +55,7 @@ public class Auction {
     }
 
     @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Bid {
 
         @SerializedName("auction_id")
@@ -67,6 +70,7 @@ public class Auction {
     }
 
     @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Ended {
 
         @SerializedName("auction_id")
@@ -81,7 +85,7 @@ public class Auction {
         private long price;
         private boolean bin;
         @SerializedName("item_bytes")
-        private NbtContent itemNbt;
+        private NbtContent item = new NbtContent();
 
     }
 
