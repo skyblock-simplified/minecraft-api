@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.generator.font;
 
 import dev.sbs.annotation.ResourcePath;
-import dev.sbs.minecraftapi.generator.exception.FontException;
 import dev.sbs.api.util.SystemUtil;
+import dev.sbs.minecraftapi.generator.exception.FontException;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 
 /**
  * Represents a customizable font with functionality for style, size, and actual rendered form.
@@ -55,10 +56,10 @@ public interface Font {
     static @NotNull java.awt.Font initFont(@ResourcePath @NotNull String resourcePath, float size) throws FontException {
         try {
             @Cleanup InputStream inputStream = SystemUtil.getResource(resourcePath);
-            java.awt.Font font = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, inputStream).deriveFont(size);
+            java.awt.Font font = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, Objects.requireNonNull(inputStream)).deriveFont(size);
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
             return font;
-        } catch (IOException | FontFormatException ex) {
+        } catch (IOException | FontFormatException | NullPointerException ex) {
             throw new FontException(ex, resourcePath);
         }
     }
