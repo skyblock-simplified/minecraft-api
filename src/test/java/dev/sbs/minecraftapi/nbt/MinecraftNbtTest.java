@@ -8,7 +8,7 @@ import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelRequest;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.SkyBlockAuctionsResponse;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
-import dev.sbs.minecraftapi.skyblock.Auction;
+import dev.sbs.minecraftapi.skyblock.SkyBlockAuction;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
@@ -49,10 +49,10 @@ public class MinecraftNbtTest {
 
         HypixelRequest hypixelRequest = SimplifiedApi.getApiRequest(HypixelRequest.class);
         SkyBlockAuctionsResponse auctionsResponse = hypixelRequest.getAuctions();
-        ConcurrentList<Auction> auctions = Concurrent.newList(auctionsResponse.getAuctions());
+        ConcurrentList<SkyBlockAuction> auctions = Concurrent.newList(auctionsResponse.getAuctions());
 
         long start = System.currentTimeMillis();
-        ConcurrentList<Auction> auctions2 = IntStream.range(1, auctionsResponse.getTotalPages())
+        ConcurrentList<SkyBlockAuction> auctions2 = IntStream.range(1, auctionsResponse.getTotalPages())
             .parallel()
             .mapToObj(page -> hypixelRequest.getAuctions(page).getAuctions())
             .flatMap(ConcurrentList::parallelStream)
