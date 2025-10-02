@@ -16,16 +16,14 @@ import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
+import dev.sbs.minecraftapi.skyblock.island.data.PetData;
+import dev.sbs.minecraftapi.skyblock.island.data.PlayerData;
+import dev.sbs.minecraftapi.skyblock.island.data.SkillData;
+import dev.sbs.minecraftapi.skyblock.island.data.SlayerData;
 import dev.sbs.minecraftapi.skyblock.island.mining.ForgeItem;
 import dev.sbs.minecraftapi.skyblock.island.mining.GlaciteTunnels;
 import dev.sbs.minecraftapi.skyblock.island.mining.Mining;
-import dev.sbs.minecraftapi.skyblock.island.profile.PlayerData;
 import dev.sbs.minecraftapi.skyblock.island.profile.dungeon.DungeonProfile;
-import dev.sbs.minecraftapi.skyblock.island.profile.pet.PetEntry;
-import dev.sbs.minecraftapi.skyblock.island.profile.pet.PetProfile;
-import dev.sbs.minecraftapi.skyblock.island.profile.skill.SkillProfile;
-import dev.sbs.minecraftapi.skyblock.island.profile.slayer.SlayerEntry;
-import dev.sbs.minecraftapi.skyblock.island.profile.slayer.SlayerProfile;
 import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
 import dev.sbs.minecraftapi.skyblock.type.Weight;
 import lombok.AccessLevel;
@@ -66,12 +64,12 @@ public class SkyBlockMember implements PostInit {
     @SerializedName("player_data")
     private @NotNull PlayerData playerData = new PlayerData();
     @SerializedName("slayer")
-    private @NotNull SlayerProfile slayerData = new SlayerProfile();
-    private transient SkillProfile skillData;
+    private @NotNull SlayerData slayerData = new SlayerData();
+    private transient SkillData skillData;
     @SerializedName("dungeons")
     private @NotNull DungeonProfile dungeonData = new DungeonProfile();
     @SerializedName("pet_data")
-    private @NotNull PetProfile petData = new PetProfile();
+    private @NotNull PetData petData = new PetData();
 
     // Locations
     private @NotNull Rift rift = new Rift();
@@ -116,7 +114,7 @@ public class SkyBlockMember implements PostInit {
     public void postInit() {
         this.accessoryBag.initialize(this);
         this.trophyFish = new TrophyFishing(this.trophyFishMap);
-        this.skillData = new SkillProfile(this.getPlayerData().getSkillExperience(), this);
+        this.skillData = new SkillData(this.getPlayerData().getSkillExperience(), this);
 
         this.collectionUnlocked = this.getCollection()
             .stream()
@@ -857,7 +855,7 @@ public class SkyBlockMember implements PostInit {
 
         @Getter
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
-        public static class SlayerQuest extends SlayerEntry.Quest {
+        public static class SlayerQuest extends SlayerData.Quest {
 
             @SerializedName("combat_xp")
             private int combatXP;
@@ -1141,7 +1139,7 @@ public class SkyBlockMember implements PostInit {
             @Accessors(fluent = true)
             @SerializedName("unlocked_pet")
             private boolean hasUnlockedPet;
-            private Optional<PetEntry> montezuma = Optional.empty();
+            private Optional<PetData.Entry> montezuma = Optional.empty();
 
         }
 
@@ -1180,10 +1178,12 @@ public class SkyBlockMember implements PostInit {
         public TrophyFishing(@NotNull ConcurrentMap<String, Object> trophy_fish) {
             this.totalCaught = (int) trophy_fish.removeOrGet("total_caught", 0);
 
-            this.lastCaught = PairOptional.of(trophy_fish.getOptional("last_caught")
-                                                  .map(String::valueOf)
-                                                  .map(value -> value.split("/"))
-                                                  .map(parts -> Pair.of(parts[0], TrophyFish.Tier.valueOf(parts[1]))));
+            this.lastCaught = PairOptional.of(
+                trophy_fish.getOptional("last_caught")
+                    .map(String::valueOf)
+                    .map(value -> value.split("/"))
+                    .map(parts -> Pair.of(parts[0], TrophyFish.Tier.valueOf(parts[1])))
+            );
 
             this.fish = MinecraftApi.getRepositoryOf(TrophyFish.class)
                 .stream()
