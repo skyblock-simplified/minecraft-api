@@ -2,6 +2,7 @@ package dev.sbs.minecraftapi;
 
 import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
+import dev.sbs.api.io.gson.GsonSettings;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelRequest;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
@@ -47,15 +48,21 @@ import org.jetbrains.annotations.NotNull;
 public class MinecraftApi extends SimplifiedApi {
 
     static {
-        // Add Minecraft Adapters
-        registerGsonTypeAdapter(NbtContent.class, new NbtContentTypeAdapter());
-        registerGsonTypeAdapter(MojangMultiUsernameResponse.class, new MojangMultiUsernameResponse.Deserializer());
-        registerGsonTypeAdapter(SkyBlockDate.RealTime.class, new SkyBlockDateTypeAdapter.RealTime());
-        registerGsonTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDateTypeAdapter.SkyBlockTime());
-        registerGsonTypeAdapter(SkyBlockEmojisResponse.class, new SkyBlockEmojisResponse.Deserializer());
-        registerGsonTypeAdapter(SkyBlockImagesResponse.class, new SkyBlockImagesResponse.Deserializer());
-        registerGsonTypeAdapter(SkyBlockItemsResponse.class, new SkyBlockItemsResponse.Deserializer());
+        // Update Gson
+        GsonSettings gsonSettings = getGsonSettings()
+            .mutate()
+            .withTypeAdapter(NbtContent.class, new NbtContentTypeAdapter())
+            .withTypeAdapter(MojangMultiUsernameResponse.class, new MojangMultiUsernameResponse.Deserializer())
+            .withTypeAdapter(SkyBlockDate.RealTime.class, new SkyBlockDateTypeAdapter.RealTime())
+            .withTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDateTypeAdapter.SkyBlockTime())
+            .withTypeAdapter(SkyBlockEmojisResponse.class, new SkyBlockEmojisResponse.Deserializer())
+            .withTypeAdapter(SkyBlockImagesResponse.class, new SkyBlockImagesResponse.Deserializer())
+            .withTypeAdapter(SkyBlockItemsResponse.class, new SkyBlockItemsResponse.Deserializer())
+            .build();
+        serviceManager.update(GsonSettings.class, gsonSettings);
+        serviceManager.update(Gson.class, gsonSettings.create());
 
+        // Provide Services
         serviceManager.add(NbtFactory.class, new NbtFactory());
 
         // Provide Class Builders
