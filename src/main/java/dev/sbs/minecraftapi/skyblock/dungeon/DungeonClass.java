@@ -1,11 +1,11 @@
-package dev.sbs.minecraftapi.skyblock.island.profile.dungeon;
+package dev.sbs.minecraftapi.skyblock.dungeon;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.skyblock.type.Experience;
-import dev.sbs.minecraftapi.skyblock.type.Weight;
-import dev.sbs.minecraftapi.skyblock.type.Weighted;
+import dev.sbs.minecraftapi.skyblock.Experience;
+import dev.sbs.minecraftapi.skyblock.Weight;
+import dev.sbs.minecraftapi.skyblock.Weighted;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

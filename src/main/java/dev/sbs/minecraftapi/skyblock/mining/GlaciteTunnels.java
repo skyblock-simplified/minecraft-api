@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.mining;
+package dev.sbs.minecraftapi.skyblock.mining;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;

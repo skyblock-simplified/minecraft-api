@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.profile.dungeon;
+package dev.sbs.minecraftapi.skyblock.dungeon;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -8,8 +8,8 @@ import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
 import dev.sbs.api.stream.pair.Pair;
+import dev.sbs.minecraftapi.skyblock.Weight;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.type.Weight;
 import dev.sbs.minecraftapi.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -109,7 +109,6 @@ public class DungeonProfile implements PostInit {
     }
 
     public double getClassProgressPercentage() {
-        ConcurrentMap<DungeonClass.Type, DungeonClass> dungeonClasses = this.getClasses();
         return this.getClasses()
             .stream()
             .map(Map.Entry::getValue)

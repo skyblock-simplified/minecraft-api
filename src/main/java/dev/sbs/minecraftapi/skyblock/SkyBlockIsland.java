@@ -1,12 +1,10 @@
-package dev.sbs.minecraftapi.skyblock.island;
+package dev.sbs.minecraftapi.skyblock;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.linked.ConcurrentLinkedMap;
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.skyblock.GameMode;
-import dev.sbs.minecraftapi.skyblock.Profile;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.skyblock.profile_stats.ProfileStats;
 import lombok.AccessLevel;

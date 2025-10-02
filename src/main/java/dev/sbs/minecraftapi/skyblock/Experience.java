@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.type;
+package dev.sbs.minecraftapi.skyblock;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island;
+package dev.sbs.minecraftapi.skyblock.data;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class Potion {
+public class PotionData {
 
     private String effect;
     private int level;

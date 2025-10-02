@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data;
+package dev.sbs.minecraftapi.skyblock.data;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
@@ -6,11 +6,11 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.island.SkyBlockMember;
+import dev.sbs.minecraftapi.skyblock.Experience;
+import dev.sbs.minecraftapi.skyblock.SkyBlockMember;
+import dev.sbs.minecraftapi.skyblock.Weight;
+import dev.sbs.minecraftapi.skyblock.Weighted;
 import dev.sbs.minecraftapi.skyblock.model.Skill;
-import dev.sbs.minecraftapi.skyblock.type.Experience;
-import dev.sbs.minecraftapi.skyblock.type.Weight;
-import dev.sbs.minecraftapi.skyblock.type.Weighted;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

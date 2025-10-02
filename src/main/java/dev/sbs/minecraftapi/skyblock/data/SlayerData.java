@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data;
+package dev.sbs.minecraftapi.skyblock.data;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -9,10 +9,10 @@ import dev.sbs.api.reflection.Reflection;
 import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
+import dev.sbs.minecraftapi.skyblock.Experience;
+import dev.sbs.minecraftapi.skyblock.Weight;
+import dev.sbs.minecraftapi.skyblock.Weighted;
 import dev.sbs.minecraftapi.skyblock.model.Slayer;
-import dev.sbs.minecraftapi.skyblock.type.Experience;
-import dev.sbs.minecraftapi.skyblock.type.Weight;
-import dev.sbs.minecraftapi.skyblock.type.Weighted;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

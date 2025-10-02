@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.profile.dungeon;
+package dev.sbs.minecraftapi.skyblock.dungeon;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;

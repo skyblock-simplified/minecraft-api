@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island;
+package dev.sbs.minecraftapi.skyblock.data;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -13,21 +13,21 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 @Getter
-public class PlayerStats {
+public class StatData {
 
-    private Races races = new Races();
-    private Mythos mythos = new Mythos();
-    private Auctions auctions = new Auctions();
+    private @NotNull Races races = new Races();
+    private @NotNull Mythos mythos = new Mythos();
+    private @NotNull Auctions auctions = new Auctions();
     @SerializedName("end_island")
-    private EndIsland endIsland = new EndIsland();
-    private Winter winter = new Winter();
+    private @NotNull EndIsland endIsland = new EndIsland();
+    private @NotNull Winter winter = new Winter();
     @SerializedName("sea_creature_kills")
     private int seaCreatureKills;
     @SerializedName("items_fished")
-    private ItemsFished itemsFished = new ItemsFished();
-    private Gifts gifts = new Gifts();
+    private @NotNull ItemsFished itemsFished = new ItemsFished();
+    private @NotNull Gifts gifts = new Gifts();
     @SerializedName("shredder_rod")
-    private ShredderRod shredderRod = new ShredderRod();
+    private @NotNull ShredderRod shredderRod = new ShredderRod();
 
     private @NotNull ConcurrentMap<String, Integer> kills = Concurrent.newMap();
     private @NotNull ConcurrentMap<String, Integer> deaths = Concurrent.newMap();
@@ -144,6 +144,7 @@ public class PlayerStats {
             private @NotNull ConcurrentMap<Type, Integer> summoningEyesContributed = Concurrent.newMap();
             @SerializedName("ender_crystals_collected")
             private int enderCrystalsCollected;
+
             public enum Type {
 
                 UNKNOWN,

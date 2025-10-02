@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island;
+package dev.sbs.minecraftapi.skyblock;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -14,18 +14,17 @@ import dev.sbs.api.util.NumberUtil;
 import dev.sbs.api.util.Range;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.NbtContent;
+import dev.sbs.minecraftapi.skyblock.data.PetData;
+import dev.sbs.minecraftapi.skyblock.data.PlayerData;
+import dev.sbs.minecraftapi.skyblock.data.SkillData;
+import dev.sbs.minecraftapi.skyblock.data.SlayerData;
+import dev.sbs.minecraftapi.skyblock.data.StatData;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.island.data.PetData;
-import dev.sbs.minecraftapi.skyblock.island.data.PlayerData;
-import dev.sbs.minecraftapi.skyblock.island.data.SkillData;
-import dev.sbs.minecraftapi.skyblock.island.data.SlayerData;
-import dev.sbs.minecraftapi.skyblock.island.mining.ForgeItem;
-import dev.sbs.minecraftapi.skyblock.island.mining.GlaciteTunnels;
-import dev.sbs.minecraftapi.skyblock.island.mining.Mining;
-import dev.sbs.minecraftapi.skyblock.island.profile.dungeon.DungeonProfile;
+import dev.sbs.minecraftapi.skyblock.dungeon.DungeonProfile;
+import dev.sbs.minecraftapi.skyblock.mining.ForgeItem;
+import dev.sbs.minecraftapi.skyblock.mining.GlaciteTunnels;
+import dev.sbs.minecraftapi.skyblock.mining.Mining;
 import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
-import dev.sbs.minecraftapi.skyblock.type.Weight;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -65,11 +64,13 @@ public class SkyBlockMember implements PostInit {
     private @NotNull PlayerData playerData = new PlayerData();
     @SerializedName("slayer")
     private @NotNull SlayerData slayerData = new SlayerData();
-    private transient SkillData skillData;
-    @SerializedName("dungeons")
-    private @NotNull DungeonProfile dungeonData = new DungeonProfile();
     @SerializedName("pet_data")
     private @NotNull PetData petData = new PetData();
+    @SerializedName("dungeons")
+    private @NotNull DungeonProfile dungeonData = new DungeonProfile();
+    @SerializedName("player_stats")
+    private @NotNull StatData statData = new StatData();
+    private transient SkillData skillData;
 
     // Locations
     private @NotNull Rift rift = new Rift();
@@ -88,8 +89,6 @@ public class SkyBlockMember implements PostInit {
     @SerializedName("nether_island_player_data")
     private @NotNull CrimsonIsle crimsonIsle = new CrimsonIsle();
     private @NotNull Experimentation experimentation = new Experimentation();
-    @SerializedName("player_stats")
-    private @NotNull PlayerStats playerStats = new PlayerStats();
     @SerializedName("fairy_soul")
     private @NotNull FairySouls fairySouls = new FairySouls();
     private @NotNull Currencies currencies = new Currencies();
@@ -653,6 +652,90 @@ public class SkyBlockMember implements PostInit {
         @SerializedName("favorite_arrow")
         private String favoriteArrow;
         private int soulflow;
+
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class JacobsContest {
+
+        @SerializedName("medals_inv")
+        private @NotNull ConcurrentMap<Medal, Integer> medals = Concurrent.newMap();
+        @SerializedPath("perks.double_drops")
+        private int doubleDrops;
+        @SerializedPath("perks.farming_level_cap")
+        private int farmingLevelCap;
+        @Accessors(fluent = true)
+        @SerializedName("talked")
+        private boolean hasTalked;
+        @Getter(AccessLevel.NONE)
+        @SerializedName("contests")
+        private @NotNull ConcurrentMap<String, Contest> contestMap = Concurrent.newMap();
+        private @NotNull ConcurrentList<Contest> contestList = Concurrent.newList();
+        @SerializedName("unique_brackets")
+        private @NotNull ConcurrentMap<Medal, ConcurrentList<String>> uniqueBrackets = Concurrent.newMap();
+        private boolean migration;
+        @SerializedName("personal_bests")
+        private @NotNull ConcurrentMap<String, Integer> personalBests = Concurrent.newMap();
+
+        public @NotNull ConcurrentList<Contest> getContests() {
+            if (this.contestList.isEmpty()) {
+                this.contestList = this.contestMap.stream()
+                    .map(entry -> {
+                        Contest contest = entry.getValue();
+
+                        String[] dataString = entry.getKey().split(":");
+                        String[] calendarString = dataString[1].split("_");
+                        int year = NumberUtil.toInt(dataString[0]);
+                        int month = NumberUtil.toInt(calendarString[0]);
+                        int day = NumberUtil.toInt(calendarString[1]);
+                        String collectionName = StringUtil.join(dataString, ":", 2, dataString.length);
+
+                        contest.skyBlockDate = new SkyBlockDate(year, month, day);
+                        contest.collectionName = collectionName;
+                        return contest;
+                    })
+                    .collect(Concurrent.toUnmodifiableList());
+            }
+
+            return this.contestList;
+        }
+
+        public enum Medal {
+
+            BRONZE,
+            SILVER,
+            GOLD,
+            PLATINUM,
+            DIAMOND
+
+        }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
+        public static class Contest {
+
+            private int collected;
+            @Accessors(fluent = true)
+            @SerializedName("claimed_rewards")
+            private boolean hasClaimedRewards;
+            @SerializedName("claimed_position")
+            private int position;
+            @SerializedName("claimed_participants")
+            private int participants;
+            private SkyBlockDate skyBlockDate;
+            private String collectionName;
+
+            @Getter
+            @NoArgsConstructor(access = AccessLevel.PRIVATE)
+            public static class Data {
+
+                private SkyBlockDate skyBlockDate;
+                private String collectionName;
+
+            }
+
+        }
 
     }
 

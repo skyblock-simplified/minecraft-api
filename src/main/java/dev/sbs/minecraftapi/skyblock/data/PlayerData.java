@@ -1,11 +1,10 @@
-package dev.sbs.minecraftapi.skyblock.island.data;
+package dev.sbs.minecraftapi.skyblock.data;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.island.Potion;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,9 +44,9 @@ public class PlayerData {
 
     // Potions & Buffs
     @SerializedName("active_effects")
-    private @NotNull ConcurrentList<Potion> activePotions = Concurrent.newList();
+    private @NotNull ConcurrentList<PotionData> activePotions = Concurrent.newList();
     @SerializedName("paused_effects")
-    private @NotNull ConcurrentList<Potion> pausedPotions = Concurrent.newList();
+    private @NotNull ConcurrentList<PotionData> pausedPotions = Concurrent.newList();
     @SerializedName("disabled_potion_effects")
     private @NotNull ConcurrentList<String> disabledPotions = Concurrent.newList();
     @SerializedName("temp_stat_buffs")

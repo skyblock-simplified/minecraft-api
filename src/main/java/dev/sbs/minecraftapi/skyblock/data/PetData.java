@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.island.data;
+package dev.sbs.minecraftapi.skyblock.data;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -7,8 +7,8 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.stream.StreamUtil;
 import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.skyblock.Experience;
 import dev.sbs.minecraftapi.skyblock.Rarity;
-import dev.sbs.minecraftapi.skyblock.type.Experience;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
