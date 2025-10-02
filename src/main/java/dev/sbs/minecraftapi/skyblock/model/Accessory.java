@@ -62,6 +62,11 @@ public interface Accessory extends Model {
 
         double getValue();
 
+        default @NotNull Stat getStat() {
+            return MinecraftApi.getRepositoryOf(Stat.class)
+                .findFirstOrNull(Stat::getId, this.getId());
+        }
+
     }
 
 }
