@@ -212,4 +212,57 @@ public class JsonItem implements Item, JsonModel {
             .build();
     }
 
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class JsonAttributes implements Attributes {
+
+        private boolean sellable;
+        private boolean tradable;
+        private boolean auctionable;
+        private boolean reforgeable;
+        private boolean museumable;
+        private boolean glowing = false;
+        private boolean unstackable = true;
+        private boolean dungeonable = false;
+        private boolean obtainable = true;
+        private @NotNull Soulbound soulbound = Soulbound.NONE;
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+
+            JsonAttributes that = (JsonAttributes) o;
+
+            return new EqualsBuilder()
+                .append(this.isSellable(), that.isSellable())
+                .append(this.isTradable(), that.isTradable())
+                .append(this.isAuctionable(), that.isAuctionable())
+                .append(this.isReforgeable(), that.isReforgeable())
+                .append(this.isMuseumable(), that.isMuseumable())
+                .append(this.isGlowing(), that.isGlowing())
+                .append(this.isUnstackable(), that.isUnstackable())
+                .append(this.isDungeonable(), that.isDungeonable())
+                .append(this.isObtainable(), that.isObtainable())
+                .append(this.getSoulbound(), that.getSoulbound())
+                .build();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder()
+                .append(this.isSellable())
+                .append(this.isTradable())
+                .append(this.isAuctionable())
+                .append(this.isReforgeable())
+                .append(this.isMuseumable())
+                .append(this.isGlowing())
+                .append(this.isUnstackable())
+                .append(this.isDungeonable())
+                .append(this.isObtainable())
+                .append(this.getSoulbound())
+                .build();
+        }
+
+    }
+
 }

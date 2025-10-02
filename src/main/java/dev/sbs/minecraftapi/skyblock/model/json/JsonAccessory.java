@@ -10,7 +10,6 @@ import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Accessory;
-import dev.sbs.minecraftapi.skyblock.model.Item;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +38,7 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
     private @NotNull Rarity rarity = Rarity.COMMON;
     private @NotNull Source source = Source.MISCELLANEOUS;
     private @NotNull Optional<MojangProperty> skin = Optional.empty();
-    private @NotNull Item.Attributes attributes = new Item.Attributes();
+    private @NotNull JsonItem.JsonAttributes attributes = new JsonItem.JsonAttributes();
     private @NotNull Optional<Family> family = Optional.empty();
     private @NotNull ConcurrentList<Substitute> stats = Concurrent.newList();
 
