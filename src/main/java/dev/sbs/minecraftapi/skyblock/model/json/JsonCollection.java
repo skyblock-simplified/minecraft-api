@@ -22,11 +22,11 @@ import javax.persistence.Id;
     path = "skyblock",
     name = "collections"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
+@NoArgsConstructor(access = AccessLevel.NONE, force = true)
 public class JsonCollection implements Collection, JsonModel {
 
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
+    private @Id @NotNull String id;
+    private @NotNull String name;
     private @NotNull ConcurrentMap<String, JsonCollectionItem> items = Concurrent.newMap();
 
     @Override
@@ -52,10 +52,10 @@ public class JsonCollection implements Collection, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
     public static class JsonCollectionItem implements Collection.Item {
 
-        private @NotNull String name = "";
+        private @NotNull String name;
         private int maxTiers;
         private @NotNull ConcurrentList<JsonCollectionTier> tiers = Concurrent.newList();
 
@@ -84,7 +84,7 @@ public class JsonCollection implements Collection, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class JsonCollectionTier implements Collection.Tier {
 
         private int tier;
