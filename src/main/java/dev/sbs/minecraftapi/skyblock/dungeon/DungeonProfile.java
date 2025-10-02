@@ -8,7 +8,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
 import dev.sbs.api.stream.pair.Pair;
-import dev.sbs.minecraftapi.skyblock.Weight;
+import dev.sbs.minecraftapi.skyblock.data.Weight;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.text.ChatFormat;
 import lombok.AccessLevel;

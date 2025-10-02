@@ -8,7 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 @Getter
-public class Article {
+public class SkyBlockArticle {
 
     @SerializedName("item.material")
     private String material;

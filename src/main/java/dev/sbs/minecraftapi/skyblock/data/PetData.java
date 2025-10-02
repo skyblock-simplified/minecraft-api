@@ -7,7 +7,6 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.stream.StreamUtil;
 import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.skyblock.Experience;
 import dev.sbs.minecraftapi.skyblock.Rarity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

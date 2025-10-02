@@ -5,7 +5,7 @@ import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import lombok.Getter;
 
 @Getter
-public class FireSale {
+public class SkyBlockFireSale {
 
     @SerializedName("item_id")
     private String itemId;

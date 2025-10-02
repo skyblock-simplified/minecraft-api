@@ -4,7 +4,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import dev.sbs.minecraftapi.skyblock.NbtContent;
+import dev.sbs.minecraftapi.skyblock.data.NbtContent;
 
 import java.io.IOException;
 
