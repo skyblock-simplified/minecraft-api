@@ -27,8 +27,8 @@ public class SkyBlockMuseum {
         private SkyBlockDate.RealTime donated;
         private boolean borrowing;
         @SerializedName("featured_slot")
-        private Optional<String> featuredSlot = Optional.empty();
-        private NbtContent items;
+        private @NotNull Optional<String> featuredSlot = Optional.empty();
+        private @NotNull NbtContent items = new NbtContent();
 
         public boolean isFeatured() {
             return this.featuredSlot.isPresent();

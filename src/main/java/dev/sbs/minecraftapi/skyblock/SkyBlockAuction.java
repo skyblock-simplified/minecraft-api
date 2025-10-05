@@ -18,7 +18,7 @@ import java.util.UUID;
 public class SkyBlockAuction {
 
     @SerializedName("item_bytes")
-    private NbtContent itemNbt;
+    private @NotNull NbtContent item = new NbtContent();
     @SerializedName("uuid")
     private UUID auctionId;
     @SerializedName("auctioneer")
@@ -26,22 +26,22 @@ public class SkyBlockAuction {
     @SerializedName("profile_id")
     private UUID islandId;
     @SerializedName("coop")
-    private ConcurrentList<UUID> coopMembers = Concurrent.newList();
+    private @NotNull ConcurrentList<UUID> coopMembers = Concurrent.newList();
     @SerializedName("start")
     private SkyBlockDate.RealTime startedAt;
     @SerializedName("end")
     private SkyBlockDate.RealTime endsAt;
     @Getter(AccessLevel.NONE)
     @SerializedName("item_lore")
-    private String lore;
+    private @NotNull String lore = "";
     private String extra;
     @SerializedName("tier")
-    private Rarity rarity;
+    private @NotNull Rarity rarity = Rarity.COMMON;
     @SerializedName("starting_big")
     private long startingBid;
     private boolean claimed;
     @SerializedName("claimed_bidders")
-    private ConcurrentList<String> claimedBidders = Concurrent.newList();
+    private @NotNull ConcurrentList<String> claimedBidders = Concurrent.newList();
     @SerializedName("highest_bid_amount")
     private long highestBid;
     private @NotNull ConcurrentList<Bid> bids = Concurrent.newList();

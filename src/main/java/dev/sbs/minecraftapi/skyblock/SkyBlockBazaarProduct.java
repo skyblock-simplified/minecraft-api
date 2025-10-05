@@ -10,13 +10,13 @@ import org.jetbrains.annotations.NotNull;
 public class SkyBlockBazaarProduct {
 
     @SerializedName("product_id")
-    private String itemId;
+    private @NotNull String itemId;
     @SerializedName("buy_summary")
     private @NotNull ConcurrentList<Summary> buySummary = Concurrent.newList();
     @SerializedName("sell_summary")
     private @NotNull ConcurrentList<Summary> sellSummary = Concurrent.newList();
     @SerializedName("quick_status")
-    private Status quickStatus;
+    private @NotNull Status quickStatus = new Status();
 
     @Getter
     public static class Status {
