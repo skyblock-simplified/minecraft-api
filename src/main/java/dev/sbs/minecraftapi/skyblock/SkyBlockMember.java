@@ -293,17 +293,26 @@ public class SkyBlockMember implements PostInit {
             this.tuningPoints = this.magicalPower / 10;
             this.logComponent = Math.pow(Math.log(1 + (0.0019 * this.magicalPower)), 1.2);
             //this.magicalPowerMultiplier = 29.97 * Math.pow(Math.log(1 + (0.0019 * this.magicalPower)), 1.2);
+
+            // Power Stats
             this.selectedPowerStats = this.getSelectedPower()
                 .stream()
-                .flatMap(power -> power.getBaseValues()
-                    .stream()
-                    .map((statId, value) -> Pair.of(
+                .flatMap(power -> {
+                    ConcurrentMap<String, Double> stats = Concurrent.newMap();
+                    stats.putAll(power.getBaseValues());
+                    power.getBonuses().forEach((statId, value) -> stats.merge(
                         statId,
-                        MinecraftApi.getRepositoryOf(Stat.class)
-                            .findFirstOrNull(Stat::getId, statId)
-                            .getPowerCoefficient() * this.getLogComponent() * value
-                    ))
-                )
+                        value,
+                        Double::sum
+                    ));
+                    return stats.stream();
+                })
+                .map(entry -> Pair.of(
+                    entry.getKey(),
+                    MinecraftApi.getRepositoryOf(Stat.class)
+                        .findFirstOrNull(Stat::getId, entry.getKey())
+                        .getPowerCoefficient() * this.getLogComponent() * entry.getValue()
+                ))
                 .collect(Concurrent.toUnmodifiableMap());
         }
 
