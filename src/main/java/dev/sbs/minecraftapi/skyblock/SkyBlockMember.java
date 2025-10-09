@@ -295,18 +295,9 @@ public class SkyBlockMember implements PostInit {
             //this.magicalPowerMultiplier = 29.97 * Math.pow(Math.log(1 + (0.0019 * this.magicalPower)), 1.2);
 
             // Power Stats
-            this.selectedPowerStats = this.getSelectedPower()
+            ConcurrentMap<String, Double> stats = this.getSelectedPower()
                 .stream()
-                .flatMap(power -> {
-                    ConcurrentMap<String, Double> stats = Concurrent.newMap();
-                    stats.putAll(power.getBaseValues());
-                    power.getBonuses().forEach((statId, value) -> stats.merge(
-                        statId,
-                        value,
-                        Double::sum
-                    ));
-                    return stats.stream();
-                })
+                .flatMap(power -> power.getBaseValues().stream())
                 .map(entry -> Pair.of(
                     entry.getKey(),
                     MinecraftApi.getRepositoryOf(Stat.class)
@@ -314,6 +305,16 @@ public class SkyBlockMember implements PostInit {
                         .getPowerCoefficient() * this.getLogComponent() * entry.getValue()
                 ))
                 .collect(Concurrent.toUnmodifiableMap());
+
+            this.getSelectedPower().ifPresent(power -> power.getBonuses()
+                .forEach((statId, value) -> stats.merge(
+                    statId,
+                    value,
+                    Double::sum
+                ))
+            );
+
+            this.selectedPowerStats = stats;
         }
 
         private int handleMagicalPower(AccessoryData accessoryData, SkyBlockMember member) {
