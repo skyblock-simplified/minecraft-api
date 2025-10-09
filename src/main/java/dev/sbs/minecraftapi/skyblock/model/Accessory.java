@@ -21,6 +21,8 @@ public interface Accessory extends Model {
 
     @NotNull Source getSource();
 
+    @NotNull Limit getLimit();
+
     @NotNull Optional<MojangProperty> getSkin();
 
     @NotNull Item.Attributes getAttributes();
@@ -39,6 +41,14 @@ public interface Accessory extends Model {
         @NotNull String getId();
 
         int getRank();
+
+    }
+
+    enum Limit {
+
+        NONE,
+        BINGO,
+        RIFT
 
     }
 

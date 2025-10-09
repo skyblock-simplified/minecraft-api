@@ -37,6 +37,7 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
     private @NotNull Optional<String> description = Optional.empty();
     private @NotNull Rarity rarity = Rarity.COMMON;
     private @NotNull Source source = Source.MISCELLANEOUS;
+    private @NotNull Limit limit = Limit.NONE;
     private @NotNull Optional<MojangProperty> skin = Optional.empty();
     private @NotNull JsonItem.JsonAttributes attributes = new JsonItem.JsonAttributes();
     private @NotNull Optional<Family> family = Optional.empty();
@@ -54,6 +55,7 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
             .append(this.getDescription(), that.getDescription())
             .append(this.getRarity(), that.getRarity())
             .append(this.getSource(), that.getSource())
+            .append(this.getLimit(), that.getLimit())
             .append(this.getSkin(), that.getSkin())
             .append(this.getAttributes(), that.getAttributes())
             .append(this.getFamily(), that.getFamily())
@@ -69,6 +71,7 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
             .append(this.getDescription())
             .append(this.getRarity())
             .append(this.getSource())
+            .append(this.getLimit())
             .append(this.getSkin())
             .append(this.getAttributes())
             .append(this.getFamily())
