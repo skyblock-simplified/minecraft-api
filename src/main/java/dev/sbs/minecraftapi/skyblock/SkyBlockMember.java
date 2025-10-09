@@ -1,9 +1,11 @@
 package dev.sbs.minecraftapi.skyblock;
 
 import com.google.gson.annotations.SerializedName;
+import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.collection.concurrent.linked.ConcurrentLinkedMap;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
@@ -13,13 +15,19 @@ import dev.sbs.api.stream.pair.PairOptional;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
+import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
+import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
 import dev.sbs.minecraftapi.skyblock.data.*;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.skyblock.dungeon.DungeonProfile;
 import dev.sbs.minecraftapi.skyblock.mining.ForgeItem;
 import dev.sbs.minecraftapi.skyblock.mining.GlaciteTunnels;
 import dev.sbs.minecraftapi.skyblock.mining.Mining;
+import dev.sbs.minecraftapi.skyblock.model.Accessory;
+import dev.sbs.minecraftapi.skyblock.model.Power;
+import dev.sbs.minecraftapi.skyblock.model.Stat;
 import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
+import dev.sbs.minecraftapi.skyblock.profile_stats.data.AccessoryData;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -158,28 +166,158 @@ public class SkyBlockMember implements PostInit {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class AccessoryBag {
 
-        private @NotNull Tuning tuning = new Tuning();
-        @SerializedName("selected_power")
-        private @NotNull Optional<String> selectedPower = Optional.empty();
         @SerializedName("bag_upgrades_purchased")
         private int bagUpgradesPurchased;
+        private transient NbtContent contents = new NbtContent();
+        private transient @NotNull ConcurrentList<AccessoryData> detectedAccessories = Concurrent.newUnmodifiableList();
+        private transient @NotNull ConcurrentList<AccessoryData> accessories = Concurrent.newUnmodifiableList();
+
+        // Power
+        @SerializedName("selected_power")
+        private @NotNull Optional<String> selectedPowerId = Optional.empty();
         @SerializedName("unlocked_powers")
-        private @NotNull ConcurrentList<String> unlockedPowers = Concurrent.newList();
+        private @NotNull ConcurrentList<String> unlockedPowerIds = Concurrent.newUnmodifiableList();
+        private transient @NotNull ConcurrentMap<String, Double> selectedPowerStats = Concurrent.newUnmodifiableMap();
+
+        public @NotNull Optional<Power> getSelectedPower() {
+            return this.getSelectedPowerId().flatMap(powerId -> MinecraftApi.getRepositoryOf(Power.class)
+                .findFirst(Power::getId, powerId)
+            );
+        }
+
+        public @NotNull ConcurrentList<Power> getUnlockedPowers() {
+            return this.getUnlockedPowerIds()
+                .stream()
+                .map(powerId -> MinecraftApi.getRepositoryOf(Power.class)
+                    .findFirst(Power::getId, powerId)
+                )
+                .flatMap(Optional::stream)
+                .collect(Concurrent.toUnmodifiableList());
+        }
+
+        // Magical Power
         @SerializedName("highest_magical_power")
         private int highestMagicalPower;
-        private transient NbtContent contents = new NbtContent();
-        @Accessors(fluent = true)
-        private transient boolean hasConsumedPrism;
-        private transient int abiphoneContacts;
-
         private transient int magicalPower;
+        private transient double logComponent;
+
+        // Tuning
+        private @NotNull Tuning tuning = new Tuning();
         private transient int tuningPoints;
-        private transient double magicalPowerMultiplier;
 
         protected void initialize(@NotNull SkyBlockMember member) {
+            // Read Accessory Bag
+            this.detectedAccessories = this.getContents()
+                .getNbtData()
+                .<CompoundTag>getListTag("i")
+                .stream()
+                .filter(CompoundTag::notEmpty)
+                .flatMap(compoundTag -> SimplifiedApi.getRepositoryOf(Accessory.class)
+                    .findFirst(
+                        Accessory::getId,
+                        compoundTag.getPathOrDefault("tag.ExtraAttributes.id", StringTag.EMPTY).getValue()
+                    )
+                    .map(accessory -> Pair.of(accessory, compoundTag))
+                    .stream()
+                )
+                .map(entry -> new AccessoryData(entry.getKey(), entry.getValue()))
+                .collect(Concurrent.toList());
+
+            // Store Families
+            ConcurrentMap<String, ConcurrentSet<Accessory>> familyAccessoryDataMap = Concurrent.newMap();
+            this.getDetectedAccessories()
+                .stream()
+                .filter(accessoryData -> accessoryData.getAccessory().getFamily().isPresent())
+                .forEach(accessoryData -> {
+                    // New Accessory Family
+                    String familyId = accessoryData.getAccessory().getFamily().get().getId();
+                    if (!familyAccessoryDataMap.containsKey(familyId))
+                        familyAccessoryDataMap.put(familyId, Concurrent.newSet());
+
+                    // Store Accessory
+                    familyAccessoryDataMap.get(familyId).add(accessoryData.getAccessory());
+                });
+
+            // Store Non-Stackable Families
+            ConcurrentSet<Accessory> processedAccessories = Concurrent.newSet();
+            this.accessories = this.getDetectedAccessories()
+                .stream()
+                .filter(accessoryData -> {
+                    if (accessoryData.getAccessory().getFamily().isPresent()) {
+                        // Handle Families
+                        ConcurrentList<Accessory> familyData = Concurrent.newList(familyAccessoryDataMap.get(
+                            accessoryData.getAccessory().getFamily().get().getId()
+                        ));
+
+                        if (accessoryData.getAccessory().getFamily().get().getRank() >= 0) {
+                            // Sort By Highest
+                            familyData = familyData.sorted(accessory -> accessory.getFamily()
+                                    .map(Accessory.Family::getRank)
+                                    .orElse(0)
+                                )
+                                .inverse();
+
+                            // Ignore Lowest Accessories
+                            Accessory topAccessory = familyData.remove(0);
+                            processedAccessories.addAll(familyData);
+
+                            // Top Accessory Only
+                            if (!accessoryData.getAccessory().equals(topAccessory))
+                                return false;
+                        } else {
+                            if (processedAccessories.contains(accessoryData.getAccessory()))
+                                return false;
+
+                            // Ignore All Accessories
+                            processedAccessories.addAll(familyData);
+                            return true;
+                        }
+                    }
+
+                    return processedAccessories.add(accessoryData.getAccessory());
+                })
+                .collect(Concurrent.toList());
+
+            // Calculate Magical Power
+            int calculatedMagicalPower = this.getAccessories()
+                .stream()
+                .mapToInt(accessoryData -> this.handleMagicalPower(accessoryData, member))
+                .sum();
+
+            // Rift Prism
+            if (member.getRift().getAccess().hasConsumedPrism())
+                calculatedMagicalPower += 11;
+
             this.contents = member.getInventory().getBags().getAccessories();
-            this.hasConsumedPrism = member.getRift().getAccess().hasConsumedPrism();
-            this.abiphoneContacts = member.getCrimsonIsle().getAbiphone().getContacts().size();
+            this.magicalPower = calculatedMagicalPower;
+            this.tuningPoints = this.magicalPower / 10;
+            this.logComponent = Math.pow(Math.log(1 + (0.0019 * this.magicalPower)), 1.2);
+            //this.magicalPowerMultiplier = 29.97 * Math.pow(Math.log(1 + (0.0019 * this.magicalPower)), 1.2);
+            this.selectedPowerStats = this.getSelectedPower()
+                .stream()
+                .flatMap(power -> power.getBaseValues()
+                    .stream()
+                    .map((statId, value) -> Pair.of(
+                        statId,
+                        MinecraftApi.getRepositoryOf(Stat.class)
+                            .findFirstOrNull(Stat::getId, statId)
+                            .getPowerCoefficient() * this.getLogComponent() * value
+                    ))
+                )
+                .collect(Concurrent.toUnmodifiableMap());
+        }
+
+        private int handleMagicalPower(AccessoryData accessoryData, SkyBlockMember member) {
+            int magicalPower = accessoryData.getRarity().getMagicPower();
+
+            // TODO: Dynamic
+            if (accessoryData.getAccessory().getId().equals("HEGEMONY_ARTIFACT"))
+                magicalPower *= 2;
+
+            if (accessoryData.getAccessory().getId().equals("ABICASE"))
+                magicalPower += member.getCrimsonIsle().getAbiphone().getContacts().size() / 2;
+
+            return magicalPower;
         }
 
         @Getter
@@ -194,7 +332,7 @@ public class SkyBlockMember implements PostInit {
 
             // Slots
             @SerializedName("slot_0")
-            private @NotNull ConcurrentMap<String, Integer> current = Concurrent.newMap();
+            private @NotNull ConcurrentMap<String, Integer> selected = Concurrent.newMap();
             @Getter(AccessLevel.NONE)
             private @NotNull ConcurrentMap<String, Integer> slot_1 = Concurrent.newMap();
             @Getter(AccessLevel.NONE)
