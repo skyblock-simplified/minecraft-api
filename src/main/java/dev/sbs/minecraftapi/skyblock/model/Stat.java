@@ -22,7 +22,9 @@ public interface Stat extends Model {
 
     double getCap();
 
-    double getAccessoryEnrichment();
+    double getEnrichment();
+
+    double getPowerMultiplier();
 
     double getTuningMultiplier();
 

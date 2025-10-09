@@ -30,7 +30,8 @@ public class JsonStat implements Stat, JsonModel {
     private @NotNull String category = "";
     private double base = 0.0;
     private double cap = 0.0;
-    private double accessoryEnrichment = 0.0;
+    private double enrichment = 0.0;
+    private double powerMultiplier = 0.0;
     private double tuningMultiplier = 0.0;
     private boolean visible;
 
@@ -43,7 +44,8 @@ public class JsonStat implements Stat, JsonModel {
         return new EqualsBuilder()
             .append(this.getBase(), jsonStat.getBase())
             .append(this.getCap(), jsonStat.getCap())
-            .append(this.getAccessoryEnrichment(), jsonStat.getAccessoryEnrichment())
+            .append(this.getEnrichment(), jsonStat.getEnrichment())
+            .append(this.getPowerMultiplier(), jsonStat.getPowerMultiplier())
             .append(this.getTuningMultiplier(), jsonStat.getTuningMultiplier())
             .append(this.isVisible(), jsonStat.isVisible())
             .append(this.getId(), jsonStat.getId())
@@ -64,7 +66,8 @@ public class JsonStat implements Stat, JsonModel {
             .append(this.getCategory())
             .append(this.getBase())
             .append(this.getCap())
-            .append(this.getAccessoryEnrichment())
+            .append(this.getEnrichment())
+            .append(this.getPowerMultiplier())
             .append(this.getTuningMultiplier())
             .append(this.isVisible())
             .build();
