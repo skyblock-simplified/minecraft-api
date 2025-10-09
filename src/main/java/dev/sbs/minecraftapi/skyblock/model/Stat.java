@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface Stat extends Model {
 
+    double MAGIC_CONSTANT = 719.28;
+
     @NotNull String getId();
 
     @NotNull String getName();
@@ -25,6 +27,10 @@ public interface Stat extends Model {
     double getEnrichment();
 
     double getPowerMultiplier();
+
+    default double getPowerCoefficient() {
+        return (this.getPowerMultiplier() * MAGIC_CONSTANT) / 100.0;
+    }
 
     double getTuningMultiplier();
 
