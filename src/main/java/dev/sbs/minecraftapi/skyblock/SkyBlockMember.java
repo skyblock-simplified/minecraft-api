@@ -522,7 +522,7 @@ public class SkyBlockMember implements PostInit {
 
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class JacobsContest {
+    public static class JacobsContest implements PostInit {
 
         @SerializedName("medals_inv")
         private @NotNull ConcurrentMap<Medal, Integer> medals = Concurrent.newMap();
@@ -536,43 +536,60 @@ public class SkyBlockMember implements PostInit {
         @Getter(AccessLevel.NONE)
         @SerializedName("contests")
         private @NotNull ConcurrentMap<String, Contest> contestMap = Concurrent.newMap();
-        private @NotNull ConcurrentList<Contest> contestList = Concurrent.newList();
+        private @NotNull ConcurrentList<Contest> contests = Concurrent.newList();
         @SerializedName("unique_brackets")
         private @NotNull ConcurrentMap<Medal, ConcurrentList<String>> uniqueBrackets = Concurrent.newMap();
         private boolean migration;
         @SerializedName("personal_bests")
         private @NotNull ConcurrentMap<String, Integer> personalBests = Concurrent.newMap();
 
-        public @NotNull ConcurrentList<Contest> getContests() {
-            if (this.contestList.isEmpty()) {
-                this.contestList = this.contestMap.stream()
-                    .map(entry -> {
-                        Contest contest = entry.getValue();
+        @Override
+        public void postInit() {
+            this.contests = this.contestMap.stream()
+                .map(entry -> {
+                    Contest contest = entry.getValue();
 
-                        String[] dataString = entry.getKey().split(":");
-                        String[] calendarString = dataString[1].split("_");
-                        int year = NumberUtil.toInt(dataString[0]);
-                        int month = NumberUtil.toInt(calendarString[0]);
-                        int day = NumberUtil.toInt(calendarString[1]);
-                        String collectionName = StringUtil.join(dataString, ":", 2, dataString.length);
+                    String[] dataString = entry.getKey().split(":");
+                    String[] calendarString = dataString[1].split("_");
+                    int year = NumberUtil.toInt(dataString[0]);
+                    int month = NumberUtil.toInt(calendarString[0]);
+                    int day = NumberUtil.toInt(calendarString[1]);
 
-                        contest.skyBlockDate = new SkyBlockDate(year, month, day);
-                        contest.collectionName = collectionName;
-                        return contest;
-                    })
-                    .collect(Concurrent.toUnmodifiableList());
-            }
-
-            return this.contestList;
+                    contest.collectionName = StringUtil.join(dataString, ":", 2, dataString.length);
+                    contest.skyBlockDate = new SkyBlockDate(year, month, day);
+                    return contest;
+                })
+                .collect(Concurrent.toUnmodifiableList());
         }
 
+        @Getter
+        @RequiredArgsConstructor
         public enum Medal {
 
-            BRONZE,
-            SILVER,
-            GOLD,
-            PLATINUM,
-            DIAMOND
+            DIAMOND(0.02, 0.05),
+            PLATINUM(0.05, 0.1),
+            GOLD(0.1, 0.2),
+            SILVER(0.3, 0.4),
+            BRONZE(0.6, 0.7),
+            NONE(1.0, 1.0);
+
+            private final double bracket;
+            private final double finneganBracket;
+
+            public static @NotNull Medal fromContest(@NotNull Contest contest) {
+                return fromPosition(contest.getPosition(), contest.getParticipants(), contest.isFinnegan());
+            }
+
+            public static @NotNull Medal fromPosition(double position, double participants, boolean isFinnegan) {
+                for (Medal medal : Medal.values()) {
+                    double bracket = isFinnegan ? medal.getFinneganBracket() : medal.getBracket();
+
+                    if (position <= Math.floor(participants * bracket))
+                        return medal;
+                }
+
+                return NONE;
+            }
 
         }
 
@@ -591,13 +608,16 @@ public class SkyBlockMember implements PostInit {
             private SkyBlockDate skyBlockDate;
             private String collectionName;
 
-            @Getter
-            @NoArgsConstructor(access = AccessLevel.PRIVATE)
-            public static class Data {
+            @Getter(AccessLevel.NONE)
+            @SerializedName("claimed_medal")
+            private @NotNull Optional<Medal> claimedMedal = Optional.empty();
 
-                private SkyBlockDate skyBlockDate;
-                private String collectionName;
+            public @NotNull Medal getMedal() {
+                return Medal.fromContest(this);
+            }
 
+            public boolean isFinnegan() {
+                return this.claimedMedal.isPresent();
             }
 
         }
