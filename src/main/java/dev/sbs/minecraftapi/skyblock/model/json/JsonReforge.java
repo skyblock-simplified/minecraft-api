@@ -1,5 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model.json;
 
+import dev.sbs.api.builder.EqualsBuilder;
+import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
@@ -33,6 +35,36 @@ public class JsonReforge implements Reforge, JsonModel {
     private @NotNull ConcurrentList<String> itemIds = Concurrent.newList();
     private @NotNull ConcurrentList<JsonSubstitute> stats = Concurrent.newList();
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JsonReforge that = (JsonReforge) o;
+
+        return new EqualsBuilder()
+            .append(this.getRequiredLevel(), that.getRequiredLevel())
+            .append(this.getId(), that.getId())
+            .append(this.getName(), that.getName())
+            .append(this.getStoneId(), that.getStoneId())
+            .append(this.getCategoryIds(), that.getCategoryIds())
+            .append(this.getItemIds(), that.getItemIds())
+            .append(this.getStats(), that.getStats())
+            .build();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.getId())
+            .append(this.getName())
+            .append(this.getStoneId())
+            .append(this.getRequiredLevel())
+            .append(this.getCategoryIds())
+            .append(this.getItemIds())
+            .append(this.getStats())
+            .build();
+    }
+
     @Getter
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonSubstitute implements Substitute {
@@ -40,6 +72,25 @@ public class JsonReforge implements Reforge, JsonModel {
         private @NotNull String id = "";
         private @NotNull ConcurrentMap<Rarity, Double> values = Concurrent.newMap();
 
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+
+            JsonSubstitute that = (JsonSubstitute) o;
+
+            return new EqualsBuilder()
+                .append(this.getId(), that.getId())
+                .append(this.getValues(), that.getValues())
+                .build();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder()
+                .append(this.getId())
+                .append(this.getValues())
+                .build();
+        }
 
     }
 
