@@ -31,6 +31,10 @@ public interface Enchantment extends Model {
         return this.getConflict().isPresent();
     }
 
+    default boolean noConflict() {
+        return !this.hasConflict();
+    }
+
     @NotNull ConcurrentList<String> getCategoryIds();
 
     default @NotNull ConcurrentList<ItemCategory> getCategories() {
