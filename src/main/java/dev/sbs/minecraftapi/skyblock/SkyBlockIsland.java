@@ -110,7 +110,7 @@ public class SkyBlockIsland {
 
             private double amount;
             private SkyBlockDate.RealTime timestamp;
-            private Transaction.Action action;
+            private Action action;
             @Getter(AccessLevel.NONE)
             @SerializedName("initiator_name")
             private String initiatorName;
@@ -135,38 +135,31 @@ public class SkyBlockIsland {
     public static class CommunityUpgrades {
 
         @SerializedName("currently_upgrading")
-        private @NotNull Optional<CommunityUpgrades.Upgrading> currentlyUpgrading = Optional.empty();
+        private @NotNull Optional<Upgrading> currentlyUpgrading = Optional.empty();
         @SerializedName("upgrade_states")
-        private @NotNull ConcurrentList<CommunityUpgrades.Upgraded> upgraded = Concurrent.newList();
+        private @NotNull ConcurrentList<Upgraded> upgraded = Concurrent.newList();
 
-        public int getHighestTier(@NotNull CommunityUpgrades.Type type) {
+        public int getHighestTier(@NotNull Type type) {
             return this.getUpgraded()
                 .stream()
                 .filter(upgraded -> upgraded.getUpgrade().name().equalsIgnoreCase(type.name()))
-                .sorted((o1, o2) -> Comparator.comparing(CommunityUpgrades.Upgraded::getTier).compare(o2, o1))
-                .map(CommunityUpgrades.Upgraded::getTier)
+                .sorted((o1, o2) -> Comparator.comparing(Upgraded::getTier).compare(o2, o1))
+                .map(Upgraded::getTier)
                 .findFirst()
                 .orElse(0);
         }
 
-        public @NotNull ConcurrentList<CommunityUpgrades.Upgraded> getUpgrades(@NotNull CommunityUpgrades.Type type) {
+        public @NotNull ConcurrentList<Upgraded> getUpgrades(@NotNull Type type) {
             return this.getUpgraded()
                 .stream()
                 .filter(upgraded -> upgraded.getUpgrade().name().equalsIgnoreCase(type.name()))
-                .sorted((o1, o2) -> Comparator.comparing(CommunityUpgrades.Upgraded::getTier).compare(o1, o2))
+                .sorted((o1, o2) -> Comparator.comparing(Upgraded::getTier).compare(o1, o2))
                 .collect(Concurrent.toList());
         }
 
         @Getter
-        public static class Upgraded {
+        public static class Upgraded extends Upgrading {
 
-            @SerializedName("upgrade")
-            private CommunityUpgrades.Type upgrade;
-            private int tier;
-            @SerializedName("started_ms")
-            private SkyBlockDate.RealTime started;
-            @SerializedName("started_by")
-            private String startedBy;
             @SerializedName("claimed_ms")
             private SkyBlockDate.RealTime claimed;
             @SerializedName("claimed_by")
@@ -179,13 +172,12 @@ public class SkyBlockIsland {
         @Getter
         public static class Upgrading {
 
-            @SerializedName("upgrade")
-            private CommunityUpgrades.Type upgrade;
-            @SerializedName("new_tier")
-            private int newTier;
+            private Type upgrade;
+            @SerializedName(alternate = "new_tier", value = "tier")
+            private int tier;
             @SerializedName("start_ms")
             private SkyBlockDate.RealTime started;
-            @SerializedName("who_started")
+            @SerializedName(alternate = "who_started", value = "started_by")
             private String startedBy;
 
         }
