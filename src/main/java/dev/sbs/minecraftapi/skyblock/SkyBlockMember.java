@@ -64,7 +64,7 @@ public class SkyBlockMember implements PostInit {
     private @NotNull PlayerData playerData = new PlayerData();
     @SerializedName("slayer")
     private @NotNull SlayerData slayerData = new SlayerData();
-    @SerializedName("pet_data")
+    @SerializedName("pets_data")
     private @NotNull PetData petData = new PetData();
     @SerializedName("dungeons")
     private @NotNull DungeonProfile dungeonData = new DungeonProfile();

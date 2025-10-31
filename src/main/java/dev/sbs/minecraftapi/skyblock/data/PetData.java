@@ -22,6 +22,8 @@ public class PetData {
 
     private final static @NotNull ConcurrentList<Integer> magicFindPetScore = Concurrent.newList(10, 25, 50, 75, 100, 130, 175, 225, 275, 325, 375, 450, 500);
     private final @NotNull ConcurrentList<Entry> pets = Concurrent.newList();
+    @SerializedName("pet_care")
+    private final @NotNull PetCare petCare = new PetCare();
     private final @NotNull AutoPet autopet = new AutoPet();
 
     public @NotNull Optional<Entry> getActivePet() {
@@ -210,6 +212,17 @@ public class PetData {
                 193275085, 195161785, 197048485, 198935185, 200821885, 202708585, 204595285, 206481985, 208368685, 210255385
             ))
         );
+
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class PetCare {
+
+        @SerializedName("coins_spent")
+        public double coinsSpent;
+        @SerializedName("pet_types_sacrificed")
+        private @NotNull ConcurrentList<String> sacrificedPets = Concurrent.newList();
 
     }
 
