@@ -57,7 +57,7 @@ public enum Profile {
     private final @NotNull String symbol;
     private final boolean usedForFruitBowl;
 
-    public static @NotNull ConcurrentMap<String, Object> CHOICES = StreamUtil.ofArrays(values())
+    public final static @NotNull ConcurrentMap<String, Object> CHOICES = StreamUtil.ofArrays(values())
         .map(profile -> Pair.of(profile.name(), profile.getName()))
         .collect(Concurrent.toWeakUnmodifiableMap());
 
