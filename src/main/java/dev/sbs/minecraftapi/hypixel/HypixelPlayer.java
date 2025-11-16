@@ -96,7 +96,7 @@ public class HypixelPlayer {
         if (StringUtil.isNotEmpty(this.packageRank))
             type = HypixelRank.Type.of(this.packageRank);
 
-        if (StringUtil.isNotEmpty(this.newPackageRank))
+        if (StringUtil.isNotEmpty(this.newPackageRank) && !"NONE".equals(this.newPackageRank))
             type = HypixelRank.Type.of(this.newPackageRank);
 
         if (StringUtil.isNotEmpty(this.monthlyPackageRank) && !"NONE".equals(this.monthlyPackageRank))

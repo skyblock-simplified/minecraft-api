@@ -78,13 +78,10 @@ public class HypixelGuild {
         private Map<String, Integer> experienceHistory;
 
         public @NotNull Rank getRank() {
-            if (this.isGuildMaster())
-                return Rank.buildGM(HypixelGuild.this.created);
-            else
-                return HypixelGuild.this.ranks.stream()
-                    .filter(rank -> rank.getName().equals(this.rank))
-                    .findFirst()
-                    .orElseThrow();
+            return HypixelGuild.this.ranks.stream()
+                .filter(rank -> rank.getName().equals(this.rank))
+                .findFirst()
+                .orElse(Rank.buildGM(HypixelGuild.this.created));
         }
 
         private boolean isGuildMaster() {
