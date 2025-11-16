@@ -42,6 +42,7 @@ public class HypixelRank {
         VIP_PLUS(ChatFormat.GREEN, "VIP", 1),
         VIP(ChatFormat.GREEN),
         PIG(ChatFormat.LIGHT_PURPLE, "PIG", 3),
+        INNIT(ChatFormat.LIGHT_PURPLE, "INNIT", 0),
         NONE(ChatFormat.GRAY);
 
         private final @NotNull ChatFormat format;
