@@ -1,10 +1,10 @@
 package dev.sbs.minecraftapi.client.sbs.response;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.minecraftapi.client.mojang.client.MojangClient;
 import dev.sbs.api.client.response.HttpStatus;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.minecraftapi.client.mojang.MojangClient;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
