@@ -5,11 +5,11 @@ import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.io.gson.GsonSettings;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
+import dev.sbs.minecraftapi.client.mojang.MinecraftServicesClient;
 import dev.sbs.minecraftapi.client.mojang.MojangApiClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.MojangSessionClient;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
-import dev.sbs.minecraftapi.client.mojang.request.MinecraftServicesEndpoints;
 import dev.sbs.minecraftapi.client.mojang.request.MojangApiEndpoints;
 import dev.sbs.minecraftapi.client.mojang.request.MojangSessionEndpoints;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
@@ -76,21 +76,15 @@ public class MinecraftApi extends SimplifiedApi {
         builderManager.add(ColorSegment.class, ColorSegment.Builder.class);
         builderManager.add(TextSegment.class, TextSegment.Builder.class);
 
-        // Create Api Handlers & Feign Proxies
+        // Provide Api Clients
         MojangProxy mojangProxy = new MojangProxy();
         serviceManager.add(MojangProxy.class, mojangProxy);
-        serviceManager.add(MojangApiEndpoints.class, mojangProxy.getApiRequest());
-        serviceManager.add(MojangSessionEndpoints.class, mojangProxy.getSessionRequest());
-        serviceManager.add(MinecraftServicesEndpoints.class, mojangProxy.getServicesRequest());
+        serviceManager.add(MojangApiClient.class, mojangProxy.getApiClient());
+        serviceManager.add(MinecraftServicesClient.class, mojangProxy.getServicesClient());
+        serviceManager.add(MojangSessionClient.class, mojangProxy.getSessionClient());
+        serviceManager.add(SbsClient.class, new SbsClient());
+        serviceManager.add(HypixelClient.class, new HypixelClient());
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
-
-        SbsClient sbsApiClient = new SbsClient();
-        serviceManager.add(SbsClient.class, sbsApiClient);
-        serviceManager.add(SbsEndpoints.class, sbsApiClient.build(SbsEndpoints.class));
-
-        HypixelClient hypixelApiClient = new HypixelClient();
-        serviceManager.add(HypixelClient.class, hypixelApiClient);
-        serviceManager.add(HypixelEndpoints.class, hypixelApiClient.build(HypixelEndpoints.class));
     }
 
     public static @NotNull NbtFactory getNbtFactory() {
