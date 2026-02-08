@@ -6,11 +6,11 @@ import dev.sbs.api.client.response.CFCacheStatus;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.minecraftapi.client.sbs.exception.SbsApiException;
-import dev.sbs.minecraftapi.client.sbs.request.SbsRequest;
+import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoints;
 import feign.FeignException;
 import org.jetbrains.annotations.NotNull;
 
-public final class SbsClient extends Client<SbsRequest> {
+public final class SbsClient extends Client<SbsEndpoints> {
 
     public SbsClient() {
         super("api.sbs.dev");

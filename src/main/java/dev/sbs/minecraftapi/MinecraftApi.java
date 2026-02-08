@@ -4,17 +4,17 @@ import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.io.gson.GsonSettings;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelRequest;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
 import dev.sbs.minecraftapi.client.mojang.MojangApiClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.MojangSessionClient;
-import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerRequest;
-import dev.sbs.minecraftapi.client.mojang.request.MinecraftServicesRequest;
-import dev.sbs.minecraftapi.client.mojang.request.MojangApiRequest;
-import dev.sbs.minecraftapi.client.mojang.request.MojangSessionRequest;
+import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
+import dev.sbs.minecraftapi.client.mojang.request.MinecraftServicesEndpoints;
+import dev.sbs.minecraftapi.client.mojang.request.MojangApiEndpoints;
+import dev.sbs.minecraftapi.client.mojang.request.MojangSessionEndpoints;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
-import dev.sbs.minecraftapi.client.sbs.request.SbsRequest;
+import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoints;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
@@ -66,10 +66,10 @@ public class MinecraftApi extends SimplifiedApi {
         serviceManager.add(NbtFactory.class, new NbtFactory());
 
         // Provide Class Builders
-        compilerManager.add(MojangApiRequest.class, MojangApiClient.class);
-        compilerManager.add(MojangSessionRequest.class, MojangSessionClient.class);
-        compilerManager.add(SbsRequest.class, SbsClient.class);
-        compilerManager.add(HypixelRequest.class, HypixelClient.class);
+        compilerManager.add(MojangApiEndpoints.class, MojangApiClient.class);
+        compilerManager.add(MojangSessionEndpoints.class, MojangSessionClient.class);
+        compilerManager.add(SbsEndpoints.class, SbsClient.class);
+        compilerManager.add(HypixelEndpoints.class, HypixelClient.class);
 
         // Provide Builders
         builderManager.add(LineSegment.class, LineSegment.Builder.class);
@@ -79,18 +79,18 @@ public class MinecraftApi extends SimplifiedApi {
         // Create Api Handlers & Feign Proxies
         MojangProxy mojangProxy = new MojangProxy();
         serviceManager.add(MojangProxy.class, mojangProxy);
-        serviceManager.add(MojangApiRequest.class, mojangProxy.getApiRequest());
-        serviceManager.add(MojangSessionRequest.class, mojangProxy.getSessionRequest());
-        serviceManager.add(MinecraftServicesRequest.class, mojangProxy.getServicesRequest());
-        serviceManager.add(MinecraftServerRequest.class, new MinecraftServerRequest());
+        serviceManager.add(MojangApiEndpoints.class, mojangProxy.getApiRequest());
+        serviceManager.add(MojangSessionEndpoints.class, mojangProxy.getSessionRequest());
+        serviceManager.add(MinecraftServicesEndpoints.class, mojangProxy.getServicesRequest());
+        serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
 
         SbsClient sbsApiClient = new SbsClient();
         serviceManager.add(SbsClient.class, sbsApiClient);
-        serviceManager.add(SbsRequest.class, sbsApiClient.build(SbsRequest.class));
+        serviceManager.add(SbsEndpoints.class, sbsApiClient.build(SbsEndpoints.class));
 
         HypixelClient hypixelApiClient = new HypixelClient();
         serviceManager.add(HypixelClient.class, hypixelApiClient);
-        serviceManager.add(HypixelRequest.class, hypixelApiClient.build(HypixelRequest.class));
+        serviceManager.add(HypixelEndpoints.class, hypixelApiClient.build(HypixelEndpoints.class));
     }
 
     public static @NotNull NbtFactory getNbtFactory() {

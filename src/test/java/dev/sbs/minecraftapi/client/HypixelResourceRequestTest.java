@@ -2,7 +2,8 @@ package dev.sbs.minecraftapi.client;
 
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.util.SystemUtil;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelRequest;
+import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.resource.ResourceCollectionsResponse;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.resource.ResourceItemsResponse;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.resource.ResourceSkillsResponse;
@@ -12,10 +13,10 @@ import org.junit.jupiter.api.Test;
 
 public class HypixelResourceRequestTest {
 
-    private static final HypixelRequest HYPIXEL_RESOURCE_REQUEST;
+    private static final HypixelEndpoints HYPIXEL_RESOURCE_REQUEST;
 
     static {
-        HYPIXEL_RESOURCE_REQUEST = SimplifiedApi.getApiRequest(HypixelRequest.class);
+        HYPIXEL_RESOURCE_REQUEST = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
     }
 
     @Test
