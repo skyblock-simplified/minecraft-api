@@ -49,7 +49,7 @@ public class MinecraftApi extends SimplifiedApi {
 
     static {
         // Update Gson
-        GsonSettings gsonSettings = getGsonSettings()
+        GsonSettings gsonSettings = serviceManager.get(GsonSettings.class)
             .mutate()
             .withTypeAdapter(NbtContent.class, new NbtContentTypeAdapter())
             .withTypeAdapter(MojangMultiUsernameResponse.class, new MojangMultiUsernameResponse.Deserializer())
