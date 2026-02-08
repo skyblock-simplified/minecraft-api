@@ -4,17 +4,13 @@ import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.io.gson.GsonSettings;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
 import dev.sbs.minecraftapi.client.mojang.MinecraftServicesClient;
 import dev.sbs.minecraftapi.client.mojang.MojangApiClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.MojangSessionClient;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
-import dev.sbs.minecraftapi.client.mojang.request.MojangApiEndpoints;
-import dev.sbs.minecraftapi.client.mojang.request.MojangSessionEndpoints;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
-import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoints;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
@@ -64,12 +60,6 @@ public class MinecraftApi extends SimplifiedApi {
 
         // Provide Services
         serviceManager.add(NbtFactory.class, new NbtFactory());
-
-        // Provide Class Builders
-        compilerManager.add(MojangApiEndpoints.class, MojangApiClient.class);
-        compilerManager.add(MojangSessionEndpoints.class, MojangSessionClient.class);
-        compilerManager.add(SbsEndpoints.class, SbsClient.class);
-        compilerManager.add(HypixelEndpoints.class, HypixelClient.class);
 
         // Provide Builders
         builderManager.add(LineSegment.class, LineSegment.Builder.class);
