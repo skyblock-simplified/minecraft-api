@@ -1,13 +1,13 @@
 package dev.sbs.minecraftapi.client.sbs.exception;
 
-import dev.sbs.api.client.exception.ApiErrorResponse;
+import dev.sbs.api.client.exception.ClientErrorResponse;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SbsErrorResponse implements ApiErrorResponse {
+public class SbsErrorResponse implements ClientErrorResponse {
 
     protected String error;
     protected String reason;
