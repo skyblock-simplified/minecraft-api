@@ -10,7 +10,7 @@ public final class SbsApiException extends ApiException {
     private final @NotNull SbsErrorResponse response;
 
     public SbsApiException(@NotNull String methodKey, @NotNull feign.Response response) {
-        super(methodKey, response, "Sbs");
+        super(methodKey, response, "SBS");
         this.response = this.getBody()
             .map(json -> super.fromJson(json, SbsErrorResponse.class))
             .orElse(new SbsErrorResponse.Unknown());
