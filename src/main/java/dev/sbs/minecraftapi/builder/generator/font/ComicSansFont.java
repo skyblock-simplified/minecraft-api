@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.builder.font;
+package dev.sbs.minecraftapi.builder.generator.font;
 
 import dev.sbs.annotation.ResourcePath;
 import dev.sbs.minecraftapi.builder.text.segment.ColorSegment;

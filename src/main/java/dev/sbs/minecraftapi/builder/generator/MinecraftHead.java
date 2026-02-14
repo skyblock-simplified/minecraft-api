@@ -1,7 +1,7 @@
-package dev.sbs.minecraftapi.generator;
+package dev.sbs.minecraftapi.builder.generator;
 
-import dev.sbs.minecraftapi.generator.exception.GeneratorException;
 import dev.sbs.api.util.SystemUtil;
+import dev.sbs.minecraftapi.builder.generator.exception.GeneratorException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

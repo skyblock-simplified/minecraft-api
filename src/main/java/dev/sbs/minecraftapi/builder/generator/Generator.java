@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.generator;
+package dev.sbs.minecraftapi.builder.generator;
 
 public class Generator {
 
