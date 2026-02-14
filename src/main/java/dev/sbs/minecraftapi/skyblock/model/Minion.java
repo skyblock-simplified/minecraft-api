@@ -1,9 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
-import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import org.jetbrains.annotations.NotNull;
@@ -37,30 +35,11 @@ public interface Minion extends Model {
 
         @NotNull String getItemId();
 
-        @NotNull UpgradeCost getUpgradeCost();
+        @NotNull Item.UpgradeCost getUpgradeCost();
 
         default @NotNull Item getItem() {
             return MinecraftApi.getRepositoryOf(Item.class)
                 .findFirstOrNull(Item::getId, this.getItemId());
-        }
-
-    }
-
-    interface UpgradeCost {
-
-        @NotNull ConcurrentMap<Currency, Double> getCurrencies();
-
-        @NotNull ConcurrentMap<String, Double> getItems();
-
-        enum Currency {
-
-            @SerializedName("coins")
-            COINS,
-            @SerializedName("pelts")
-            PELTS,
-            @SerializedName("northStars")
-            NORTH_STARS
-
         }
 
     }
