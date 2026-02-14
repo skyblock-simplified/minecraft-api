@@ -3,7 +3,7 @@ package dev.sbs.minecraftapi.generator;
 import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.io.ByteArrayDataOutput;
+import dev.sbs.api.io.stream.ByteArrayDataOutput;
 import dev.sbs.api.util.Range;
 import dev.sbs.api.util.SystemUtil;
 import dev.sbs.minecraftapi.generator.exception.GeneratorException;
