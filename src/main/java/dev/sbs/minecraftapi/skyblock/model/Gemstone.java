@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.text.ChatFormat;
+import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import org.jetbrains.annotations.NotNull;
 
 public interface Gemstone extends Model {

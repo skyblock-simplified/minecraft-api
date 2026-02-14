@@ -6,8 +6,8 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.Model;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
+import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.Rarity;
-import dev.sbs.minecraftapi.text.ChatFormat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

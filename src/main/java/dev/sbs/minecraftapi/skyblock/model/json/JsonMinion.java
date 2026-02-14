@@ -5,7 +5,6 @@ import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.data.json.JsonModel;
 import dev.sbs.api.data.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.Minion;
@@ -64,7 +63,7 @@ public class JsonMinion implements Minion, JsonModel {
         private double speed;
         @SerializedName("item")
         private @NotNull String itemId = "";
-        private @NotNull JsonMinionUpgradeCost upgradeCost = new JsonMinionUpgradeCost();
+        private @NotNull JsonItem.JsonUpgradeCost upgradeCost = new JsonItem.JsonUpgradeCost();
 
         @Override
         public boolean equals(Object o) {
@@ -87,35 +86,6 @@ public class JsonMinion implements Minion, JsonModel {
                 .append(this.getSpeed())
                 .append(this.getItemId())
                 .append(this.getUpgradeCost())
-                .build();
-        }
-
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
-    public static class JsonMinionUpgradeCost implements UpgradeCost {
-
-        private @NotNull ConcurrentMap<Currency, Double> currencies = Concurrent.newMap();
-        private @NotNull ConcurrentMap<String, Double> items = Concurrent.newMap();
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-
-            JsonMinionUpgradeCost that = (JsonMinionUpgradeCost) o;
-
-            return new EqualsBuilder()
-                .append(this.getCurrencies(), that.getCurrencies())
-                .append(this.getItems(), that.getItems())
-                .build();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getCurrencies())
-                .append(this.getItems())
                 .build();
         }
 

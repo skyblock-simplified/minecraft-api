@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.hypixel;
 
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.text.ChatFormat;
+import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
