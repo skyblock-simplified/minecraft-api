@@ -1,7 +1,7 @@
-package dev.sbs.minecraftapi.generator.font;
+package dev.sbs.minecraftapi.builder.font;
 
 import dev.sbs.annotation.ResourcePath;
-import dev.sbs.minecraftapi.text.segment.ColorSegment;
+import dev.sbs.minecraftapi.builder.text.segment.ColorSegment;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

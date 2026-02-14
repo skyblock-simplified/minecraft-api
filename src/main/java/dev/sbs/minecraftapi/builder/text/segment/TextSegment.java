@@ -1,12 +1,12 @@
-package dev.sbs.minecraftapi.text.segment;
+package dev.sbs.minecraftapi.builder.text.segment;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.sbs.minecraftapi.text.ChatFormat;
-import dev.sbs.minecraftapi.text.event.ClickEvent;
-import dev.sbs.minecraftapi.text.event.HoverEvent;
-import dev.sbs.api.util.StringUtil;
 import dev.sbs.api.builder.ClassBuilder;
+import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.builder.text.ChatFormat;
+import dev.sbs.minecraftapi.builder.text.event.ClickEvent;
+import dev.sbs.minecraftapi.builder.text.event.HoverEvent;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

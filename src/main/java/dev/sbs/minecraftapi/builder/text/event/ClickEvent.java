@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.text.event;
+package dev.sbs.minecraftapi.builder.text.event;
 
 import com.google.gson.JsonObject;
 import lombok.Getter;
