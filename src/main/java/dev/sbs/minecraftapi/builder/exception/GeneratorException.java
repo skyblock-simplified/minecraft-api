@@ -1,11 +1,10 @@
-package dev.sbs.minecraftapi.generator.exception;
+package dev.sbs.minecraftapi.builder.exception;
 
-import dev.sbs.minecraftapi.exception.MinecraftException;
 import org.intellij.lang.annotations.PrintFormat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class GeneratorException extends MinecraftException {
+public final class GeneratorException extends BuilderException {
 
     public GeneratorException(@NotNull Throwable cause) {
         super(cause);
