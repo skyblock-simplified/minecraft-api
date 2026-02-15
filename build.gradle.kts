@@ -28,8 +28,8 @@ dependencies {
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.10.0")
 
     // Logging
-    implementation(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.20.0")
-    implementation(group = "org.apache.logging.log4j", name = "log4j-slf4j-impl", version = "2.20.0")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.25.3")
+    implementation(group = "org.apache.logging.log4j", name = "log4j-slf4j-impl", version = "2.25.3")
 
     // Deserialization
     implementation(group = "com.google.code.gson", name = "gson", version = "2.10.1")
@@ -44,7 +44,6 @@ dependencies {
     // Api Clients
     implementation(group = "io.github.openfeign", name = "feign-gson", version = "13.6")
     implementation(group = "io.github.openfeign", name = "feign-httpclient", version = "13.6")
-    implementation(group = "redis.clients", name = "jedis", version = "6.0.0")
 
     // Projects
     implementation(optionalProject(":api", "com.github.skyblock-simplified:api:master-SNAPSHOT"))
