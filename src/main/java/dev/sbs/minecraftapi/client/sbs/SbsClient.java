@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.client.sbs;
 
 import dev.sbs.api.client.Client;
-import dev.sbs.api.client.exception.ClientErrorDecoder;
+import dev.sbs.api.client.decoder.ClientErrorDecoder;
 import dev.sbs.minecraftapi.client.sbs.exception.SbsApiException;
 import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoints;
 import org.jetbrains.annotations.NotNull;
