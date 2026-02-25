@@ -8,10 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 public final class SbsClient extends Client<SbsEndpoints> {
 
-    public SbsClient() {
-        super("api.sbs.dev");
-    }
-
     @Override
     protected @NotNull ClientErrorDecoder configureErrorDecoder() {
         return (methodKey, response) -> {

@@ -1,6 +1,7 @@
 package dev.sbs.minecraftapi.client.sbs.request;
 
 import dev.sbs.api.client.request.Endpoints;
+import dev.sbs.api.client.route.Route;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProfile;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
 import dev.sbs.minecraftapi.client.sbs.response.MojangStatusResponse;
@@ -14,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@Route("api.sbs.dev")
 public interface SbsEndpoints extends Endpoints {
 
     @RequestLine("GET /test/{username}")
