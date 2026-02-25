@@ -4,7 +4,7 @@ import dev.sbs.api.client.request.Endpoints;
 import dev.sbs.api.client.route.Route;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProfile;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
-import dev.sbs.minecraftapi.client.sbs.response.MojangStatusResponse;
+import dev.sbs.minecraftapi.client.sbs.exception.SbsApiException;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
@@ -20,27 +20,24 @@ public interface SbsEndpoints extends Endpoints {
 
     @RequestLine("GET /test/{username}")
     @Deprecated
-    @NotNull MojangUsernameResponse getTestProfileFromUsername(@NotNull @Param("username") String username);
+    @NotNull MojangUsernameResponse getTestProfileFromUsername(@NotNull @Param("username") String username) throws SbsApiException;
 
     @RequestLine("GET /mojang/user/{username}")
-    @NotNull MojangProfile getProfileFromUsername(@NotNull @Param("username") String username);
+    @NotNull MojangProfile getProfileFromUsername(@NotNull @Param("username") String username) throws SbsApiException;
 
     @RequestLine("GET /mojang/user/{uniqueId}")
-    @NotNull MojangProfile getProfileFromUniqueId(@NotNull @Param("uniqueId") UUID uniqueId);
-
-    @RequestLine("GET /mojang/status")
-    @NotNull MojangStatusResponse getStatus();
+    @NotNull MojangProfile getProfileFromUniqueId(@NotNull @Param("uniqueId") UUID uniqueId) throws SbsApiException;
 
     @RequestLine("GET /skyblock/emojis.json")
-    @NotNull SkyBlockEmojisResponse getEmojis();
+    @NotNull SkyBlockEmojisResponse getEmojis() throws SbsApiException;
 
     @RequestLine("GET /skyblock/images.json")
-    @NotNull SkyBlockImagesResponse getImages();
+    @NotNull SkyBlockImagesResponse getImages() throws SbsApiException;
 
     @RequestLine("GET /skyblock/items.json")
-    @NotNull SkyBlockItemsResponse getItems();
+    @NotNull SkyBlockItemsResponse getItems() throws SbsApiException;
 
-    default @NotNull SkyBlockEmojis getItemEmojis() {
+    default @NotNull SkyBlockEmojis getItemEmojis() throws SbsApiException {
         return new SkyBlockEmojis(
             this.getItems(),
             this.getEmojis(),
