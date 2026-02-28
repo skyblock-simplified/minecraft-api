@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.Rarity;
@@ -32,7 +32,7 @@ public interface Accessory extends Model {
     @NotNull ConcurrentList<Substitute> getStats();
 
     default @NotNull Item getItem() {
-        return MinecraftApi.getRepositoryOf(Item.class)
+        return MinecraftApi.getRepository(Item.class)
             .findFirstOrNull(Item::getId, this.getId());
     }
 
@@ -73,7 +73,7 @@ public interface Accessory extends Model {
         double getValue();
 
         default @NotNull Stat getStat() {
-            return MinecraftApi.getRepositoryOf(Stat.class)
+            return MinecraftApi.getRepository(Stat.class)
                 .findFirstOrNull(Stat::getId, this.getId());
         }
 

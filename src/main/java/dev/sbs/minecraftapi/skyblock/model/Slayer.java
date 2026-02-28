@@ -3,7 +3,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.api.stream.pair.Pair;
 import dev.sbs.minecraftapi.MinecraftApi;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public interface Slayer extends Model {
     @NotNull String getMobTypeId();
 
     default @NotNull MobType getMobType() {
-        return MinecraftApi.getRepositoryOf(MobType.class)
+        return MinecraftApi.getRepository(MobType.class)
             .findFirstOrNull(MobType::getId, this.getMobTypeId());
     }
 
@@ -64,7 +64,7 @@ public interface Slayer extends Model {
         @NotNull ConcurrentList<String> getUnlocks();
 
         default @NotNull ConcurrentMap<String, Double> getEffects() {
-            return MinecraftApi.getRepositoryOf(Stat.class)
+            return MinecraftApi.getRepository(Stat.class)
                 .stream()
                 .map(stat -> Pair.of(
                     stat.getId(),

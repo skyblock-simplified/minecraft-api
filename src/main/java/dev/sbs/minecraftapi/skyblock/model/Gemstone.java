@@ -2,7 +2,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ public interface Gemstone extends Model {
     @NotNull String getStatId();
 
     default @NotNull Stat getStat() {
-        return MinecraftApi.getRepositoryOf(Stat.class).findFirstOrNull(Stat::getId, this.getStatId());
+        return MinecraftApi.getRepository(Stat.class).findFirstOrNull(Stat::getId, this.getStatId());
     }
 
     @NotNull ConcurrentMap<Type, ConcurrentMap<ChatFormat, Double>> getValues();

@@ -3,7 +3,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.Rarity;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ public interface Reforge extends Model {
     @NotNull Optional<String> getStoneId();
 
     default @NotNull Optional<Item> getStone() {
-        return this.getStoneId().flatMap(itemId -> MinecraftApi.getRepositoryOf(Item.class)
+        return this.getStoneId().flatMap(itemId -> MinecraftApi.getRepository(Item.class)
             .findFirst(Item::getId, itemId)
         );
     }
@@ -37,7 +37,7 @@ public interface Reforge extends Model {
     @NotNull ConcurrentList<String> getCategoryIds();
 
     default @NotNull ConcurrentList<ItemCategory> getCategories() {
-        return MinecraftApi.getRepositoryOf(ItemCategory.class)
+        return MinecraftApi.getRepository(ItemCategory.class)
             .matchAll(category -> this.getCategoryIds().contains(category.getId()))
             .collect(Concurrent.toUnmodifiableList());
     }
@@ -45,7 +45,7 @@ public interface Reforge extends Model {
     @NotNull ConcurrentList<String> getItemIds();
 
     default @NotNull ConcurrentList<Item> getItems() {
-        return MinecraftApi.getRepositoryOf(Item.class)
+        return MinecraftApi.getRepository(Item.class)
             .matchAll(item -> this.getItemIds().contains(item.getId()))
             .collect(Concurrent.toUnmodifiableList());
     }
@@ -64,7 +64,7 @@ public interface Reforge extends Model {
         @NotNull String getId();
 
         default @NotNull Optional<Stat> getStat() {
-            return MinecraftApi.getRepositoryOf(Stat.class)
+            return MinecraftApi.getRepository(Stat.class)
                 .findFirst(Stat::getId, this.getId());
         }
 

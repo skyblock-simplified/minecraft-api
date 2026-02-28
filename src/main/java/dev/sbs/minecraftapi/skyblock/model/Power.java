@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ public interface Power extends Model {
     @NotNull Optional<String> getStoneId();
 
     default @NotNull Optional<Item> getStone() {
-        return this.getStoneId().flatMap(stoneId -> MinecraftApi.getRepositoryOf(Item.class)
+        return this.getStoneId().flatMap(stoneId -> MinecraftApi.getRepository(Item.class)
             .findFirst(Item::getId, stoneId)
         );
     }

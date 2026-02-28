@@ -1,6 +1,6 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import org.jetbrains.annotations.NotNull;
 

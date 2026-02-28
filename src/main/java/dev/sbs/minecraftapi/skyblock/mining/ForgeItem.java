@@ -22,7 +22,7 @@ public class ForgeItem {
     private boolean notified;
 
     public @NotNull Item getItem() {
-        return MinecraftApi.getRepositoryOf(Item.class).findFirstOrNull(Item::getId, this.getItemId());
+        return MinecraftApi.getRepository(Item.class).findFirstOrNull(Item::getId, this.getItemId());
     }
 
 }

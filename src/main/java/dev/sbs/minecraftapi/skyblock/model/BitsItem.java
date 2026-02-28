@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.api.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 

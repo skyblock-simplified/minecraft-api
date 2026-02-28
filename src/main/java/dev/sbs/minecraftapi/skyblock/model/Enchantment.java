@@ -3,7 +3,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.Rarity;
@@ -38,7 +38,7 @@ public interface Enchantment extends Model {
     @NotNull ConcurrentList<String> getCategoryIds();
 
     default @NotNull ConcurrentList<ItemCategory> getCategories() {
-        return MinecraftApi.getRepositoryOf(ItemCategory.class)
+        return MinecraftApi.getRepository(ItemCategory.class)
             .matchAll(category -> this.getCategoryIds().contains(category.getId()))
             .collect(Concurrent.toUnmodifiableList());
     }
@@ -46,7 +46,7 @@ public interface Enchantment extends Model {
     @NotNull ConcurrentList<String> getItemIds();
 
     default @NotNull ConcurrentList<Item> getItems() {
-        return MinecraftApi.getRepositoryOf(Item.class)
+        return MinecraftApi.getRepository(Item.class)
             .matchAll(item -> this.getItemIds().contains(item.getId()))
             .collect(Concurrent.toUnmodifiableList());
     }
@@ -58,7 +58,7 @@ public interface Enchantment extends Model {
     @NotNull ConcurrentList<String> getMobTypeIds();
 
     default @NotNull ConcurrentList<MobType> getMobTypes() {
-        return MinecraftApi.getRepositoryOf(MobType.class)
+        return MinecraftApi.getRepository(MobType.class)
             .matchAll(mobType -> this.getMobTypeIds().contains(mobType.getId()))
             .collect(Concurrent.toUnmodifiableList());
     }
@@ -70,7 +70,7 @@ public interface Enchantment extends Model {
         @NotNull Optional<String> getItemId();
 
         default @NotNull Optional<Item> getItem() {
-            return this.getItemId().flatMap(itemId -> MinecraftApi.getRepositoryOf(Item.class)
+            return this.getItemId().flatMap(itemId -> MinecraftApi.getRepository(Item.class)
                 .findFirst(Item::getId, itemId)
             );
         }
@@ -101,7 +101,7 @@ public interface Enchantment extends Model {
         @NotNull String getId();
 
         default @NotNull Optional<Stat> getStat() {
-            return MinecraftApi.getRepositoryOf(Stat.class)
+            return MinecraftApi.getRepository(Stat.class)
                 .findFirst(Stat::getId, this.getId());
         }
 

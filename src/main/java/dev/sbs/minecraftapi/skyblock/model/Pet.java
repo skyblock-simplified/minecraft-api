@@ -3,7 +3,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
@@ -28,7 +28,7 @@ public interface Pet extends Model {
     @NotNull String getSkillId();
 
     default @NotNull Skill getSkill() {
-        return MinecraftApi.getRepositoryOf(Skill.class)
+        return MinecraftApi.getRepository(Skill.class)
             .findFirstOrNull(Skill::getId, this.getSkillId());
     }
 
@@ -90,7 +90,7 @@ public interface Pet extends Model {
         @NotNull String getId();
 
         default @NotNull Optional<Stat> getStat() {
-            return MinecraftApi.getRepositoryOf(Stat.class)
+            return MinecraftApi.getRepository(Stat.class)
                 .findFirst(Stat::getId, this.getId());
         }
 

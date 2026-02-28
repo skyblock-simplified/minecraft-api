@@ -2,8 +2,8 @@ package dev.sbs.minecraftapi.skyblock.model.json;
 
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
-import dev.sbs.api.data.json.JsonModel;
-import dev.sbs.api.data.json.JsonResource;
+import dev.sbs.api.persistence.json.JsonModel;
+import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.Item;
 import dev.sbs.minecraftapi.skyblock.model.ItemCategory;
 import lombok.AccessLevel;

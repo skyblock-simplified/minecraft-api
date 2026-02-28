@@ -2,7 +2,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,7 +23,7 @@ public interface Minion extends Model {
     @NotNull ConcurrentList<Tier> getTiers();
 
     default @NotNull Collection getCollection() {
-        return MinecraftApi.getRepositoryOf(Collection.class)
+        return MinecraftApi.getRepository(Collection.class)
             .findFirstOrNull(Collection::getId, this.getCollectionId());
     }
 
@@ -38,7 +38,7 @@ public interface Minion extends Model {
         @NotNull Item.UpgradeCost getUpgradeCost();
 
         default @NotNull Item getItem() {
-            return MinecraftApi.getRepositoryOf(Item.class)
+            return MinecraftApi.getRepository(Item.class)
                 .findFirstOrNull(Item::getId, this.getItemId());
         }
 
