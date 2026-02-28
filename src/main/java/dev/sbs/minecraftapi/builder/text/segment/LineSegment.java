@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.stream.StreamUtil;
+import dev.sbs.api.util.StreamUtil;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
 import lombok.AccessLevel;

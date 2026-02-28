@@ -6,7 +6,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.reflection.Reflection;
-import dev.sbs.api.stream.pair.Pair;
+import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.model.Slayer;
@@ -129,7 +129,7 @@ public class SlayerData implements PostInit {
 
 
         public @NotNull Slayer getSlayer() {
-            return MinecraftApi.getRepositoryOf(Slayer.class).findFirstOrNull(Slayer::getId, this.getId());
+            return MinecraftApi.getRepository(Slayer.class).findFirstOrNull(Slayer::getId, this.getId());
         }
 
         @Override

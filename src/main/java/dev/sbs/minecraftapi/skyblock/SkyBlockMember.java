@@ -9,11 +9,11 @@ import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.collection.concurrent.linked.ConcurrentLinkedMap;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
-import dev.sbs.api.mutable.MutableDouble;
-import dev.sbs.api.stream.pair.Pair;
-import dev.sbs.api.stream.pair.PairOptional;
+import dev.sbs.api.tuple.pair.Pair;
+import dev.sbs.api.tuple.pair.PairOptional;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.api.util.StringUtil;
+import dev.sbs.api.util.mutable.MutableDouble;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
@@ -180,7 +180,7 @@ public class SkyBlockMember implements PostInit {
         private transient @NotNull ConcurrentMap<String, Double> selectedPowerStats = Concurrent.newUnmodifiableMap();
 
         public @NotNull Optional<Power> getSelectedPower() {
-            return this.getSelectedPowerId().flatMap(powerId -> MinecraftApi.getRepositoryOf(Power.class)
+            return this.getSelectedPowerId().flatMap(powerId -> MinecraftApi.getRepository(Power.class)
                 .findFirst(Power::getId, powerId)
             );
         }
@@ -188,7 +188,7 @@ public class SkyBlockMember implements PostInit {
         public @NotNull ConcurrentList<Power> getUnlockedPowers() {
             return this.getUnlockedPowerIds()
                 .stream()
-                .map(powerId -> MinecraftApi.getRepositoryOf(Power.class)
+                .map(powerId -> MinecraftApi.getRepository(Power.class)
                     .findFirst(Power::getId, powerId)
                 )
                 .flatMap(Optional::stream)
@@ -212,7 +212,7 @@ public class SkyBlockMember implements PostInit {
                 .<CompoundTag>getListTag("i")
                 .stream()
                 .filter(CompoundTag::notEmpty)
-                .flatMap(compoundTag -> SimplifiedApi.getRepositoryOf(Accessory.class)
+                .flatMap(compoundTag -> SimplifiedApi.getRepository(Accessory.class)
                     .findFirst(
                         Accessory::getId,
                         compoundTag.getPathOrDefault("tag.ExtraAttributes.id", StringTag.EMPTY).getValue()
@@ -300,7 +300,7 @@ public class SkyBlockMember implements PostInit {
                 .flatMap(power -> power.getBaseValues().stream())
                 .map(entry -> Pair.of(
                     entry.getKey(),
-                    MinecraftApi.getRepositoryOf(Stat.class)
+                    MinecraftApi.getRepository(Stat.class)
                         .findFirstOrNull(Stat::getId, entry.getKey())
                         .getPowerCoefficient() * this.getLogComponent() * entry.getValue()
                 ))
@@ -764,7 +764,7 @@ public class SkyBlockMember implements PostInit {
                     .map(parts -> Pair.of(parts[0], TrophyFish.Tier.valueOf(parts[1])))
             );
 
-            this.fish = MinecraftApi.getRepositoryOf(TrophyFish.class)
+            this.fish = MinecraftApi.getRepository(TrophyFish.class)
                 .stream()
                 .map(type -> Pair.of(
                     type.getId(),

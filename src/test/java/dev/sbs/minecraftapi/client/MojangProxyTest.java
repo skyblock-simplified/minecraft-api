@@ -5,7 +5,7 @@ import dev.sbs.api.scheduler.Scheduler;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.exception.MojangApiException;
-import dev.sbs.minecraftapi.client.mojang.request.MojangApiEndpoints;
+import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoints;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
@@ -17,15 +17,15 @@ public class MojangProxyTest {
     @Test
     public void makeMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangApiEndpoints apiRequest = mojangProxy.getApiRequest();
-        MojangUsernameResponse usernameResponse = apiRequest.getUniqueId("CraftedFury");
+        MojangEndpoints apiRequest = mojangProxy.getEndpoints();
+        MojangUsernameResponse usernameResponse = apiRequest.getPlayer("CraftedFury");
         System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId());
     }
 
     @Test
     public void makeMultiMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangApiEndpoints apiRequest = mojangProxy.getApiRequest();
+        MojangEndpoints apiRequest = mojangProxy.getEndpoints();
         MojangMultiUsernameResponse multiUsernameResponse = apiRequest.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
         multiUsernameResponse.getProfiles().forEach(usernameResponse -> System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId()));
     }

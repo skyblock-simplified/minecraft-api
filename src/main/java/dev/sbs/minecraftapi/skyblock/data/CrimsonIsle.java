@@ -6,7 +6,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
-import dev.sbs.api.stream.pair.Pair;
+import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.api.util.Range;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;

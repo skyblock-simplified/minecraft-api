@@ -4,12 +4,12 @@ import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.collection.search.SearchFunction;
-import dev.sbs.api.data.DataSession;
-import dev.sbs.api.data.Repository;
-import dev.sbs.api.data.sql.SqlConfig;
-import dev.sbs.api.data.sql.SqlModel;
-import dev.sbs.api.stream.pair.Pair;
+import dev.sbs.api.collection.query.SearchFunction;
+import dev.sbs.api.persistence.Repository;
+import dev.sbs.api.persistence.Session;
+import dev.sbs.api.persistence.sql.SqlConfig;
+import dev.sbs.api.persistence.sql.SqlModel;
+import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.exception.HypixelApiException;
@@ -46,7 +46,7 @@ public class SkyBlockIslandTest {
     public void getGuildLevels_ok() {
         try {
             System.out.println("Database Starting... ");
-            DataSession<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
+            Session<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
             System.out.println("Database initialized in " + session.getInitialization() + "ms");
             System.out.println("Database started in " + session.getStartup() + "ms");
             HypixelEndpoints hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
@@ -117,7 +117,7 @@ public class SkyBlockIslandTest {
     public void getPlayerStats_ok() {
         try {
             System.out.println("Database Starting... ");
-            DataSession<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
+            Session<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
             System.out.println("Database initialized in " + session.getInitialization() + "ms");
             System.out.println("Database started in " + session.getStartup() + "ms");
             HypixelEndpoints hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
@@ -192,24 +192,24 @@ public class SkyBlockIslandTest {
     public void getIsland_ok() {
         try {
             System.out.println("Database Starting... ");
-            DataSession<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
+            Session<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
             System.out.println("Database initialized in " + session.getInitialization() + "ms");
             System.out.println("Database started in " + session.getStartup() + "ms");
             HypixelEndpoints hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
-            ProfileModel pineappleProfile = SimplifiedApi.getRepositoryOf(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE");
-            ProfileModel bananaProfile = SimplifiedApi.getRepositoryOf(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA");
+            ProfileModel pineappleProfile = SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE");
+            ProfileModel bananaProfile = SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA");
 
             Pair<UUID, ProfileModel> pair_CraftedFury = Pair.of(
                 StringUtil.toUUID("f33f51a7-9691-4076-abda-f66e3d047a71"),
-                SimplifiedApi.getRepositoryOf(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE")
+                SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE")
             );
             Pair<UUID, ProfileModel> pair_GoldenDusk = Pair.of(
                 StringUtil.toUUID("df5e1701-809c-48be-9b0d-ef50b83b009e"),
-                SimplifiedApi.getRepositoryOf(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "POMEGRANATE")
+                SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "POMEGRANATE")
             );
             Pair<UUID, ProfileModel> pair_CrazyHjonk = Pair.of(
                 StringUtil.toUUID("c360fb57-1e6c-458c-86b5-c971e864536c"),
-                SimplifiedApi.getRepositoryOf(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA")
+                SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA")
             );
             Pair<UUID, ProfileModel> checkThis = pair_CraftedFury;
 
@@ -239,22 +239,22 @@ public class SkyBlockIslandTest {
             ConcurrentList<JacobsContest.Contest> contests = member.getJacobsContest().getContests();
 
             // skills, skill_levels
-            Repository<SkillModel> skillRepo = SimplifiedApi.getRepositoryOf(SkillModel.class);
+            Repository<SkillModel> skillRepo = SimplifiedApi.getRepository(SkillModel.class);
             SkillModel combatSkillModel = skillRepo.findFirstOrNull(SkillModel::getKey, "COMBAT");
-            ConcurrentList<SkillLevelModel> skillLevels = SimplifiedApi.getRepositoryOf(SkillLevelModel.class)
+            ConcurrentList<SkillLevelModel> skillLevels = SimplifiedApi.getRepository(SkillLevelModel.class)
                 .findAll(SkillLevelModel::getSkill, combatSkillModel)
                 .collect(Concurrent.toList());
             MatcherAssert.assertThat(skillLevels.size(), Matchers.equalTo(60));
 
             // collection_items, collections
-            Repository<CollectionModel> collectionRepo = SimplifiedApi.getRepositoryOf(CollectionModel.class);
+            Repository<CollectionModel> collectionRepo = SimplifiedApi.getRepository(CollectionModel.class);
             CollectionModel collectionModel = collectionRepo.findFirstOrNull(CollectionModel::getKey, combatSkillModel.getKey());
             Collection sbCollection = member.asEnhanced().getCollection(collectionModel);
-            SackModel sbSack = SimplifiedApi.getRepositoryOf(SackModel.class).findFirstOrNull(SackModel::getKey, "MINING");
+            SackModel sbSack = SimplifiedApi.getRepository(SackModel.class).findFirstOrNull(SackModel::getKey, "MINING");
             //MatcherAssert.assertThat(member.getSack(sbSack).getStored().size(), Matchers.greaterThan(0));
 
             // minion_tier_upgrades, minion_tiers, items
-            MinionTierUpgradeModel wheatGen11 = SimplifiedApi.getRepositoryOf(MinionTierUpgradeModel.class).findFirstOrNull(
+            MinionTierUpgradeModel wheatGen11 = SimplifiedApi.getRepository(MinionTierUpgradeModel.class).findFirstOrNull(
                 SearchFunction.combine(MinionTierUpgradeModel::getMinionTier, SearchFunction.combine(MinionTierModel::getItem, ItemModel::getItemId)), "WHEAT_GENERATOR_11");
 
             MatcherAssert.assertThat(wheatGen11.getMinionTier().getMinion().getKey(), Matchers.equalTo("WHEAT"));
@@ -294,7 +294,7 @@ public class SkyBlockIslandTest {
                 PetModel spiderPet = espiderPetInfo.getTypeModel().get();
                 PetModel dragPet = dragInfo.asEnhanced().getTypeModel().get();
 
-                RarityModel commonRarity = SimplifiedApi.getRepositoryOf(RarityModel.class).findFirstOrNull(RarityModel::getKey, "COMMON");
+                RarityModel commonRarity = SimplifiedApi.getRepository(RarityModel.class).findFirstOrNull(RarityModel::getKey, "COMMON");
                 MatcherAssert.assertThat(spiderPet.getLowestRarity(), Matchers.equalTo(commonRarity));
 
                 int wolf_hs = spiderPet.hashCode();
