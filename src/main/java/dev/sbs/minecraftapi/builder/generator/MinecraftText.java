@@ -4,7 +4,7 @@ import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.io.stream.ByteArrayDataOutput;
-import dev.sbs.api.util.Range;
+import dev.sbs.api.math.Range;
 import dev.sbs.api.util.SystemUtil;
 import dev.sbs.minecraftapi.builder.generator.exception.GeneratorException;
 import dev.sbs.minecraftapi.builder.generator.font.Font;
