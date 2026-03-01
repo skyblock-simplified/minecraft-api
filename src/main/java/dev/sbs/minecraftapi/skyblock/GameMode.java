@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum GameMode {
 
-    NORMAL,
+    CLASSIC,
     @SerializedName("ironman")
     IRONMAN,
     @SerializedName("island")

@@ -33,7 +33,7 @@ public class SkyBlockIsland {
     private @NotNull Optional<CommunityUpgrades> communityUpgrades = Optional.empty();
     private @NotNull Optional<Banking> banking = Optional.empty();
     @SerializedName("game_mode")
-    private @NotNull GameMode gameMode = GameMode.NORMAL;
+    private @NotNull GameMode gameMode = GameMode.CLASSIC;
     @SerializedName("cute_name")
     private @NotNull Profile profile;
     private boolean selected;
