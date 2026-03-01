@@ -29,7 +29,6 @@ import dev.sbs.minecraftapi.skyblock.model.Stat;
 import dev.sbs.minecraftapi.skyblock.model.TrophyFish;
 import dev.sbs.minecraftapi.skyblock.profile_stats.data.AccessoryData;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,6 @@ import java.util.function.Function;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class SkyBlockMember implements PostInit {
     
     // Profile

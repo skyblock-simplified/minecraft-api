@@ -8,7 +8,6 @@ import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.skyblock.profile_stats.ProfileStats;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class SkyBlockIsland {
 
     private static final DecimalFormat smallDecimalFormat = new DecimalFormat("#0.#");
