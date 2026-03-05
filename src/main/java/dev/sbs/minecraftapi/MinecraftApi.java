@@ -3,11 +3,10 @@ package dev.sbs.minecraftapi;
 import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.io.gson.GsonSettings;
-import dev.sbs.minecraftapi.builder.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.builder.text.segment.LineSegment;
-import dev.sbs.minecraftapi.builder.text.segment.TextSegment;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
+import dev.sbs.minecraftapi.client.hypixel.response.skyblock.common.NbtContent;
+import dev.sbs.minecraftapi.client.hypixel.response.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.client.mojang.MojangClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
@@ -19,10 +18,9 @@ import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
-import dev.sbs.minecraftapi.skyblock.common.NbtContent;
-import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.gson.NbtContentTypeAdapter;
-import dev.sbs.minecraftapi.skyblock.gson.SkyBlockDateTypeAdapter;
+import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
+import dev.sbs.minecraftapi.render.text.segment.LineSegment;
+import dev.sbs.minecraftapi.render.text.segment.TextSegment;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -48,10 +46,10 @@ public class MinecraftApi extends SimplifiedApi {
         // Update Gson
         GsonSettings gsonSettings = serviceManager.get(GsonSettings.class)
             .mutate()
-            .withTypeAdapter(NbtContent.class, new NbtContentTypeAdapter())
+            .withTypeAdapter(NbtContent.class, new NbtContent.Adapter())
             .withTypeAdapter(MojangMultiUsernameResponse.class, new MojangMultiUsernameResponse.Deserializer())
-            .withTypeAdapter(SkyBlockDate.RealTime.class, new SkyBlockDateTypeAdapter.RealTime())
-            .withTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDateTypeAdapter.SkyBlockTime())
+            .withTypeAdapter(SkyBlockDate.RealTime.class, new SkyBlockDate.RealTime.Adapter())
+            .withTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDate.SkyBlockTime.Adapter())
             .withTypeAdapter(SkyBlockEmojisResponse.class, new SkyBlockEmojisResponse.Deserializer())
             .withTypeAdapter(SkyBlockImagesResponse.class, new SkyBlockImagesResponse.Deserializer())
             .withTypeAdapter(SkyBlockItemsResponse.class, new SkyBlockItemsResponse.Deserializer())

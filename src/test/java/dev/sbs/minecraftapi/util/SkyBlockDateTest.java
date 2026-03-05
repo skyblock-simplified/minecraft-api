@@ -1,9 +1,9 @@
 package dev.sbs.minecraftapi.util;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.minecraftapi.skyblock.date.Season;
-import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import dev.sbs.minecraftapi.skyblock.election.SpecialElection;
+import dev.sbs.minecraftapi.client.hypixel.response.skyblock.date.Season;
+import dev.sbs.minecraftapi.client.hypixel.response.skyblock.date.SkyBlockDate;
+import dev.sbs.minecraftapi.client.hypixel.response.skyblock.election.SpecialElection;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
