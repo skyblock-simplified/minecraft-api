@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.builder.generator;
+package dev.sbs.minecraftapi.render.generator;
 
 import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -6,12 +6,12 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.io.stream.ByteArrayDataOutput;
 import dev.sbs.api.math.Range;
 import dev.sbs.api.util.SystemUtil;
-import dev.sbs.minecraftapi.builder.generator.exception.GeneratorException;
-import dev.sbs.minecraftapi.builder.generator.font.Font;
-import dev.sbs.minecraftapi.builder.generator.font.MinecraftFont;
-import dev.sbs.minecraftapi.builder.text.ChatFormat;
-import dev.sbs.minecraftapi.builder.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.builder.text.segment.LineSegment;
+import dev.sbs.minecraftapi.render.font.Font;
+import dev.sbs.minecraftapi.render.font.MinecraftFont;
+import dev.sbs.minecraftapi.render.generator.exception.GeneratorException;
+import dev.sbs.minecraftapi.render.text.ChatFormat;
+import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
+import dev.sbs.minecraftapi.render.text.segment.LineSegment;
 import lombok.AccessLevel;
 import lombok.Cleanup;
 import lombok.Getter;

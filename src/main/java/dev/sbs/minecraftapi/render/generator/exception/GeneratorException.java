@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.builder.generator.exception;
+package dev.sbs.minecraftapi.render.generator.exception;
 
 import dev.sbs.minecraftapi.exception.MinecraftException;
 import org.intellij.lang.annotations.PrintFormat;

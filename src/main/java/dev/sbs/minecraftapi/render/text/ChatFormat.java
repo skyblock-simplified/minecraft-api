@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.builder.text;
+package dev.sbs.minecraftapi.render.text;
 
 import dev.sbs.api.util.Preconditions;
 import dev.sbs.api.util.RegexUtil;
