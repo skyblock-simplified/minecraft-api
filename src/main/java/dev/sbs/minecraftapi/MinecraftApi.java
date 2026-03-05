@@ -19,7 +19,7 @@ import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
-import dev.sbs.minecraftapi.skyblock.data.NbtContent;
+import dev.sbs.minecraftapi.skyblock.common.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.skyblock.gson.NbtContentTypeAdapter;
 import dev.sbs.minecraftapi.skyblock.gson.SkyBlockDateTypeAdapter;
