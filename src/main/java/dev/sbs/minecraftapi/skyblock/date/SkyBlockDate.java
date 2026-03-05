@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.client.hypixel.response.skyblock.date;
+package dev.sbs.minecraftapi.skyblock.date;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -372,7 +372,7 @@ public class SkyBlockDate extends SimpleDate {
 
             @Override
             public void write(@NotNull JsonWriter out, @NotNull SkyBlockDate.SkyBlockTime value) throws IOException {
-                out.value(value.getRealTime());
+                out.value((value.getRealTime() - Launch.SKYBLOCK) / 1000);
             }
 
             @Override
