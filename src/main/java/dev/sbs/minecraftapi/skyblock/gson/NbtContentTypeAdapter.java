@@ -4,14 +4,15 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import dev.sbs.minecraftapi.skyblock.data.NbtContent;
+import dev.sbs.minecraftapi.skyblock.common.NbtContent;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
 public class NbtContentTypeAdapter extends TypeAdapter<NbtContent> {
 
     @Override
-    public void write(JsonWriter out, NbtContent value) throws IOException {
+    public void write(@NotNull JsonWriter out, @NotNull NbtContent value) throws IOException {
         out.beginObject()
             .name("type")
             .value(0)
@@ -21,7 +22,7 @@ public class NbtContentTypeAdapter extends TypeAdapter<NbtContent> {
     }
 
     @Override
-    public NbtContent read(JsonReader in) throws IOException {
+    public NbtContent read(@NotNull JsonReader in) throws IOException {
         String data;
 
         if (in.peek() == JsonToken.BEGIN_OBJECT) { // Auctions are bad

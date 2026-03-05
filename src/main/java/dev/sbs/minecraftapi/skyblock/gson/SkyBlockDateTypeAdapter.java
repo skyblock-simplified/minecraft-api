@@ -4,23 +4,23 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
-@NoArgsConstructor(access = AccessLevel.NONE)
+@UtilityClass
 public class SkyBlockDateTypeAdapter {
 
     public static class RealTime extends TypeAdapter<SkyBlockDate.RealTime> {
 
         @Override
-        public void write(JsonWriter out, SkyBlockDate.RealTime value) throws IOException {
+        public void write(@NotNull JsonWriter out, @NotNull SkyBlockDate.RealTime value) throws IOException {
             out.value(value.getRealTime());
         }
 
         @Override
-        public SkyBlockDate.RealTime read(JsonReader in) throws IOException {
+        public SkyBlockDate.RealTime read(@NotNull JsonReader in) throws IOException {
             return new SkyBlockDate.RealTime(in.nextLong());
         }
 
@@ -29,12 +29,12 @@ public class SkyBlockDateTypeAdapter {
     public static class SkyBlockTime extends TypeAdapter<SkyBlockDate.SkyBlockTime> {
 
         @Override
-        public void write(JsonWriter out, SkyBlockDate.SkyBlockTime value) throws IOException {
+        public void write(@NotNull JsonWriter out, @NotNull SkyBlockDate.SkyBlockTime value) throws IOException {
             out.value(value.getRealTime());
         }
 
         @Override
-        public SkyBlockDate.SkyBlockTime read(JsonReader in) throws IOException {
+        public SkyBlockDate.SkyBlockTime read(@NotNull JsonReader in) throws IOException {
             return new SkyBlockDate.SkyBlockTime(in.nextLong());
         }
 
