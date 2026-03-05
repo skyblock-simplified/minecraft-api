@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.mining;
+package dev.sbs.minecraftapi.skyblock.member.mining;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.minecraftapi.MinecraftApi;

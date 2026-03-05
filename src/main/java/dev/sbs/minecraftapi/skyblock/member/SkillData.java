@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data;
+package dev.sbs.minecraftapi.skyblock.member;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
@@ -7,6 +7,9 @@ import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.api.util.NumberUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.SkyBlockMember;
+import dev.sbs.minecraftapi.skyblock.common.Experience;
+import dev.sbs.minecraftapi.skyblock.common.Weight;
+import dev.sbs.minecraftapi.skyblock.common.Weighted;
 import dev.sbs.minecraftapi.skyblock.model.Skill;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

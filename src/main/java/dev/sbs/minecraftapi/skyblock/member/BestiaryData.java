@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data;
+package dev.sbs.minecraftapi.skyblock.member;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;

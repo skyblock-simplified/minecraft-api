@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data;
+package dev.sbs.minecraftapi.skyblock.member;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
