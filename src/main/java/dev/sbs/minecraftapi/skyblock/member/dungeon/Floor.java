@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.dungeon;
+package dev.sbs.minecraftapi.skyblock.member.dungeon;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.util.StringUtil;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public enum Floor {
 
     @SerializedName("0")
-    ZERO(0, Size.TINY, Boss.WATCHER),
+    ENTRANCE(0, Size.TINY, Boss.WATCHER),
     @SerializedName("1")
     ONE(1, Size.TINY, Boss.BONZO),
     @SerializedName("2")
@@ -30,6 +30,15 @@ public enum Floor {
     private final int value;
     private final @NotNull Size size;
     private final @NotNull Boss boss;
+
+    public static @NotNull Floor of(int value) {
+        for (Floor floor : values()) {
+            if (floor.getValue() == value)
+                return floor;
+        }
+
+        return ENTRANCE;
+    }
 
     public enum Boss {
 

@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.dungeon;
+package dev.sbs.minecraftapi.skyblock.member.dungeon;
 
 import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
@@ -9,7 +9,7 @@ import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.io.gson.SerializedPath;
 import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
-import dev.sbs.minecraftapi.skyblock.data.Weight;
+import dev.sbs.minecraftapi.skyblock.common.Weight;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,13 +47,18 @@ public class DungeonProfile implements PostInit {
 
     @Override
     public void postInit() {
-        this.dungeonMap.stream()
-            .filter(entry -> !entry.getKey().startsWith("MASTER_"))
-            .forEach((key, value) -> this.dungeons.put(
-                DungeonEntry.Type.of(key), new DungeonEntry(
-                value.getExperience(), value,
-                this.dungeonMap.getOrDefault(String.format("MASTER_%s", key), new FloorData())
-            )));
+        this.dungeons = this.dungeonMap.stream()
+            .filterKey(key -> !key.startsWith("MASTER_"))
+            .mapKey(DungeonEntry.Type::of)
+            .map((type, value) -> Pair.of(type, new DungeonEntry(
+                value.getExperience(),
+                value,
+                this.dungeonMap.getOrDefault(
+                    String.format("MASTER_%s", type.name()),
+                    new FloorData()
+                )
+            )))
+            .collect(Concurrent.toUnmodifiableMap());
 
         this.classes = this.classMap.stream()
             .map(entry -> Pair.of(
