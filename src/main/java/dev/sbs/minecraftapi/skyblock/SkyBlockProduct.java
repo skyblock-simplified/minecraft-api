@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 @Getter
-public class SkyBlockBazaarProduct {
+public class SkyBlockProduct {
 
     @SerializedName("product_id")
     private @NotNull String itemId;
