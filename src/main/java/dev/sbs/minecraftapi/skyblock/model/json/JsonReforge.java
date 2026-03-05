@@ -7,7 +7,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
-import dev.sbs.minecraftapi.skyblock.Rarity;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Reforge;
 import lombok.AccessLevel;
 import lombok.Getter;

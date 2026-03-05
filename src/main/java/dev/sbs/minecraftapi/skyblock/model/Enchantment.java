@@ -6,7 +6,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.builder.text.ChatFormat;
-import dev.sbs.minecraftapi.skyblock.Rarity;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

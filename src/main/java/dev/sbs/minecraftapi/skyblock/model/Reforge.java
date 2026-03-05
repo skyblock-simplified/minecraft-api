@@ -5,7 +5,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.skyblock.Rarity;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;

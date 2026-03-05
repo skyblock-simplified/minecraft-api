@@ -8,7 +8,7 @@ import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
-import dev.sbs.minecraftapi.skyblock.Rarity;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Accessory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
