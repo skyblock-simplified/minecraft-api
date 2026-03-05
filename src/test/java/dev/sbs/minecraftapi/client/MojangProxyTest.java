@@ -5,11 +5,11 @@ import dev.sbs.api.scheduler.Scheduler;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.exception.MojangApiException;
-import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoints;
+import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoint;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
-import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoints;
+import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
 import org.junit.jupiter.api.Test;
 
 public class MojangProxyTest {
@@ -17,7 +17,7 @@ public class MojangProxyTest {
     @Test
     public void makeMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangEndpoints apiRequest = mojangProxy.getEndpoints();
+        MojangEndpoint apiRequest = mojangProxy.getEndpoints();
         MojangUsernameResponse usernameResponse = apiRequest.getPlayer("CraftedFury");
         System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId());
     }
@@ -25,7 +25,7 @@ public class MojangProxyTest {
     @Test
     public void makeMultiMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangEndpoints apiRequest = mojangProxy.getEndpoints();
+        MojangEndpoint apiRequest = mojangProxy.getEndpoints();
         MojangMultiUsernameResponse multiUsernameResponse = apiRequest.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
         multiUsernameResponse.getProfiles().forEach(usernameResponse -> System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId()));
     }
@@ -34,7 +34,7 @@ public class MojangProxyTest {
     public void makeMojangProfile_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
         //MojangProfileResponse mojangProfileResponse = mojangProxy.getMojangProfile("CraftedFury");
-        SbsEndpoints sbsEndpoints = SimplifiedApi.getClient(SbsClient.class).getEndpoints();
+        SbsEndpoint sbsEndpoints = SimplifiedApi.getClient(SbsClient.class).getEndpoints();
 
         for (int i = 0; i < 1_000; i++) {
             int x = i;

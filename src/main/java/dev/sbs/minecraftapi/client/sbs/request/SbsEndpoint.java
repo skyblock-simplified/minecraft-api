@@ -1,6 +1,6 @@
 package dev.sbs.minecraftapi.client.sbs.request;
 
-import dev.sbs.api.client.request.Endpoints;
+import dev.sbs.api.client.request.Endpoint;
 import dev.sbs.api.client.route.Route;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProfile;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 @Route("api.sbs.dev")
-public interface SbsEndpoints extends Endpoints {
+public interface SbsEndpoint extends Endpoint {
 
     @RequestLine("GET /test/{username}")
     @Deprecated

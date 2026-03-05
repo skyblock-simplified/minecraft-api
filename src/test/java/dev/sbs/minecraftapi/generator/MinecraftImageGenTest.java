@@ -2,13 +2,13 @@ package dev.sbs.minecraftapi.generator;
 
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.builder.generator.MinecraftHead;
-import dev.sbs.minecraftapi.builder.generator.MinecraftText;
-import dev.sbs.minecraftapi.builder.text.ChatFormat;
-import dev.sbs.minecraftapi.builder.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.builder.text.segment.LineSegment;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProfile;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
+import dev.sbs.minecraftapi.render.generator.MinecraftHead;
+import dev.sbs.minecraftapi.render.generator.MinecraftText;
+import dev.sbs.minecraftapi.render.text.ChatFormat;
+import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
+import dev.sbs.minecraftapi.render.text.segment.LineSegment;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;

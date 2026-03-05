@@ -4,16 +4,16 @@ import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.io.gson.GsonSettings;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.common.NbtContent;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.date.SkyBlockDate;
 import dev.sbs.minecraftapi.client.mojang.MojangClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
-import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoints;
+import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoint;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
-import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoints;
+import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
@@ -61,9 +61,9 @@ public class MinecraftApi extends SimplifiedApi {
         serviceManager.add(NbtFactory.class, new NbtFactory());
 
         // Provide Builders
-        builderManager.add(SbsEndpoints.class, SbsClient.class);
-        builderManager.add(MojangEndpoints.class, MojangClient.class);
-        builderManager.add(HypixelEndpoints.class, HypixelClient.class);
+        builderManager.add(SbsEndpoint.class, SbsClient.class);
+        builderManager.add(MojangEndpoint.class, MojangClient.class);
+        builderManager.add(HypixelEndpoint.class, HypixelClient.class);
         builderManager.add(LineSegment.class, LineSegment.Builder.class);
         builderManager.add(ColorSegment.class, ColorSegment.Builder.class);
         builderManager.add(TextSegment.class, TextSegment.Builder.class);
