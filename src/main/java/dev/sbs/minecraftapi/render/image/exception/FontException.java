@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.render.generator.exception;
+package dev.sbs.minecraftapi.render.image.exception;
 
 import dev.sbs.minecraftapi.exception.MinecraftException;
 import org.jetbrains.annotations.NotNull;
