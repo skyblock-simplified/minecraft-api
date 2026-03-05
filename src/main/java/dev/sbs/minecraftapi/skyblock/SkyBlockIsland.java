@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.linked.ConcurrentLinkedMap;
-import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
+import dev.sbs.minecraftapi.skyblock.common.GameMode;
+import dev.sbs.minecraftapi.skyblock.common.Profile;
+import dev.sbs.minecraftapi.skyblock.island.Banking;
+import dev.sbs.minecraftapi.skyblock.island.CommunityUpgrades;
 import dev.sbs.minecraftapi.skyblock.profile_stats.ProfileStats;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
@@ -94,115 +94,6 @@ public class SkyBlockIsland {
             )
             .map(Long::intValue)
             .orElse(0);
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Banking {
-
-        private double balance;
-        private @NotNull ConcurrentList<Transaction> transactions = Concurrent.newList();
-
-        @Getter
-        public static class Transaction {
-
-            private double amount;
-            private SkyBlockDate.RealTime timestamp;
-            private Action action;
-            @Getter(AccessLevel.NONE)
-            @SerializedName("initiator_name")
-            private String initiatorName;
-
-            public String getInitiatorName() {
-                return this.initiatorName.replace("Â", ""); // API Artifact
-            }
-
-            public enum Action {
-
-                WITHDRAW,
-                DEPOSIT
-
-            }
-
-        }
-
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class CommunityUpgrades {
-
-        @SerializedName("currently_upgrading")
-        private @NotNull Optional<Upgrading> currentlyUpgrading = Optional.empty();
-        @SerializedName("upgrade_states")
-        private @NotNull ConcurrentList<Upgraded> upgraded = Concurrent.newList();
-
-        public int getHighestTier(@NotNull Type type) {
-            return this.getUpgraded()
-                .stream()
-                .filter(upgraded -> upgraded.getUpgrade().name().equalsIgnoreCase(type.name()))
-                .sorted((o1, o2) -> Comparator.comparing(Upgraded::getTier).compare(o2, o1))
-                .map(Upgraded::getTier)
-                .findFirst()
-                .orElse(0);
-        }
-
-        public @NotNull ConcurrentList<Upgraded> getUpgrades(@NotNull Type type) {
-            return this.getUpgraded()
-                .stream()
-                .filter(upgraded -> upgraded.getUpgrade().name().equalsIgnoreCase(type.name()))
-                .sorted((o1, o2) -> Comparator.comparing(Upgraded::getTier).compare(o1, o2))
-                .collect(Concurrent.toList());
-        }
-
-        @Getter
-        public static class Upgraded extends Upgrading {
-
-            @SerializedName("claimed_ms")
-            private SkyBlockDate.RealTime claimed;
-            @SerializedName("claimed_by")
-            private String claimedBy;
-            @SerializedName("fasttracked")
-            private boolean fastTracked;
-
-        }
-
-        @Getter
-        public static class Upgrading {
-
-            private Type upgrade;
-            @SerializedName(alternate = "new_tier", value = "tier")
-            private int tier;
-            @SerializedName("start_ms")
-            private SkyBlockDate.RealTime started;
-            @SerializedName(alternate = "who_started", value = "started_by")
-            private String startedBy;
-
-        }
-
-        @Getter
-        @RequiredArgsConstructor
-        public enum Type {
-
-            @SerializedName("minion_slots")
-            MINION_SLOTS(5),
-            @SerializedName("coins_allowance")
-            COINS_ALLOWANCE(5),
-            @SerializedName("guests_count")
-            GUESTS_COUNT(5),
-            @SerializedName("island_size")
-            ISLAND_SIZE(10),
-            @SerializedName("coop_slots")
-            COOP_SLOTS(3);
-
-            private final int maxLevel;
-
-            public @NotNull String getName() {
-                return StringUtil.capitalizeFully(this.name().replace("_", " "));
-            }
-
-        }
-
     }
 
 }
