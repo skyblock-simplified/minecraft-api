@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data;
+package dev.sbs.minecraftapi.skyblock.common;
 
 import lombok.AccessLevel;
 import lombok.Getter;

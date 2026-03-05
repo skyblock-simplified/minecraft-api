@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.skyblock.data;
+package dev.sbs.minecraftapi.skyblock.common;
 
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import org.jetbrains.annotations.NotNull;
