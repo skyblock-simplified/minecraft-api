@@ -13,7 +13,6 @@ import dev.sbs.minecraftapi.skyblock.model.Accessory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -29,7 +28,6 @@ import java.util.Optional;
         JsonItem.class
     }
 )
-@NoArgsConstructor(access = AccessLevel.NONE, force = true)
 public class JsonAccessory implements Accessory, JsonModel, PostInit {
 
     private @Id @NotNull String id;
@@ -93,10 +91,9 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE, force = true)
     public static class JsonFamily implements Accessory.Family {
 
-        private @NotNull String id;
+        private @NotNull String id = "";
         private int rank;
 
         @Override

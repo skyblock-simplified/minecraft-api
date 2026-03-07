@@ -6,9 +6,7 @@ import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.model.Keyword;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -21,7 +19,6 @@ import java.util.Optional;
     path = "skyblock",
     name = "keywords"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonKeyword implements Keyword, JsonModel {
 
     private @Id @NotNull String id = "";

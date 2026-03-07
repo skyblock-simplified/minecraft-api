@@ -9,9 +9,7 @@ import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Reforge;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -24,7 +22,6 @@ import java.util.Optional;
     path = "skyblock",
     name = "reforges"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonReforge implements Reforge, JsonModel {
 
     private @Id @NotNull String id = "";
@@ -66,7 +63,6 @@ public class JsonReforge implements Reforge, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonSubstitute implements Substitute {
 
         private @NotNull String id = "";

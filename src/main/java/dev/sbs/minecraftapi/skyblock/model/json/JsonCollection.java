@@ -22,11 +22,10 @@ import javax.persistence.Id;
     path = "skyblock",
     name = "collections"
 )
-@NoArgsConstructor(access = AccessLevel.NONE, force = true)
 public class JsonCollection implements Collection, JsonModel {
 
-    private @Id @NotNull String id;
-    private @NotNull String name;
+    private @Id @NotNull String id = "";
+    private @NotNull String name = "";
     private @NotNull ConcurrentMap<String, JsonCollectionItem> items = Concurrent.newMap();
 
     @Override

@@ -8,9 +8,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.Power;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -23,7 +21,6 @@ import java.util.Optional;
     path = "skyblock",
     name = "powers"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonPower implements Power, JsonModel {
 
     private @Id @NotNull String id = "";

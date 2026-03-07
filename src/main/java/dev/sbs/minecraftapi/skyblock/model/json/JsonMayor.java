@@ -9,9 +9,7 @@ import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.model.Mayor;
 import dev.sbs.minecraftapi.skyblock.model.Stat;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -23,7 +21,6 @@ import javax.persistence.Id;
     path = "skyblock",
     name = "mayors"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonMayor implements Mayor, JsonModel {
 
     private @Id @NotNull String id = "";
@@ -59,7 +56,6 @@ public class JsonMayor implements Mayor, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonPerk implements Perk {
 
         private @NotNull String id = "";
@@ -94,7 +90,6 @@ public class JsonMayor implements Mayor, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonSubstitute implements Substitute {
 
         private @NotNull String id = "";

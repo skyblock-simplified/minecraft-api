@@ -7,9 +7,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.Skill;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -21,7 +19,6 @@ import javax.persistence.Id;
     path = "skyblock",
     name = "skills"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonSkill implements Skill, JsonModel {
 
     private @Id @NotNull String id = "";
@@ -66,7 +63,6 @@ public class JsonSkill implements Skill, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonSkillLevel implements Skill.Level {
 
         private int level;

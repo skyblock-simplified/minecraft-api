@@ -8,9 +8,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.Enchantment;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -23,7 +21,6 @@ import java.util.Optional;
     path = "skyblock",
     name = "enchantments"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonEnchantment implements Enchantment, JsonModel {
 
     private @Id @NotNull String id = "";

@@ -8,9 +8,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.skyblock.model.Slayer;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -22,7 +20,6 @@ import javax.persistence.Id;
     path = "skyblock",
     name = "slayers"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonSlayer implements Slayer, JsonModel {
 
     private @Id @NotNull String id = "";
@@ -71,7 +68,6 @@ public class JsonSlayer implements Slayer, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonSlayerLevel implements Level {
 
         private int level;

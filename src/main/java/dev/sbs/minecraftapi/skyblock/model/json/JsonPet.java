@@ -11,9 +11,7 @@ import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Pet;
 import dev.sbs.minecraftapi.skyblock.model.Stat;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
@@ -25,7 +23,6 @@ import javax.persistence.Id;
     path = "skyblock",
     name = "pets"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonPet implements Pet, JsonModel {
 
     private @Id @NotNull String id = "";
@@ -73,7 +70,6 @@ public class JsonPet implements Pet, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonAbility implements Ability {
 
         private @NotNull String name = "";
@@ -108,7 +104,6 @@ public class JsonPet implements Pet, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonSubstitute implements Substitute {
 
         private @NotNull String id = "";
@@ -144,7 +139,6 @@ public class JsonPet implements Pet, JsonModel {
         }
 
         @Getter
-        @NoArgsConstructor(access = AccessLevel.NONE)
         public static class JsonValue implements Value {
 
             private double base = 0.0;
