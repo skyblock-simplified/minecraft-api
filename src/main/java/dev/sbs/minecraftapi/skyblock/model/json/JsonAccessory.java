@@ -10,7 +10,6 @@ import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Accessory;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +36,6 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
     private @NotNull Source source = Source.MISCELLANEOUS;
     private @NotNull Limit limit = Limit.NONE;
     private @NotNull Optional<MojangProperty> skin = Optional.empty();
-    private @NotNull JsonItem.JsonAttributes attributes = new JsonItem.JsonAttributes();
     private @NotNull Optional<Family> family = Optional.empty();
     private @NotNull ConcurrentList<Substitute> stats = Concurrent.newList();
 
@@ -55,7 +53,6 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
             .append(this.getSource(), that.getSource())
             .append(this.getLimit(), that.getLimit())
             .append(this.getSkin(), that.getSkin())
-            .append(this.getAttributes(), that.getAttributes())
             .append(this.getFamily(), that.getFamily())
             .append(this.getStats(), that.getStats())
             .build();
@@ -71,7 +68,6 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
             .append(this.getSource())
             .append(this.getLimit())
             .append(this.getSkin())
-            .append(this.getAttributes())
             .append(this.getFamily())
             .append(this.getStats())
             .build();
@@ -119,7 +115,7 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
     }
 
     @Getter
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor
     public static class JsonSubstitute implements Accessory.Substitute {
 
         private @NotNull String id;

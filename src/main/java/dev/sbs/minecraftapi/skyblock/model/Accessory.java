@@ -25,8 +25,6 @@ public interface Accessory extends Model {
 
     @NotNull Optional<MojangProperty> getSkin();
 
-    @NotNull Item.Attributes getAttributes();
-
     @NotNull Optional<Family> getFamily();
 
     @NotNull ConcurrentList<Substitute> getStats();
