@@ -6,12 +6,13 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.json.JsonModel;
-import dev.sbs.api.data.json.JsonResource;
+import dev.sbs.api.persistence.json.JsonModel;
+import dev.sbs.api.persistence.json.JsonResource;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
-import dev.sbs.minecraftapi.skyblock.Rarity;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import dev.sbs.minecraftapi.skyblock.model.Item;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,6 @@ import java.util.Optional;
     path = "skyblock",
     name = "items"
 )
-@NoArgsConstructor(access = AccessLevel.NONE)
 public class JsonItem implements Item, JsonModel {
 
     // Expected Data
@@ -40,8 +40,61 @@ public class JsonItem implements Item, JsonModel {
     private @NotNull Rarity rarity = Rarity.COMMON;
     @SerializedName("category")
     private @NotNull String categoryId = "OTHER";
-    @SerializedName("soulbound")
-    private @NotNull Soulbound soulboundStatus = Soulbound.NONE;
+
+    // Attributes
+    @Getter(AccessLevel.NONE)
+    private boolean can_place = true;
+    @Getter(AccessLevel.NONE)
+    private boolean can_trade = true;
+    @Getter(AccessLevel.NONE)
+    private boolean can_auction = true;
+    @Getter(AccessLevel.NONE)
+    private boolean cannot_reforge = false;
+    @Getter(AccessLevel.NONE)
+    private boolean can_recombobulate = true;
+    @Getter(AccessLevel.NONE)
+    private boolean can_burn_in_furnace = false;
+    @Getter(AccessLevel.NONE)
+    private boolean salvageable_from_recipe = false;
+    @Getter(AccessLevel.NONE)
+    private boolean museum = false;
+    @Getter(AccessLevel.NONE)
+    private boolean glowing = false;
+    @Getter(AccessLevel.NONE)
+    private boolean unstackable = true;
+    @Getter(AccessLevel.NONE)
+    private boolean dungeon_item = false;
+    @Getter(AccessLevel.NONE)
+    private boolean rift_transferrable = false;
+    @Getter(AccessLevel.NONE)
+    private @NotNull Soulbound soulbound = Soulbound.NONE;
+
+    private transient JsonAttributes attributes;
+
+    @Override
+    public @NotNull JsonAttributes getAttributes() {
+        if (this.attributes == null) {
+            this.attributes = new JsonAttributes(
+                this.npcSellPrice > 0,
+                this.can_place,
+                this.can_trade,
+                this.can_auction,
+                !this.cannot_reforge,
+                this.can_recombobulate,
+                this.can_burn_in_furnace,
+                this.salvageable_from_recipe,
+                this.museum,
+                this.glowing,
+                this.unstackable,
+                this.dungeon_item,
+                this.rift_transferrable,
+                this.rarity != Rarity.ADMIN,
+                this.soulbound
+            );
+        }
+
+        return this.attributes;
+    }
 
     // Possible Data
     private @NotNull Optional<Integer> durability = Optional.empty();
@@ -62,31 +115,15 @@ public class JsonItem implements Item, JsonModel {
     @SerializedName("ability_damage_scaling")
     private double abilityDamageScaling;
 
-    // Booleans
-    private boolean glowing;
-    private boolean unstackable;
-    @SerializedName("museum")
-    private boolean museumable;
-    //@SerializedName("can_have_attributes")
-    //private boolean attributable;
-    @SerializedName("salvageable_from_recipe")
-    private boolean salvageableFromRecipe;
-    @SerializedName("cannot_reforge")
-    private boolean notReforgeable;
-
     // Dungeons
     @SerializedName("gear_score")
     private int gearScore;
-    @SerializedName("dungeon_item")
-    private boolean dungeonItem;
     @SerializedName("dungeon_item_conversion_cost")
     private @NotNull ConcurrentMap<String, Object> dungeonizationCost = Concurrent.newMap();
     @SerializedName("catacombs_requirements")
     private @NotNull ConcurrentList<ConcurrentMap<String, Object>> catacombsRequirements = Concurrent.newList();
 
     // Rift
-    @SerializedName("rift_transferrable")
-    private boolean riftTransferable;
     @SerializedName("lose_motes_value_on_transfer")
     private boolean motesValueLostOnTransfer;
     @SerializedName("motes_sell_price")
@@ -121,15 +158,8 @@ public class JsonItem implements Item, JsonModel {
         return new EqualsBuilder()
             .append(this.getNpcSellPrice(), jsonItem.getNpcSellPrice())
             .append(this.getAbilityDamageScaling(), jsonItem.getAbilityDamageScaling())
-            .append(this.isGlowing(), jsonItem.isGlowing())
-            .append(this.isUnstackable(), jsonItem.isUnstackable())
-            .append(this.isMuseumable(), jsonItem.isMuseumable())
-            //.append(this.isAttributable(), jsonItem.isAttributable())
-            .append(this.isSalvageableFromRecipe(), jsonItem.isSalvageableFromRecipe())
-            .append(this.isNotReforgeable(), jsonItem.isNotReforgeable())
+            .append(this.getAttributes(), jsonItem.getAttributes())
             .append(this.getGearScore(), jsonItem.getGearScore())
-            .append(this.isDungeonItem(), jsonItem.isDungeonItem())
-            .append(this.isRiftTransferable(), jsonItem.isRiftTransferable())
             .append(this.isMotesValueLostOnTransfer(), jsonItem.isMotesValueLostOnTransfer())
             .append(this.getMotesSellPrice(), jsonItem.getMotesSellPrice())
             .append(this.getGeneratorTier(), jsonItem.getGeneratorTier())
@@ -137,7 +167,6 @@ public class JsonItem implements Item, JsonModel {
             .append(this.getId(), jsonItem.getId())
             .append(this.getDisplayName(), jsonItem.getDisplayName())
             .append(this.getRarity(), jsonItem.getRarity())
-            .append(this.getSoulboundStatus(), jsonItem.getSoulboundStatus())
             .append(this.getDurability(), jsonItem.getDurability())
             .append(this.getCategory(), jsonItem.getCategory())
             .append(this.getDescription(), jsonItem.getDescription())
@@ -171,7 +200,6 @@ public class JsonItem implements Item, JsonModel {
             .append(this.getId())
             .append(this.getDisplayName())
             .append(this.getRarity())
-            .append(this.getSoulboundStatus())
             .append(this.getDurability())
             .append(this.getCategory())
             .append(this.getDescription())
@@ -185,17 +213,10 @@ public class JsonItem implements Item, JsonModel {
             .append(this.getMiniIslandGenerator())
             .append(this.getNpcSellPrice())
             .append(this.getAbilityDamageScaling())
-            .append(this.isGlowing())
-            .append(this.isUnstackable())
-            .append(this.isMuseumable())
-            //.append(this.isAttributable())
-            .append(this.isSalvageableFromRecipe())
-            .append(this.isNotReforgeable())
+            .append(this.getAttributes())
             .append(this.getGearScore())
-            .append(this.isDungeonItem())
             .append(this.getDungeonizationCost())
             .append(this.getCatacombsRequirements())
-            .append(this.isRiftTransferable())
             .append(this.isMotesValueLostOnTransfer())
             .append(this.getMotesSellPrice())
             .append(this.getGenerator())
@@ -213,19 +234,25 @@ public class JsonItem implements Item, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class JsonAttributes implements Attributes {
 
-        private boolean sellable;
-        private boolean tradable;
+        private boolean npcSellable;
+        private boolean placeable;
+        private boolean tradeable;
         private boolean auctionable;
         private boolean reforgeable;
+        private boolean recombobulatable;
+        private boolean burnableInFurnace;
+        private boolean salvageableFromRecipe;
         private boolean museumable;
-        private boolean glowing = false;
-        private boolean unstackable = true;
-        private boolean dungeonable = false;
-        private boolean obtainable = true;
-        private @NotNull Soulbound soulbound = Soulbound.NONE;
+        private boolean glowing;
+        private boolean unstackable;
+        private boolean dungeonItem;
+        private boolean riftTransferrable;
+        private boolean obtainable;
+        private @NotNull Soulbound soulbound;
 
         @Override
         public boolean equals(Object o) {
@@ -234,14 +261,19 @@ public class JsonItem implements Item, JsonModel {
             JsonAttributes that = (JsonAttributes) o;
 
             return new EqualsBuilder()
-                .append(this.isSellable(), that.isSellable())
-                .append(this.isTradable(), that.isTradable())
+                .append(this.isNpcSellable(), that.isNpcSellable())
+                .append(this.isPlaceable(), that.isPlaceable())
+                .append(this.isTradeable(), that.isTradeable())
                 .append(this.isAuctionable(), that.isAuctionable())
                 .append(this.isReforgeable(), that.isReforgeable())
+                .append(this.isRecombobulatable(), that.isRecombobulatable())
+                .append(this.isBurnableInFurnace(), that.isBurnableInFurnace())
+                .append(this.isSalvageableFromRecipe(), that.isSalvageableFromRecipe())
                 .append(this.isMuseumable(), that.isMuseumable())
                 .append(this.isGlowing(), that.isGlowing())
                 .append(this.isUnstackable(), that.isUnstackable())
-                .append(this.isDungeonable(), that.isDungeonable())
+                .append(this.isDungeonItem(), that.isDungeonItem())
+                .append(this.isRiftTransferrable(), that.isRiftTransferrable())
                 .append(this.isObtainable(), that.isObtainable())
                 .append(this.getSoulbound(), that.getSoulbound())
                 .build();
@@ -250,16 +282,52 @@ public class JsonItem implements Item, JsonModel {
         @Override
         public int hashCode() {
             return new HashCodeBuilder()
-                .append(this.isSellable())
-                .append(this.isTradable())
+                .append(this.isNpcSellable())
+                .append(this.isPlaceable())
+                .append(this.isTradeable())
                 .append(this.isAuctionable())
                 .append(this.isReforgeable())
+                .append(this.isRecombobulatable())
+                .append(this.isBurnableInFurnace())
+                .append(this.isSalvageableFromRecipe())
                 .append(this.isMuseumable())
                 .append(this.isGlowing())
                 .append(this.isUnstackable())
-                .append(this.isDungeonable())
+                .append(this.isDungeonItem())
+                .append(this.isRiftTransferrable())
                 .append(this.isObtainable())
                 .append(this.getSoulbound())
+                .build();
+        }
+
+    }
+
+    @Getter
+    public static class JsonCost implements Cost {
+
+        private int experience = 0;
+        private @NotNull ConcurrentMap<Currency, Double> currencies = Concurrent.newMap();
+        private @NotNull ConcurrentMap<String, Double> items = Concurrent.newMap();
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+
+            JsonCost that = (JsonCost) o;
+
+            return new EqualsBuilder()
+                .append(this.getCurrencies(), that.getCurrencies())
+                .append(this.getExperience(), that.getExperience())
+                .append(this.getItems(), that.getItems())
+                .build();
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder()
+                .append(this.getCurrencies())
+                .append(this.getExperience())
+                .append(this.getItems())
                 .build();
         }
 

@@ -4,11 +4,11 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.data.Model;
+import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
-import dev.sbs.minecraftapi.skyblock.GameStage;
-import dev.sbs.minecraftapi.skyblock.Rarity;
+import dev.sbs.minecraftapi.skyblock.common.GameStage;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,14 +33,14 @@ public interface Item extends Model {
     @NotNull String getCategoryId();
 
     default @NotNull ItemCategory getCategory() {
-        return MinecraftApi.getRepositoryOf(ItemCategory.class)
+        return MinecraftApi.getRepository(ItemCategory.class)
             .findFirst(ItemCategory::getId, this.getCategoryId())
-            .orElse(MinecraftApi.getRepositoryOf(ItemCategory.class)
+            .orElse(MinecraftApi.getRepository(ItemCategory.class)
                 .findFirstOrNull(ItemCategory::getId, "OTHER")
             );
     }
 
-    @NotNull Soulbound getSoulboundStatus();
+    @NotNull Attributes getAttributes();
 
     default @NotNull String getMinecraftId() {
         return this.getDurability()
@@ -74,53 +74,9 @@ public interface Item extends Model {
 
     double getAbilityDamageScaling();
 
-    // Booleans
-
-    boolean isGlowing();
-
-    default boolean notGlowing() {
-        return !this.isGlowing();
-    }
-
-    boolean isUnstackable();
-
-    default boolean notStackable() {
-        return !this.isUnstackable();
-    }
-
-    boolean isMuseumable();
-
-    default boolean notMuseumable() {
-        return !this.isMuseumable();
-    }
-
-    /*boolean isAttributable();
-
-    default boolean notAttributable() {
-        return !this.isAttributable();
-    }*/
-
-    boolean isSalvageableFromRecipe();
-
-    default boolean notSalvageableFromRecipe() {
-        return !this.isSalvageableFromRecipe();
-    }
-
-    boolean isNotReforgeable();
-
-    default boolean isReforgeable() {
-        return !this.isNotReforgeable();
-    }
-
     // Dungeons
 
     int getGearScore();
-
-    boolean isDungeonItem();
-
-    default boolean notDungeonItem() {
-        return !this.isDungeonItem();
-    }
 
     @NotNull ConcurrentMap<String, Object> getDungeonizationCost();
 
@@ -131,12 +87,6 @@ public interface Item extends Model {
     }
 
     // Rift
-
-    boolean isRiftTransferable();
-
-    default boolean notRiftTransferable() {
-        return !this.isRiftTransferable();
-    }
 
     boolean isMotesValueLostOnTransfer();
 
@@ -174,25 +124,91 @@ public interface Item extends Model {
 
     interface Attributes {
 
-        boolean isSellable();
+        boolean isNpcSellable();
 
-        boolean isTradable();
+        default boolean notSellable() {
+            return !this.isNpcSellable();
+        }
+
+        boolean isPlaceable();
+
+        default boolean notPlaceable() {
+            return !this.isPlaceable();
+        }
+
+        boolean isTradeable();
+
+        default boolean notTradable() {
+            return !this.isTradeable();
+        }
 
         boolean isAuctionable();
 
+        default boolean notAuctionable() {
+            return !this.isAuctionable();
+        }
+
         boolean isReforgeable();
+
+        default boolean notReforgeable() {
+            return !this.isReforgeable();
+        }
+
+        boolean isRecombobulatable();
+
+        default boolean notRecombobulatable() {
+            return !this.isRecombobulatable();
+        }
+
+        boolean isBurnableInFurnace();
+
+        default boolean notBurnableInFurnace() {
+            return !this.isBurnableInFurnace();
+        }
+
+        boolean isSalvageableFromRecipe();
+
+        default boolean notSalvageableFromRecipe() {
+            return !this.isSalvageableFromRecipe();
+        }
 
         boolean isMuseumable();
 
-        boolean isGlowing(); // TODO: Default false
+        default boolean notMuseumable() {
+            return !this.isMuseumable();
+        }
 
-        boolean isUnstackable(); // TODO: Default true
+        boolean isGlowing();
 
-        boolean isDungeonable(); // TODO: Default false
+        default boolean notGlowing() {
+            return !this.isGlowing();
+        }
 
-        boolean isObtainable(); // TODO: Default true
+        boolean isUnstackable();
 
-        @NotNull Soulbound getSoulbound(); // TODO: Default NONE
+        default boolean notStackable() {
+            return !this.isUnstackable();
+        }
+
+        boolean isDungeonItem();
+
+        default boolean notDungeonItem() {
+            return !this.isDungeonItem();
+        }
+
+        boolean isRiftTransferrable();
+
+        default boolean notRiftTransferrable() {
+            return !this.isRiftTransferrable();
+        }
+
+        boolean isObtainable();
+
+        default boolean notObtainable() {
+            return !this.isObtainable();
+        }
+
+        @NotNull Soulbound getSoulbound();
 
     }
 
@@ -253,6 +269,26 @@ public interface Item extends Model {
         OTHER,
         TOOL,
         WEAPON
+
+    }
+
+    interface Cost {
+
+        @NotNull ConcurrentMap<Currency, Double> getCurrencies();
+
+        int getExperience();
+
+        @NotNull ConcurrentMap<String, Double> getItems();
+
+        enum Currency {
+
+            COINS,
+            ESSENCE,
+            MOTES,
+            NORTH_STARS,
+            PELTS
+
+        }
 
     }
 
