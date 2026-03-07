@@ -23,6 +23,7 @@ public class JsonRegion implements Region, JsonModel {
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
     private @NotNull ChatFormat format = ChatFormat.GRAY;
+    private @NotNull String remoteId = "";
 
     @Override
     public boolean equals(Object o) {
@@ -34,6 +35,7 @@ public class JsonRegion implements Region, JsonModel {
             .append(this.getId(), that.getId())
             .append(this.getName(), that.getName())
             .append(this.getFormat(), that.getFormat())
+            .append(this.getRemoteId(), that.getRemoteId())
             .build();
     }
 
@@ -43,6 +45,7 @@ public class JsonRegion implements Region, JsonModel {
             .append(this.getId())
             .append(this.getName())
             .append(this.getFormat())
+            .append(this.getRemoteId())
             .build();
     }
 

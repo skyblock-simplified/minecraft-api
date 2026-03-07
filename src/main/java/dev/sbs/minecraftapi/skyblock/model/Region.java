@@ -15,6 +15,8 @@ public interface Region extends Model {
 
     @NotNull ChatFormat getFormat();
 
+    @NotNull String getRemoteId();
+
     default @NotNull ConcurrentList<Zone> getZones() {
         return MinecraftApi.getRepository(Zone.class)
             .findAll(Zone::getRegionId, this.getId())
