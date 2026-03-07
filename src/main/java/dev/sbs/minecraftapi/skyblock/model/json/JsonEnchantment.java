@@ -1,15 +1,13 @@
 package dev.sbs.minecraftapi.skyblock.model.json;
 
+import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.json.JsonModel;
 import dev.sbs.api.persistence.json.JsonResource;
-import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.model.Enchantment;
-import dev.sbs.minecraftapi.skyblock.model.Stat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,7 +35,7 @@ public class JsonEnchantment implements Enchantment, JsonModel {
     private @NotNull ConcurrentList<String> categoryIds = Concurrent.newList();
     private @NotNull ConcurrentList<String> itemIds = Concurrent.newList();
     private @NotNull ConcurrentList<JsonLevel> levels = Concurrent.newList();
-    private @NotNull ConcurrentList<JsonSubstitute> stats = Concurrent.newList();
+    private @NotNull ConcurrentList<JsonStat.JsonSubstitute> stats = Concurrent.newList();
     private @NotNull ConcurrentList<String> mobTypeIds = Concurrent.newList();
 
     @Override
@@ -79,40 +77,11 @@ public class JsonEnchantment implements Enchantment, JsonModel {
     }
 
     @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
-    public static class JsonApplyCost implements ApplyCost {
-
-        private int experience = 0;
-        private @NotNull Optional<String> itemId = Optional.empty();
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-
-            JsonApplyCost that = (JsonApplyCost) o;
-
-            return new EqualsBuilder()
-                .append(this.getExperience(), that.getExperience())
-                .append(this.getItemId(), that.getItemId())
-                .build();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getExperience())
-                .append(this.getItemId())
-                .build();
-        }
-
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class JsonLevel implements Level {
 
         private int level = 0;
-        private @NotNull JsonApplyCost applyCost = new JsonApplyCost();
+        @SerializedName("cost")
+        private @NotNull JsonItem.JsonCost applyCost = new JsonItem.JsonCost();
 
         @Override
         public boolean equals(Object o) {
@@ -131,44 +100,6 @@ public class JsonEnchantment implements Enchantment, JsonModel {
             return new HashCodeBuilder()
                 .append(this.getLevel())
                 .append(this.getApplyCost())
-                .build();
-        }
-
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.NONE)
-    public static class JsonSubstitute implements Substitute {
-
-        private @NotNull String id = "";
-        private int precision = 0;
-        private @NotNull Stat.Type type = Stat.Type.NONE;
-        private @NotNull ChatFormat format = ChatFormat.GREEN;
-        private @NotNull ConcurrentMap<Integer, Double> values = Concurrent.newMap();
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-
-            JsonSubstitute that = (JsonSubstitute) o;
-
-            return new EqualsBuilder()
-                .append(this.getPrecision(), that.getPrecision())
-                .append(this.getId(), that.getId())
-                .append(this.getType(), that.getType())
-                .append(this.getFormat(), that.getFormat())
-                .append(this.getValues(), that.getValues())
-                .build();
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getPrecision())
-                .append(this.getType())
-                .append(this.getFormat())
-                .append(this.getValues())
                 .build();
         }
 

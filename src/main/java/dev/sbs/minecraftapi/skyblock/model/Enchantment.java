@@ -63,20 +63,6 @@ public interface Enchantment extends Model {
             .collect(Concurrent.toUnmodifiableList());
     }
 
-    interface ApplyCost {
-
-        int getExperience();
-
-        @NotNull Optional<String> getItemId();
-
-        default @NotNull Optional<Item> getItem() {
-            return this.getItemId().flatMap(itemId -> MinecraftApi.getRepository(Item.class)
-                .findFirst(Item::getId, itemId)
-            );
-        }
-
-    }
-
     interface Level {
 
         int getLevel();
@@ -92,7 +78,7 @@ public interface Enchantment extends Model {
             };
         }
 
-        @NotNull ApplyCost getApplyCost();
+        @NotNull Item.Cost getApplyCost();
 
     }
 

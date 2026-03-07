@@ -63,7 +63,7 @@ public class JsonMinion implements Minion, JsonModel {
         private double speed;
         @SerializedName("item")
         private @NotNull String itemId = "";
-        private @NotNull JsonItem.JsonUpgradeCost upgradeCost = new JsonItem.JsonUpgradeCost();
+        private @NotNull JsonItem.JsonCost upgradeCost = new JsonItem.JsonCost();
 
         @Override
         public boolean equals(Object o) {

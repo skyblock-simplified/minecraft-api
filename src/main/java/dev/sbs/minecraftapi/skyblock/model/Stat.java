@@ -1,10 +1,14 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
+import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.Model;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
 
 public interface Stat extends Model {
 
@@ -38,6 +42,25 @@ public interface Stat extends Model {
 
     default boolean notVisible() {
         return !this.isVisible();
+    }
+
+    interface Substitute {
+
+        @NotNull String getId();
+
+        default @NotNull Optional<Stat> getStat() {
+            return MinecraftApi.getRepository(Stat.class)
+                .findFirst(Stat::getId, this.getId());
+        }
+
+        int getPrecision();
+
+        @NotNull Type getType();
+
+        @NotNull ChatFormat getFormat();
+
+        @NotNull ConcurrentMap<Integer, Double> getValues();
+
     }
 
     @Getter

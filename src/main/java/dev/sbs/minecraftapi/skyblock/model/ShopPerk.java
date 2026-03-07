@@ -1,10 +1,8 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.Model;
-import dev.sbs.minecraftapi.MinecraftApi;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Optional;
 
 public interface ShopPerk extends Model {
 
@@ -14,21 +12,19 @@ public interface ShopPerk extends Model {
 
     @NotNull String getDescription();
 
-    @NotNull Optional<String> getStatId();
+    @NotNull ConcurrentList<String> getZoneIds();
 
-    default @NotNull Optional<Stat> getStat() {
-        return this.getStatId().flatMap(statId -> MinecraftApi.getRepository(Stat.class)
-            .findFirst(Stat::getId, statId)
-        );
-    }
+    // TODO: Zone model next
 
-    @NotNull Stat.Type getType();
+    @NotNull ConcurrentList<Unlock> getUnlocks();
 
-    interface Upgrade {
+    @NotNull ConcurrentList<Stat.Substitute> getStats();
+
+    interface Unlock {
 
         int getTier();
 
-        @NotNull Item.UpgradeCost getUpgradeCost();
+        @NotNull Item.Cost getCost();
 
     }
 

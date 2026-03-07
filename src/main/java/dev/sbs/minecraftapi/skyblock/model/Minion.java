@@ -35,7 +35,7 @@ public interface Minion extends Model {
 
         @NotNull String getItemId();
 
-        @NotNull Item.UpgradeCost getUpgradeCost();
+        @NotNull Item.Cost getUpgradeCost();
 
         default @NotNull Item getItem() {
             return MinecraftApi.getRepository(Item.class)
