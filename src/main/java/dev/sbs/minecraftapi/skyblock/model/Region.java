@@ -4,34 +4,21 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
+import dev.sbs.minecraftapi.render.text.ChatFormat;
 import org.jetbrains.annotations.NotNull;
 
-public interface ShopPerk extends Model {
+public interface Region extends Model {
 
     @NotNull String getId();
 
     @NotNull String getName();
 
-    @NotNull String getDescription();
-
-    @NotNull ConcurrentList<String> getZoneIds();
+    @NotNull ChatFormat getFormat();
 
     default @NotNull ConcurrentList<Zone> getZones() {
         return MinecraftApi.getRepository(Zone.class)
-            .matchAll(zone -> this.getZoneIds().contains(zone.getId()))
+            .findAll(Zone::getRegionId, this.getId())
             .collect(Concurrent.toUnmodifiableList());
-    }
-
-    @NotNull ConcurrentList<Stat.Substitute> getStats();
-
-    @NotNull ConcurrentList<Unlock> getUnlocks();
-
-    interface Unlock {
-
-        int getTier();
-
-        @NotNull Item.Cost getCost();
-
     }
 
 }
