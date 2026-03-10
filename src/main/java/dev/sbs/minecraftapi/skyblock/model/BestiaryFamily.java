@@ -23,6 +23,12 @@ public interface BestiaryFamily extends Model {
 
     int getMaxTier();
 
+    default int getMaxKills() {
+        return BestiaryFamily.BRACKETS
+            .get(this.getBracket() - 1)
+            .get(this.getMaxTier() - 1);
+    }
+
     @NotNull String getCategoryId();
 
     default @NotNull BestiaryCategory getCategory() {
