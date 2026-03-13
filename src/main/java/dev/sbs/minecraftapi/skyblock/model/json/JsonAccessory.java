@@ -82,7 +82,7 @@ public class JsonAccessory implements Accessory, JsonModel, PostInit {
             .getStats()
             .stream()
             .mapKey(String::toUpperCase)
-            .mapToObj(JsonSubstitute::new)
+            .collapseToSingle(JsonSubstitute::new)
             .collect(Concurrent.toUnmodifiableList());
     }
 

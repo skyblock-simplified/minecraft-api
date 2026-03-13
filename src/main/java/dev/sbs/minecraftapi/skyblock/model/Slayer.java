@@ -70,7 +70,7 @@ public interface Slayer extends Model {
                     stat.getId(),
                     this.getUnlocks()
                         .indexedStream()
-                        .mapToObj((line, index, size) -> {
+                        .collapseToSingle((line, index, size) -> {
                             String value = "0.0";
 
                             if (line.startsWith("+") && line.endsWith(stat.getName())) // Flat
