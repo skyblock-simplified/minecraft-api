@@ -1,10 +1,7 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
-import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
-import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -13,21 +10,13 @@ public interface Accessory extends Model {
 
     @NotNull String getId();
 
-    @NotNull String getName();
-
     @NotNull Optional<String> getDescription();
-
-    @NotNull Rarity getRarity();
 
     @NotNull Source getSource();
 
     @NotNull Limit getLimit();
 
-    @NotNull Optional<MojangProperty> getSkin();
-
     @NotNull Optional<Family> getFamily();
-
-    @NotNull ConcurrentList<Substitute> getStats();
 
     default @NotNull Item getItem() {
         return MinecraftApi.getRepository(Item.class)
