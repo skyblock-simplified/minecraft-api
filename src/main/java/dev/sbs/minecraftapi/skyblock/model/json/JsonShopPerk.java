@@ -24,7 +24,7 @@ public class JsonShopPerk implements ShopPerk, JsonModel {
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
     private @NotNull String description = "";
-    private @NotNull ConcurrentList<String> zoneIds = Concurrent.newList();
+    private @NotNull ConcurrentList<String> regionIds = Concurrent.newList();
     private @NotNull ConcurrentList<JsonStat.JsonSubstitute> stats = Concurrent.newList();
     private @NotNull ConcurrentList<JsonUnlock> unlocks = Concurrent.newList();
 
@@ -38,7 +38,7 @@ public class JsonShopPerk implements ShopPerk, JsonModel {
             .append(this.getId(), that.getId())
             .append(this.getName(), that.getName())
             .append(this.getDescription(), that.getDescription())
-            .append(this.getZoneIds(), that.getZoneIds())
+            .append(this.getRegionIds(), that.getRegionIds())
             .append(this.getStats(), that.getStats())
             .append(this.getUnlocks(), that.getUnlocks())
             .build();
@@ -50,7 +50,7 @@ public class JsonShopPerk implements ShopPerk, JsonModel {
             .append(this.getId())
             .append(this.getName())
             .append(this.getDescription())
-            .append(this.getZoneIds())
+            .append(this.getRegionIds())
             .append(this.getStats())
             .append(this.getUnlocks())
             .build();

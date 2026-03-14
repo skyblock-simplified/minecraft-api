@@ -2,6 +2,7 @@ package dev.sbs.minecraftapi.skyblock.model;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.collection.query.SearchFunction;
 import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +15,14 @@ public interface ShopPerk extends Model {
 
     @NotNull String getDescription();
 
-    @NotNull ConcurrentList<String> getZoneIds();
+    @NotNull ConcurrentList<String> getRegionIds();
 
-    default @NotNull ConcurrentList<Zone> getZones() {
-        return MinecraftApi.getRepository(Zone.class)
-            .matchAll(zone -> this.getZoneIds().contains(zone.getId()))
+    default @NotNull ConcurrentList<Region> getRegions() {
+        return MinecraftApi.getRepository(Region.class)
+            .matchAll(
+                SearchFunction.Match.ANY,
+                region -> this.getRegionIds().contains(region.getId())
+            )
             .collect(Concurrent.toUnmodifiableList());
     }
 
