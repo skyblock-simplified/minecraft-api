@@ -39,7 +39,7 @@ import org.jetbrains.annotations.NotNull;
  *     <li>and more...</li>
  * </ul>
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MinecraftApi extends SimplifiedApi {
 
     static {
