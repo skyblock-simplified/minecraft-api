@@ -1,10 +1,10 @@
 package dev.sbs.minecraftapi.skyblock.model;
 
-import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.Model;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import org.jetbrains.annotations.NotNull;
 
 public interface Gemstone extends Model {
@@ -20,22 +20,18 @@ public interface Gemstone extends Model {
     @NotNull String getStatId();
 
     default @NotNull Stat getStat() {
-        return MinecraftApi.getRepository(Stat.class).findFirstOrNull(Stat::getId, this.getStatId());
+        return MinecraftApi.getRepository(Stat.class)
+            .findFirstOrNull(Stat::getId, this.getStatId());
     }
 
-    @NotNull ConcurrentMap<Type, ConcurrentMap<ChatFormat, Double>> getValues();
+    @NotNull ConcurrentMap<Type, ConcurrentMap<Rarity, Double>> getValues();
 
     enum Type {
 
-        @SerializedName("rough")
         ROUGH,
-        @SerializedName("flawed")
         FLAWED,
-        @SerializedName("fine")
         FINE,
-        @SerializedName("flawless")
         FLAWLESS,
-        @SerializedName("perfect")
         PERFECT;
 
     }
