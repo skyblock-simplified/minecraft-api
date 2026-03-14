@@ -19,7 +19,7 @@ import javax.persistence.Id;
 @Entity
 @JsonResource(
     path = "skyblock",
-    name = "bestiary_mobs"
+    name = "bestiary_families"
 )
 public class JsonBestiaryFamily implements BestiaryFamily, JsonModel {
 

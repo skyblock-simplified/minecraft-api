@@ -29,6 +29,10 @@ public interface BestiaryFamily extends Model {
             .get(this.getMaxTier() - 1);
     }
 
+    default @NotNull ConcurrentList<Integer> getTiers() {
+        return BestiaryFamily.BRACKETS.get(this.getBracket() - 1);
+    }
+
     @NotNull String getCategoryId();
 
     default @NotNull BestiaryCategory getCategory() {
