@@ -282,10 +282,17 @@ public interface Item extends Model {
 
         enum Currency {
 
+            @SerializedName("coins")
             COINS,
+            @SerializedName("essence")
             ESSENCE,
+            @SerializedName("motes")
             MOTES,
+            @SerializedName("stars")
+            STARS,
+            @SerializedName("northStars")
             NORTH_STARS,
+            @SerializedName("pelts")
             PELTS
 
         }
