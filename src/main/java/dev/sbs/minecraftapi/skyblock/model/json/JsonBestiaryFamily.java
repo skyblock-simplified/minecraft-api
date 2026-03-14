@@ -35,6 +35,7 @@ public class JsonBestiaryFamily implements BestiaryFamily, JsonModel {
     private @NotNull String subcategoryId = "";
     @SerializedName("mobTypes")
     private @NotNull ConcurrentList<String> mobTypeIds = Concurrent.newUnmodifiableList();
+    private @NotNull ConcurrentList<String> mobs = Concurrent.newUnmodifiableList();
 
     @Override
     public boolean equals(Object o) {
@@ -52,6 +53,7 @@ public class JsonBestiaryFamily implements BestiaryFamily, JsonModel {
             .append(this.getCategoryId(), that.getCategoryId())
             .append(this.getSubcategoryId(), that.getSubcategoryId())
             .append(this.getMobTypeIds(), that.getMobTypeIds())
+            .append(this.getMobs(), that.getMobs())
             .build();
     }
 
@@ -67,6 +69,7 @@ public class JsonBestiaryFamily implements BestiaryFamily, JsonModel {
             .append(this.getCategoryId())
             .append(this.getSubcategoryId())
             .append(this.getMobTypeIds())
+            .append(this.getMobs())
             .build();
     }
 

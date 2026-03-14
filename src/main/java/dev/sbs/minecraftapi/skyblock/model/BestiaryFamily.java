@@ -53,6 +53,8 @@ public interface BestiaryFamily extends Model {
             .collect(Concurrent.toUnmodifiableList());
     }
 
+    @NotNull ConcurrentList<String> getMobs();
+
     @NotNull ConcurrentList<ConcurrentList<Integer>> BRACKETS = Concurrent.newUnmodifiableList(
         Concurrent.newUnmodifiableList(
             20, 40, 60, 100, 200,
