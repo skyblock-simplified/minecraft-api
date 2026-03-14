@@ -22,7 +22,12 @@ public interface Stat extends Model {
 
     @NotNull ChatFormat getFormat();
 
-    @NotNull String getCategory();
+    @NotNull String getCategoryId();
+
+    default @NotNull StatCategory getCategory() {
+        return MinecraftApi.getRepository(StatCategory.class)
+            .findFirstOrNull(StatCategory::getId, this.getCategoryId());
+    }
 
     double getBase();
 
