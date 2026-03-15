@@ -29,7 +29,9 @@ import java.util.Optional;
 @JsonResource(
     path = "skyblock",
     name = "pets",
-    indexes = {Skill.class}
+    indexes = {
+        Skill.class
+    }
 )
 public class Pet implements JpaModel {
 

@@ -22,7 +22,9 @@ import javax.persistence.ManyToOne;
 @JsonResource(
     path = "skyblock",
     name = "zones",
-    indexes = {Region.class}
+    indexes = {
+        Region.class
+    }
 )
 public class Zone implements JpaModel {
 

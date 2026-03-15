@@ -40,7 +40,9 @@ import java.util.Optional;
 @JsonResource(
     path = "skyblock",
     name = "items",
-    indexes = {ItemCategory.class}
+    indexes = {
+        ItemCategory.class
+    }
 )
 public class Item implements JpaModel, PostInit {
 

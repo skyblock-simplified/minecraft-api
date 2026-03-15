@@ -28,7 +28,10 @@ import java.util.Optional;
 @JsonResource(
     path = "skyblock",
     name = "reforges",
-    indexes = {ItemCategory.class, Item.class}
+    indexes = {
+        ItemCategory.class,
+        Item.class
+    }
 )
 public class Reforge implements JpaModel {
 

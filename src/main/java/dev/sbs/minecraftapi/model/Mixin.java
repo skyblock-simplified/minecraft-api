@@ -21,7 +21,10 @@ import javax.persistence.OneToMany;
 @JsonResource(
     path = "skyblock",
     name = "mixins",
-    indexes = {Item.class, Region.class}
+    indexes = {
+        Item.class,
+        Region.class
+    }
 )
 public class Mixin implements JpaModel {
 

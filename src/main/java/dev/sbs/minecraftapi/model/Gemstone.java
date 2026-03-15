@@ -25,7 +25,9 @@ import javax.persistence.ManyToOne;
 @JsonResource(
     path = "skyblock",
     name = "gemstones",
-    indexes = {Stat.class}
+    indexes = {
+        Stat.class
+    }
 )
 public class Gemstone implements JpaModel {
 

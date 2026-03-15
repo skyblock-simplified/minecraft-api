@@ -26,7 +26,9 @@ import java.util.Optional;
 @JsonResource(
     path = "skyblock",
     name = "bestiary_categories",
-    indexes = {Region.class}
+    indexes = {
+        Region.class
+    }
 )
 public class BestiaryCategory implements JpaModel {
 

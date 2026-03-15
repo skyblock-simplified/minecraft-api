@@ -27,7 +27,9 @@ import java.util.Optional;
 @JsonResource(
     path = "skyblock",
     name = "accessories",
-    indexes = {Item.class}
+    indexes = {
+        Item.class
+    }
 )
 public class Accessory implements JpaModel {
 

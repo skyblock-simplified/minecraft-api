@@ -22,7 +22,9 @@ import javax.persistence.OneToMany;
 @JsonResource(
     path = "skyblock",
     name = "shop_perks",
-    indexes = {Region.class}
+    indexes = {
+        Region.class
+    }
 )
 public class ShopPerk implements JpaModel, PostInit {
 

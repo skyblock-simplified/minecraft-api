@@ -26,7 +26,9 @@ import java.util.Map;
 @JsonResource(
     path = "skyblock",
     name = "slayers",
-    indexes = {MobType.class}
+    indexes = {
+        MobType.class
+    }
 )
 public class Slayer implements JpaModel {
 

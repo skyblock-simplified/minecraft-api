@@ -22,7 +22,9 @@ import javax.persistence.ManyToOne;
 @JsonResource(
     path = "skyblock",
     name = "bestiary_subcategories",
-    indexes = {BestiaryCategory.class}
+    indexes = {
+        BestiaryCategory.class
+    }
 )
 public class BestiarySubcategory implements JpaModel {
 
