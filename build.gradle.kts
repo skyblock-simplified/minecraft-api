@@ -26,6 +26,7 @@ dependencies {
     testImplementation(group = "org.hamcrest", name = "hamcrest", version = "2.2")
     testImplementation(group = "org.junit.jupiter", name = "junit-jupiter-api", version = "5.10.0")
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.10.0")
+    testImplementation(group = "com.h2database", name = "h2", version = "2.2.224")
 
     // Logging
     implementation(group = "org.apache.logging.log4j", name = "log4j-core", version = "2.25.3")
