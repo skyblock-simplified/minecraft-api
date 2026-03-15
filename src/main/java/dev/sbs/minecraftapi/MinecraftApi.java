@@ -2,7 +2,15 @@ package dev.sbs.minecraftapi;
 
 import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
+import dev.sbs.api.client.Client;
+import dev.sbs.api.client.request.Endpoint;
 import dev.sbs.api.io.gson.GsonSettings;
+import dev.sbs.api.persistence.JpaConfig;
+import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.Repository;
+import dev.sbs.api.persistence.SessionManager;
+import dev.sbs.api.persistence.driver.H2Driver;
+import dev.sbs.api.scheduler.Scheduler;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.mojang.MojangClient;
@@ -15,6 +23,7 @@ import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
+import dev.sbs.minecraftapi.model.Item;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
 import dev.sbs.minecraftapi.render.text.segment.LineSegment;
@@ -23,7 +32,10 @@ import dev.sbs.minecraftapi.skyblock.common.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 
 /**
  * The {@code MinecraftApi} is a non-instantiable extension of the {@link SimplifiedApi} utility class for managing and
@@ -75,10 +87,35 @@ public class MinecraftApi extends SimplifiedApi {
         serviceManager.add(SbsClient.class, new SbsClient());
         serviceManager.add(HypixelClient.class, new HypixelClient());
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
+
+        // Provide Json Persistence (H2-backed JPA session) TODO
+        getSessionManager().connect(
+            JpaConfig.builder()
+                .withDriver(new H2Driver())
+                .withPackageOf(Item.class)
+                .withGsonSettings(gsonSettings)
+                .build()
+        );
     }
 
-    public static @NotNull NbtFactory getNbtFactory() {
-        return serviceManager.get(NbtFactory.class);
+    /**
+     * Gets the built API client for the given class of client type {@link A}.
+     *
+     * @param tClass Client to locate.
+     * @param <T> Request type to match.
+     * @param <A> Client type to match.
+     */
+    public static <T extends Endpoint, A extends Client<T>> @NotNull A getClient(@NotNull Class<A> tClass) {
+        return serviceManager.get(tClass);
+    }
+
+    @SneakyThrows
+    public static @NotNull File getCurrentDirectory() {
+        return new File(SimplifiedApi.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+    }
+
+    public static @NotNull Gson getGson() {
+        return serviceManager.get(Gson.class);
     }
 
     /**
@@ -86,6 +123,29 @@ public class MinecraftApi extends SimplifiedApi {
      */
     public static @NotNull MojangProxy getMojangProxy() {
         return serviceManager.get(MojangProxy.class);
+    }
+
+    public static @NotNull NbtFactory getNbtFactory() {
+        return serviceManager.get(NbtFactory.class);
+    }
+
+    /**
+     * Gets the {@link Repository} caching all models of type {@link T}.
+     *
+     * @param tClass The {@link JpaModel} class to find.
+     * @param <T> The type of model.
+     * @return The repository of type {@link T}.
+     */
+    public static <T extends JpaModel> @NotNull Repository<T> getRepository(@NotNull Class<T> tClass) {
+        return getSessionManager().getRepository(tClass);
+    }
+
+    public static @NotNull Scheduler getScheduler() {
+        return serviceManager.get(Scheduler.class);
+    }
+
+    public static @NotNull SessionManager getSessionManager() {
+        return serviceManager.get(SessionManager.class);
     }
 
 }
