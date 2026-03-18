@@ -6,8 +6,6 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.AccessLevel;
@@ -15,30 +13,22 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "reforges",
-    indexes = {
-        ItemCategory.class,
-        Item.class
-    }
-)
+@Table(name = "reforges")
 public class Reforge implements JpaModel {
 
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
     @Column(name = "stone_id")
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> stoneId = Optional.empty();
     private int requiredLevel = 0;
     private @NotNull ConcurrentList<String> categoryIds = Concurrent.newList();

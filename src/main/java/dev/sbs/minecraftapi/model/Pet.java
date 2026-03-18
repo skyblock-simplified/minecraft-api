@@ -7,7 +7,6 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
@@ -22,17 +21,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "pets",
-    indexes = {
-        Skill.class
-    }
-)
+@Table(name = "pets")
 public class Pet implements JpaModel {
 
     public static final @NotNull ConcurrentList<Integer> PET_SCORE = Concurrent.newList(

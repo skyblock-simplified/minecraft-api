@@ -3,32 +3,25 @@ package dev.sbs.minecraftapi.model;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "keywords"
-)
+@Table(name = "keywords")
 public class Keyword implements JpaModel {
 
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> plural = Optional.empty();
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> symbol = Optional.empty();
     @Enumerated(EnumType.STRING)
     private @NotNull ChatFormat format = ChatFormat.GREEN;

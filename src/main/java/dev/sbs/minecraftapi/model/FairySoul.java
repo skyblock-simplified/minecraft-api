@@ -3,7 +3,6 @@ package dev.sbs.minecraftapi.model;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,16 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "fairy_souls",
-    indexes = {
-        Zone.class
-    }
-)
+@Table(name = "fairy_souls")
 public class FairySoul implements JpaModel {
 
     private @Id int id = 0;

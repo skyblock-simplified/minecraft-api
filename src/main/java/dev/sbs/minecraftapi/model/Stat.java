@@ -6,7 +6,6 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
@@ -20,17 +19,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "stats",
-    indexes = {
-        StatCategory.class
-    }
-)
+@Table(name = "stats")
 public class Stat implements JpaModel {
 
     public static final double MAGIC_CONSTANT = 719.28;

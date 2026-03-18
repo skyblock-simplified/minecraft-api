@@ -5,20 +5,17 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "potions"
-)
+@Table(name = "potions")
 public class Potion implements JpaModel {
 
     private @Id @NotNull String id = "";

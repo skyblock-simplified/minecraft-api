@@ -6,7 +6,6 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.MinecraftApi;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,16 +16,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "minions",
-    indexes = {
-        Collection.class
-    }
-)
+@Table(name = "minions")
 public class Minion implements JpaModel {
 
     public static final @NotNull ConcurrentList<Integer> UNIQUE_CRAFTS = Concurrent.newList(

@@ -3,32 +3,41 @@ package dev.sbs.minecraftapi.model;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "brews"
-)
+@Table(name = "brews")
 public class Brew implements JpaModel {
 
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
-    private @NotNull String description = "";
-    private @NotNull String rarityId = "";
-    private boolean amplified = false;
-    private @NotNull Item.Cost cost = new Item.Cost();
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
 
-    public @NotNull Rarity getRarity() {
-        return Rarity.of(this.getRarityId());
-    }
+    @Column(name = "name", nullable = false)
+    private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
+    private @NotNull String description = "";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rarity", nullable = false)
+    private @NotNull Rarity rarity = Rarity.COMMON;
+
+    @Column(name = "amplified", nullable = false)
+    private boolean amplified = false;
+
+    @Column(name = "cost", nullable = false)
+    private @NotNull Item.Cost cost = new Item.Cost();
 
     @Override
     public boolean equals(Object o) {
@@ -41,7 +50,7 @@ public class Brew implements JpaModel {
             .append(this.getId(), that.getId())
             .append(this.getName(), that.getName())
             .append(this.getDescription(), that.getDescription())
-            .append(this.getRarityId(), that.getRarityId())
+            .append(this.getRarity(), that.getRarity())
             .append(this.getCost(), that.getCost())
             .build();
     }
@@ -52,7 +61,7 @@ public class Brew implements JpaModel {
             .append(this.getId())
             .append(this.getName())
             .append(this.getDescription())
-            .append(this.getRarityId())
+            .append(this.getRarity())
             .append(this.isAmplified())
             .append(this.getCost())
             .build();

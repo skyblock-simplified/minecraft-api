@@ -7,7 +7,6 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.minecraftapi.MinecraftApi;
 import lombok.AccessLevel;
@@ -19,17 +18,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Map;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "slayers",
-    indexes = {
-        MobType.class
-    }
-)
+@Table(name = "slayers")
 public class Slayer implements JpaModel {
 
     private @Id @NotNull String id = "";

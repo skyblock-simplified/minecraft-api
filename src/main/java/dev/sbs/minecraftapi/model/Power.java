@@ -6,31 +6,25 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "powers"
-)
+@Table(name = "powers")
 public class Power implements JpaModel {
 
     private @Id @NotNull String id = "";
     private @NotNull String name = "";
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> stoneId = Optional.empty();
     @SerializedName("requiredLevel")
     private int requiredCombatLevel = 0;

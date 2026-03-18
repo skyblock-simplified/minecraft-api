@@ -5,7 +5,6 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,17 +14,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "mixins",
-    indexes = {
-        Item.class,
-        Region.class
-    }
-)
+@Table(name = "mixins")
 public class Mixin implements JpaModel {
 
     @Column(name = "item_id")

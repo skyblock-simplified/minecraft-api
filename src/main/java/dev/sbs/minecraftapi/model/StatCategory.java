@@ -3,7 +3,6 @@ package dev.sbs.minecraftapi.model;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -12,13 +11,11 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "stat_categories"
-)
+@Table(name = "stat_categories")
 public class StatCategory implements JpaModel {
 
     private @Id @NotNull String id = "";

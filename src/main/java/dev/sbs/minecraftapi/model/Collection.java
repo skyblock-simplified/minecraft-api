@@ -6,31 +6,31 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
+import dev.sbs.api.persistence.type.GsonType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "collections"
-)
+@Table(name = "collections")
 public class Collection implements JpaModel {
 
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
-    @Getter(AccessLevel.NONE)
-    private @NotNull ConcurrentMap<String, Item> items = Concurrent.newMap();
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
 
-    public @NotNull ConcurrentMap<String, Item> getItems() {
-        return this.items;
-    }
+    @Column(name = "name", nullable = false)
+    private @NotNull String name = "";
+
+    @Column(name = "items", nullable = false)
+    private @NotNull ConcurrentMap<String, Item> items = Concurrent.newMap();
 
     @Override
     public boolean equals(Object o) {
@@ -55,6 +55,7 @@ public class Collection implements JpaModel {
     }
 
     @Getter
+    @GsonType
     @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
     public static class Item {
 
@@ -96,6 +97,7 @@ public class Collection implements JpaModel {
     }
 
     @Getter
+    @GsonType
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Tier {
 

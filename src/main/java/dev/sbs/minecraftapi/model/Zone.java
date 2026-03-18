@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -16,15 +15,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "zones",
-    indexes = {
-        Region.class
-    }
+@Table(
+    name = "zones"
 )
 public class Zone implements JpaModel {
 

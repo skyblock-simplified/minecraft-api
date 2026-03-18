@@ -5,7 +5,6 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
@@ -15,13 +14,11 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "regions"
-)
+@Table(name = "regions")
 public class Region implements JpaModel {
 
     private @Id @NotNull String id = "";

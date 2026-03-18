@@ -3,59 +3,54 @@ package dev.sbs.minecraftapi.model;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.MinecraftApi;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "accessories",
-    indexes = {
-        Item.class
-    }
-)
+@Table(name = "accessories")
 public class Accessory implements JpaModel {
 
-    @Column(name = "id")
-    private @Id @NotNull String id;
-    @Convert(converter = OptionalStringConverter.class)
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id;
+
+    @Column(name = "description")
     private @NotNull Optional<String> description = Optional.empty();
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false)
     private @NotNull Source source = Source.MISCELLANEOUS;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "limit", nullable = false)
     private @NotNull Limit limit = Limit.NONE;
+
     @Getter(AccessLevel.NONE)
-    @Transient
-    private @NotNull Optional<Family> family = Optional.empty();
+    @Column(name = "family")
+    private @Nullable Family family;
 
     @ManyToOne
     @JoinColumn(name = "id", referencedColumnName = "id")
-    private transient Item item;
+    private transient @NotNull Item item;
 
     public @NotNull Optional<Family> getFamily() {
-        return this.family;
-    }
-
-    public @NotNull Item getItem() {
-        return MinecraftApi.getRepository(Item.class)
-            .findFirstOrNull(Item::getId, this.getId());
+        return Optional.ofNullable(this.family);
     }
 
     @Override
@@ -107,6 +102,7 @@ public class Accessory implements JpaModel {
     }
 
     @Getter
+    @GsonType
     public static class Family {
 
         private @NotNull String id = "";
@@ -135,6 +131,7 @@ public class Accessory implements JpaModel {
     }
 
     @Getter
+    @GsonType
     @AllArgsConstructor
     public static class Substitute {
 

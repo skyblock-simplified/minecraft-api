@@ -8,10 +8,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalColorConverter;
-import dev.sbs.api.persistence.converter.optional.OptionalIntegerConverter;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.common.GameStage;
@@ -23,13 +20,13 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.awt.*;
 import java.util.List;
@@ -37,13 +34,7 @@ import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "items",
-    indexes = {
-        ItemCategory.class
-    }
-)
+@Table(name = "items")
 public class Item implements JpaModel, PostInit {
 
     // Expected Data
@@ -118,28 +109,20 @@ public class Item implements JpaModel, PostInit {
     }
 
     // Possible Data
-    @Convert(converter = OptionalIntegerConverter.class)
     private @NotNull Optional<Integer> durability = Optional.empty();
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> description = Optional.empty();
-    @Convert(converter = OptionalColorConverter.class)
     private @NotNull Optional<Color> color = Optional.empty();
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> origin = Optional.empty();
     @Transient
     private @NotNull Optional<MojangProperty> skin = Optional.empty();
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> furniture = Optional.empty();
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> crystal = Optional.empty();
     @SerializedName("museum_data")
     @Transient
     private @NotNull Optional<MuseumData> museumData = Optional.empty();
     @SerializedName("sword_type")
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> swordType = Optional.empty();
     @SerializedName("private_island")
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> miniIslandGenerator = Optional.empty();
     @SerializedName("npc_sell_price")
     private double npcSellPrice;
@@ -161,7 +144,6 @@ public class Item implements JpaModel, PostInit {
     private double motesSellPrice;
 
     // Minions
-    @Convert(converter = OptionalStringConverter.class)
     private @NotNull Optional<String> generator = Optional.empty();
     @SerializedName("generator_tier")
     private int generatorTier;
@@ -372,6 +354,7 @@ public class Item implements JpaModel, PostInit {
     }
 
     @Getter
+    @GsonType
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class MuseumData {
 
@@ -432,6 +415,7 @@ public class Item implements JpaModel, PostInit {
     }
 
     @Getter
+    @GsonType
     public static class Cost {
 
         private int experience = 0;

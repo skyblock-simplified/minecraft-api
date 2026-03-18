@@ -6,15 +6,13 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -22,20 +20,110 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "bestiary_families",
-    indexes = {
-        BestiaryCategory.class,
-        BestiarySubcategory.class,
-        MobType.class
-    }
-)
+@Table(name = "bestiary_families")
 public class BestiaryFamily implements JpaModel {
+
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "id", nullable = false)
+    private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
+    private @NotNull String description = "";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
+    private @NotNull ChatFormat format = ChatFormat.GREEN;
+
+    @Column(name = "bracket", nullable = false)
+    private int bracket = 1;
+
+    @Column(name = "max_tier", nullable = false)
+    private int maxTier = 25;
+
+    @SerializedName("category")
+    @Column(name = "category_id", nullable = false)
+    private @NotNull String categoryId = "";
+
+    @SerializedName("subcategory")
+    @Column(name = "subcategory_id")
+    private @NotNull Optional<String> subcategoryId = Optional.empty();
+
+    @SerializedName("mobTypes")
+    @Column(name = "mob_types", nullable = false)
+    private @NotNull ConcurrentList<String> mobTypeIds = Concurrent.newUnmodifiableList();
+
+    @Column(name = "mobs", nullable = false)
+    private @NotNull ConcurrentList<String> mobs = Concurrent.newUnmodifiableList();
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private transient @NotNull BestiaryCategory category;
+
+    @ManyToOne
+    @Getter(AccessLevel.NONE)
+    @JoinColumn(name = "subcategory_id", referencedColumnName = "id")
+    private transient @Nullable BestiarySubcategory subcategory;
+
+    @OneToMany
+    private transient @NotNull ConcurrentList<MobType> mobTypes = Concurrent.newList();
+
+    public int getMaxKills() {
+        return BRACKETS
+            .get(this.getBracket() - 1)
+            .get(this.getMaxTier() - 1);
+    }
+
+    public @NotNull Optional<BestiarySubcategory> getSubcategory() {
+        return Optional.ofNullable(this.subcategory);
+    }
+
+    public @NotNull ConcurrentList<Integer> getTiers() {
+        return BRACKETS.get(this.getBracket() - 1);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BestiaryFamily that = (BestiaryFamily) o;
+
+        return new EqualsBuilder()
+            .append(this.getBracket(), that.getBracket())
+            .append(this.getMaxTier(), that.getMaxTier())
+            .append(this.getId(), that.getId())
+            .append(this.getName(), that.getName())
+            .append(this.getDescription(), that.getDescription())
+            .append(this.getFormat(), that.getFormat())
+            .append(this.getCategoryId(), that.getCategoryId())
+            .append(this.getSubcategoryId(), that.getSubcategoryId())
+            .append(this.getMobTypeIds(), that.getMobTypeIds())
+            .append(this.getMobs(), that.getMobs())
+            .build();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+            .append(this.getId())
+            .append(this.getName())
+            .append(this.getDescription())
+            .append(this.getFormat())
+            .append(this.getBracket())
+            .append(this.getMaxTier())
+            .append(this.getCategoryId())
+            .append(this.getSubcategoryId())
+            .append(this.getMobTypeIds())
+            .append(this.getMobs())
+            .build();
+    }
 
     public static final @NotNull ConcurrentList<ConcurrentList<Integer>> BRACKETS = Concurrent.newUnmodifiableList(
         Concurrent.newUnmodifiableList(
@@ -88,85 +176,5 @@ public class BestiaryFamily implements JpaModel {
             1_000, 1_500, 2_000, 2_500, 3_000
         )
     );
-
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
-    private @NotNull String description = "";
-    @Enumerated(EnumType.STRING)
-    private @NotNull ChatFormat format = ChatFormat.GREEN;
-    private int bracket = 1;
-    private int maxTier = 25;
-    @Column(name = "category_id")
-    @SerializedName("category")
-    private @NotNull String categoryId = "";
-    @Column(name = "subcategory_id")
-    @SerializedName("subcategory")
-    @Convert(converter = OptionalStringConverter.class)
-    private @NotNull Optional<String> subcategoryId = Optional.empty();
-    @SerializedName("mobTypes")
-    private @NotNull ConcurrentList<String> mobTypeIds = Concurrent.newUnmodifiableList();
-    private @NotNull ConcurrentList<String> mobs = Concurrent.newUnmodifiableList();
-
-    @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private transient BestiaryCategory category;
-
-    @ManyToOne
-    @JoinColumn(name = "subcategory_id", referencedColumnName = "id")
-    @Getter(AccessLevel.NONE)
-    private transient BestiarySubcategory subcategory;
-
-    @OneToMany
-    private transient ConcurrentList<MobType> mobTypes = Concurrent.newList();
-
-    public @NotNull Optional<BestiarySubcategory> getSubcategory() {
-        return Optional.ofNullable(this.subcategory);
-    }
-
-    public int getMaxKills() {
-        return BRACKETS
-            .get(this.getBracket() - 1)
-            .get(this.getMaxTier() - 1);
-    }
-
-    public @NotNull ConcurrentList<Integer> getTiers() {
-        return BRACKETS.get(this.getBracket() - 1);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BestiaryFamily that = (BestiaryFamily) o;
-
-        return new EqualsBuilder()
-            .append(this.getBracket(), that.getBracket())
-            .append(this.getMaxTier(), that.getMaxTier())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getCategoryId(), that.getCategoryId())
-            .append(this.getSubcategoryId(), that.getSubcategoryId())
-            .append(this.getMobTypeIds(), that.getMobTypeIds())
-            .append(this.getMobs(), that.getMobs())
-            .build();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getFormat())
-            .append(this.getBracket())
-            .append(this.getMaxTier())
-            .append(this.getCategoryId())
-            .append(this.getSubcategoryId())
-            .append(this.getMobTypeIds())
-            .append(this.getMobs())
-            .build();
-    }
 
 }

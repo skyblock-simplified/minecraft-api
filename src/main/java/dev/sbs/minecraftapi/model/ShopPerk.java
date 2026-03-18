@@ -7,7 +7,6 @@ import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.MinecraftApi;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,16 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "shop_perks",
-    indexes = {
-        Region.class
-    }
-)
+@Table(name = "shop_perks")
 public class ShopPerk implements JpaModel, PostInit {
 
     private @Id @NotNull String id = "";

@@ -5,43 +5,35 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.api.util.StringUtil;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "bits_items"
-)
+@Table(name = "bits_items")
 public class BitsItem implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "id", nullable = false)
     private @NotNull Type type = Type.ITEM;
+    @Column(name = "cost", nullable = false)
     private int cost;
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "variants", nullable = false)
     private @NotNull ConcurrentList<Variant> variants = Concurrent.newList();
-
-    public @NotNull ConcurrentList<Variant> getVariants() {
-        return this.variants;
-    }
-
-    public boolean hasVariants() {
-        return !this.variants.isEmpty();
-    }
-
-    public boolean noVariants() {
-        return !this.hasVariants();
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -87,6 +79,7 @@ public class BitsItem implements JpaModel {
     }
 
     @Getter
+    @GsonType
     public static class Variant {
 
         private @NotNull String id = "";

@@ -6,65 +6,70 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.persistence.Convert;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "enchantments",
-    indexes = {
-        ItemCategory.class,
-        Item.class,
-        MobType.class
-    }
-)
+@Table(name = "enchantments")
 public class Enchantment implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
     private @NotNull String description = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
     private @NotNull Type type = Type.NORMAL;
+
+    @Column(name = "required_level", nullable = false)
     private int requiredLevel = 0;
-    @Convert(converter = OptionalStringConverter.class)
+
+    @Column(name = "conflict")
     private @NotNull Optional<String> conflict = Optional.empty();
+
+    @Column(name = "categories", nullable = false)
     private @NotNull ConcurrentList<String> categoryIds = Concurrent.newList();
+
+    @Column(name = "items", nullable = false)
     private @NotNull ConcurrentList<String> itemIds = Concurrent.newList();
+
+    @Column(name = "levels", nullable = false)
     private @NotNull ConcurrentList<Level> levels = Concurrent.newList();
+
+    @Column(name = "stats", nullable = false)
     private @NotNull ConcurrentList<Stat.Substitute> stats = Concurrent.newList();
+
+    @Column(name = "mob_types", nullable = false)
     private @NotNull ConcurrentList<String> mobTypeIds = Concurrent.newList();
 
     @OneToMany
-    private transient ConcurrentList<ItemCategory> categories = Concurrent.newList();
+    private transient @NotNull ConcurrentList<ItemCategory> categories = Concurrent.newList();
 
     @OneToMany
-    private transient ConcurrentList<Item> items = Concurrent.newList();
+    private transient @NotNull ConcurrentList<Item> items = Concurrent.newList();
 
     @OneToMany
-    private transient ConcurrentList<MobType> mobTypes = Concurrent.newList();
-
-    public boolean hasConflict() {
-        return this.getConflict().isPresent();
-    }
-
-    public boolean noConflict() {
-        return !this.hasConflict();
-    }
+    private transient @NotNull ConcurrentList<MobType> mobTypes = Concurrent.newList();
 
     @Override
     public boolean equals(Object o) {
@@ -122,6 +127,7 @@ public class Enchantment implements JpaModel {
     }
 
     @Getter
+    @GsonType
     public static class Level {
 
         private int level = 0;

@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -16,30 +15,34 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "bestiary_subcategories",
-    indexes = {
-        BestiaryCategory.class
-    }
-)
+@Table(name = "bestiary_subcategories")
 public class BestiarySubcategory implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.GREEN;
-    @Column(name = "category_id")
+
     @SerializedName("category")
+    @Column(name = "category_id", nullable = false)
     private @NotNull String categoryId = "";
+
+    @Column(name = "ordinal", nullable = false)
     private int ordinal = -1;
 
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private transient BestiaryCategory category;
+    private transient @NotNull BestiaryCategory category;
 
     @Override
     public boolean equals(Object o) {

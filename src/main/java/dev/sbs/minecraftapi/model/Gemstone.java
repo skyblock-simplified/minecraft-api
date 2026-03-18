@@ -6,7 +6,6 @@ import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.Getter;
@@ -19,16 +18,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "gemstones",
-    indexes = {
-        Stat.class
-    }
-)
+@Table(name = "gemstones")
 public class Gemstone implements JpaModel {
 
     private @Id @NotNull String id = "";

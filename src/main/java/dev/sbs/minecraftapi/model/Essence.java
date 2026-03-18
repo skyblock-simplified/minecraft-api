@@ -3,27 +3,31 @@ package dev.sbs.minecraftapi.model;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "essences"
-)
+@Table(name = "essences")
 public class Essence implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.LIGHT_PURPLE;
 
     @Override

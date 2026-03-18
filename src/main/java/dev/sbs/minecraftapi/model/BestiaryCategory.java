@@ -4,48 +4,49 @@ import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.builder.EqualsBuilder;
 import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.JsonResource;
-import dev.sbs.api.persistence.converter.optional.OptionalStringConverter;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Optional;
 
 @Getter
 @Entity
-@JsonResource(
-    path = "skyblock",
-    name = "bestiary_categories",
-    indexes = {
-        Region.class
-    }
-)
+@Table(name = "bestiary_categories")
 public class BestiaryCategory implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
-    @Column(name = "region_id")
+
     @SerializedName("region")
-    @Convert(converter = OptionalStringConverter.class)
+    @Column(name = "region_id")
     private @NotNull Optional<String> regionId = Optional.empty();
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.GREEN;
+
+    @Column(name = "ordinal", nullable = false)
     private int ordinal = -1;
 
     @ManyToOne
-    @JoinColumn(name = "region_id", referencedColumnName = "id")
     @Getter(AccessLevel.NONE)
-    private transient Region region;
+    @JoinColumn(name = "region_id", referencedColumnName = "id")
+    private transient @Nullable Region region;
 
     public @NotNull Optional<Region> getRegion() {
         return Optional.ofNullable(this.region);
