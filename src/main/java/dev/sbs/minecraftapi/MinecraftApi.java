@@ -33,23 +33,40 @@ import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.logging.log4j.Level;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.cache.jcache.MissingCacheStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
 /**
- * The {@code MinecraftApi} is a non-instantiable extension of the {@link SimplifiedApi} utility class for managing and
- * accessing various managers, services, builders, and API clients used across the application.
+ * Minecraft- and Hypixel-specific extension of {@link SimplifiedApi} that bootstraps all
+ * game-related services, Feign clients, Gson adapters, and an H2-backed JPA session for
+ * JSON-sourced models.
  * <p>
- * This class centralizes the initialization and retrieval of dependent resources to ensure a simplified and
- * consistent interface for interacting with API components.
+ * All bootstrapping happens in a static initializer block:
  * <ul>
- *     <li>Adds Minecraft and Hypixel related {@link Gson} configurations.</li>
- *     <li>Adds service support for {@link NbtFactory}.</li>
- *     <li>Adds JSON text support through {@link TextSegment}.</li>
- *     <li>Adds Mojang, Hypixel and Sbs client configurations.</li>
- *     <li>and more...</li>
+ *     <li>Registers Minecraft/Hypixel {@link Gson} type adapters for NBT content,
+ *         SkyBlock dates, and SBS API response types.</li>
+ *     <li>Registers {@link NbtFactory} as a service for reading/writing NBT data.</li>
+ *     <li>Registers {@link dev.sbs.api.builder.ClassBuilder ClassBuilder} entries for
+ *         {@link SbsClient}, {@link MojangClient}, {@link HypixelClient}, and text segment types.</li>
+ *     <li>Instantiates and registers the {@link MojangProxy} (with IPv6 rotation),
+ *         {@link SbsClient}, {@link HypixelClient}, and {@link MinecraftServerPing} clients.</li>
+ *     <li>Connects an H2 in-memory JPA session that loads JSON model files from
+ *         the {@code skyblock/} classpath resource directory.</li>
  * </ul>
+ *
+ * <p>Typical access patterns:
+ * <pre>{@code
+ * MinecraftApi.getClient(HypixelClient.class);
+ * MinecraftApi.getRepository(Item.class);
+ * MinecraftApi.getNbtFactory();
+ * MinecraftApi.getMojangProxy();
+ * }</pre>
+ *
+ * @see SimplifiedApi
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MinecraftApi extends SimplifiedApi {
@@ -93,57 +110,104 @@ public class MinecraftApi extends SimplifiedApi {
             JpaConfig.builder()
                 .withDriver(new H2Driver())
                 .withPackageOf(Item.class)
+                .withJsonResourceBase("skyblock")
                 .withGsonSettings(gsonSettings)
+                .withLogLevel(Level.WARN)
+                .isUsingQueryCache()
+                .isUsing2ndLevelCache()
+                .withCacheConcurrencyStrategy(CacheConcurrencyStrategy.READ_WRITE)
+                .withMissingCacheStrategy(MissingCacheStrategy.CREATE_WARN)
+                .withQueryResultsTTL(30)
                 .build()
         );
     }
 
     /**
-     * Gets the built API client for the given class of client type {@link A}.
+     * Retrieves a registered {@link Client} instance for the given client class.
+     * <p>
+     * Available clients include {@link HypixelClient}, {@link MojangClient},
+     * {@link SbsClient}, and {@link MinecraftServerPing}.
      *
-     * @param tClass Client to locate.
-     * @param <T> Request type to match.
-     * @param <A> Client type to match.
+     * @param tClass the client class to look up in the {@link #serviceManager}
+     * @param <T>    the endpoint type the client operates on
+     * @param <A>    the client type
+     * @return the registered client instance
      */
     public static <T extends Endpoint, A extends Client<T>> @NotNull A getClient(@NotNull Class<A> tClass) {
         return serviceManager.get(tClass);
     }
 
+    /**
+     * Returns the directory containing the running application's JAR or class files.
+     *
+     * @return the parent directory of this class's code source location
+     */
     @SneakyThrows
     public static @NotNull File getCurrentDirectory() {
         return new File(SimplifiedApi.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
     }
 
+    /**
+     * Returns the globally configured {@link Gson} instance, which includes
+     * Minecraft-specific type adapters for {@link NbtContent}, {@link SkyBlockDate},
+     * and SBS API response types in addition to the base adapters from {@link SimplifiedApi}.
+     *
+     * @return the shared {@link Gson} instance registered in the {@link #serviceManager}
+     */
     public static @NotNull Gson getGson() {
         return serviceManager.get(Gson.class);
     }
 
     /**
-     * Gets the {@link MojangProxy} used to interact with the Mojang API.
+     * Returns the {@link MojangProxy} that manages a pool of {@link MojangClient} instances
+     * with IPv6 rotation to avoid Mojang API rate limits.
+     *
+     * @return the shared {@link MojangProxy} instance
      */
     public static @NotNull MojangProxy getMojangProxy() {
         return serviceManager.get(MojangProxy.class);
     }
 
+    /**
+     * Returns the {@link NbtFactory} for reading and writing Minecraft NBT data
+     * in multiple formats (Base64, byte arrays, files, streams, SNBT, and JSON).
+     *
+     * @return the shared {@link NbtFactory} instance
+     */
     public static @NotNull NbtFactory getNbtFactory() {
         return serviceManager.get(NbtFactory.class);
     }
 
     /**
-     * Gets the {@link Repository} caching all models of type {@link T}.
+     * Retrieves the {@link Repository} that caches all entities of the given model type.
+     * <p>
+     * For JSON-backed models (e.g. {@link Item}), entities are loaded from classpath
+     * JSON resources in the {@code skyblock/} directory into an embedded H2 database.
      *
-     * @param tClass The {@link JpaModel} class to find.
-     * @param <T> The type of model.
-     * @return The repository of type {@link T}.
+     * @param tClass the {@link JpaModel} class to find a repository for
+     * @param <T>    the entity type
+     * @return the repository caching entities of type {@code T}
      */
     public static <T extends JpaModel> @NotNull Repository<T> getRepository(@NotNull Class<T> tClass) {
         return getSessionManager().getRepository(tClass);
     }
 
+    /**
+     * Returns the global {@link Scheduler} for executing asynchronous and recurring tasks.
+     *
+     * @return the shared {@link Scheduler} instance registered in the {@link #serviceManager}
+     */
     public static @NotNull Scheduler getScheduler() {
         return serviceManager.get(Scheduler.class);
     }
 
+    /**
+     * Returns the global {@link SessionManager} that manages all active
+     * {@link dev.sbs.api.persistence.JpaSession JpaSession} instances, including the
+     * H2 session for JSON-backed models bootstrapped by this class.
+     *
+     * @return the shared {@link SessionManager} instance registered in the {@link #serviceManager}
+     */
     public static @NotNull SessionManager getSessionManager() {
         return serviceManager.get(SessionManager.class);
     }
