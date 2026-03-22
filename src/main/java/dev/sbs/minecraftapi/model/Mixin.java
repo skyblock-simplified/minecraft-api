@@ -22,8 +22,8 @@ import java.util.Objects;
 public class Mixin implements JpaModel {
 
     @Id
-    @Column(name = "item_id", nullable = false)
-    private @NotNull String itemId = "";
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
 
     @Column(name = "name", nullable = false)
     private @NotNull String name = "";
@@ -33,7 +33,7 @@ public class Mixin implements JpaModel {
     private @NotNull ConcurrentList<String> regionIds = Concurrent.newList();
 
     @ManyToOne
-    @JoinColumn(name = "item_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
     private @NotNull Item item;
 
     @ForeignIds("regionIds")
@@ -45,14 +45,14 @@ public class Mixin implements JpaModel {
 
         Mixin that = (Mixin) o;
 
-        return Objects.equals(this.getItemId(), that.getItemId())
+        return Objects.equals(this.getId(), that.getId())
             && Objects.equals(this.getName(), that.getName())
             && Objects.equals(this.getRegionIds(), that.getRegionIds());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getItemId(), this.getName(), this.getRegionIds());
+        return Objects.hash(this.getId(), this.getName(), this.getRegionIds());
     }
 
 }
