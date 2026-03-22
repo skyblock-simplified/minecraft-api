@@ -1,27 +1,35 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "mob_types")
 public class MobType implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "symbol", nullable = false)
     private @NotNull String symbol = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.WHITE;
 
     @Override
@@ -30,22 +38,15 @@ public class MobType implements JpaModel {
 
         MobType that = (MobType) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getSymbol(), that.getSymbol())
-            .append(this.getFormat(), that.getFormat())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getSymbol(), that.getSymbol())
+            && Objects.equals(this.getFormat(), that.getFormat());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getSymbol())
-            .append(this.getFormat())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getSymbol(), this.getFormat());
     }
 
 }

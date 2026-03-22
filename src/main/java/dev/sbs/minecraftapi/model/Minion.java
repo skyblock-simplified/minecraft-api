@@ -1,13 +1,11 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.MinecraftApi;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -29,21 +28,23 @@ public class Minion implements JpaModel {
         400, 450, 500, 550, 600, 650, 700, 750, 800, 850
     );
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
-    @Column(name = "collection_id")
+
     @SerializedName("collection")
+    @Column(name = "collection_id", nullable = false)
     private @NotNull String collectionId = "";
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "tiers", nullable = false)
     private @NotNull ConcurrentList<Tier> tiers = Concurrent.newList();
 
     @ManyToOne
-    @JoinColumn(name = "collection_id", referencedColumnName = "id")
-    private transient Collection collection;
-
-    public @NotNull ConcurrentList<Tier> getTiers() {
-        return this.tiers;
-    }
+    @JoinColumn(name = "collection_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull Collection collection;
 
     @Override
     public boolean equals(Object o) {
@@ -51,25 +52,19 @@ public class Minion implements JpaModel {
 
         Minion that = (Minion) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getCollectionId(), that.getCollectionId())
-            .append(this.getTiers(), that.getTiers())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getCollectionId(), that.getCollectionId())
+            && Objects.equals(this.getTiers(), that.getTiers());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getCollectionId())
-            .append(this.getTiers())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getCollectionId(), this.getTiers());
     }
 
     @Getter
+    @GsonType
     public static class Tier {
 
         private int tier;
@@ -89,22 +84,15 @@ public class Minion implements JpaModel {
 
             Tier that = (Tier) o;
 
-            return new EqualsBuilder()
-                .append(this.getTier(), that.getTier())
-                .append(this.getSpeed(), that.getSpeed())
-                .append(this.getItemId(), that.getItemId())
-                .append(this.getUpgradeCost(), that.getUpgradeCost())
-                .build();
+            return this.getTier() == that.getTier()
+                && this.getSpeed() == that.getSpeed()
+                && Objects.equals(this.getItemId(), that.getItemId())
+                && Objects.equals(this.getUpgradeCost(), that.getUpgradeCost());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getTier())
-                .append(this.getSpeed())
-                .append(this.getItemId())
-                .append(this.getUpgradeCost())
-                .build();
+            return Objects.hash(this.getTier(), this.getSpeed(), this.getItemId(), this.getUpgradeCost());
         }
 
     }

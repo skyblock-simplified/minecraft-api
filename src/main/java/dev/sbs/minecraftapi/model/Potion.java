@@ -1,34 +1,40 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "potions")
 public class Potion implements JpaModel {
 
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
-    private @NotNull String description = "";
-    private boolean buff;
-    private boolean brewable;
-    @Getter(AccessLevel.NONE)
-    private @NotNull ConcurrentList<Stat.Substitute> stats = Concurrent.newList();
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
 
-    public @NotNull ConcurrentList<Stat.Substitute> getStats() {
-        return this.stats;
-    }
+    @Column(name = "name", nullable = false)
+    private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
+    private @NotNull String description = "";
+
+    @Column(name = "buff", nullable = false)
+    private boolean buff;
+
+    @Column(name = "brewable", nullable = false)
+    private boolean brewable;
+
+    @Column(name = "stats", nullable = false)
+    private @NotNull ConcurrentList<Stat.Substitute> stats = Concurrent.newList();
 
     @Override
     public boolean equals(Object o) {
@@ -36,26 +42,17 @@ public class Potion implements JpaModel {
 
         Potion that = (Potion) o;
 
-        return new EqualsBuilder()
-            .append(this.isBuff(), that.isBuff())
-            .append(this.isBrewable(), that.isBrewable())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getStats(), that.getStats())
-            .build();
+        return this.isBuff() == that.isBuff()
+            && this.isBrewable() == that.isBrewable()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getStats(), that.getStats());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.isBuff())
-            .append(this.isBrewable())
-            .append(this.getStats())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.isBuff(), this.isBrewable(), this.getStats());
     }
 
 }

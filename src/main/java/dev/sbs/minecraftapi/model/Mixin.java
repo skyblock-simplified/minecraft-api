@@ -1,9 +1,9 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
+import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.persistence.ForeignIds;
 import dev.sbs.api.persistence.JpaModel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -13,25 +13,31 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "mixins")
 public class Mixin implements JpaModel {
 
-    @Column(name = "item_id")
-    private @Id @NotNull String itemId = "";
+    @Id
+    @Column(name = "item_id", nullable = false)
+    private @NotNull String itemId = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @SerializedName("regions")
+    @Column(name = "regions", nullable = false)
     private @NotNull ConcurrentList<String> regionIds = Concurrent.newList();
 
     @ManyToOne
-    @JoinColumn(name = "item_id", referencedColumnName = "id")
-    private transient Item item;
+    @JoinColumn(name = "item_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull Item item;
 
-    @OneToMany
-    private transient ConcurrentList<Region> regions = Concurrent.newList();
+    @ForeignIds("regionIds")
+    private transient @NotNull ConcurrentList<Region> regions = Concurrent.newList();
 
     @Override
     public boolean equals(Object o) {
@@ -39,20 +45,14 @@ public class Mixin implements JpaModel {
 
         Mixin that = (Mixin) o;
 
-        return new EqualsBuilder()
-            .append(this.getItemId(), that.getItemId())
-            .append(this.getName(), that.getName())
-            .append(this.getRegionIds(), that.getRegionIds())
-            .build();
+        return Objects.equals(this.getItemId(), that.getItemId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getRegionIds(), that.getRegionIds());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getItemId())
-            .append(this.getName())
-            .append(this.getRegionIds())
-            .build();
+        return Objects.hash(this.getItemId(), this.getName(), this.getRegionIds());
     }
 
 }

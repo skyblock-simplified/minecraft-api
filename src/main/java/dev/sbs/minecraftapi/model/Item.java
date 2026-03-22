@@ -1,15 +1,11 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.io.gson.PostInit;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.type.GsonType;
-import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.common.GameStage;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
@@ -30,59 +26,92 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.awt.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
 @Entity
 @Table(name = "items")
-public class Item implements JpaModel, PostInit {
+public class Item implements JpaModel {
 
-    // Expected Data
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "material", nullable = false)
     private @NotNull String material = "";
+
     @SerializedName("name")
+    @Column(name = "display_name", nullable = false)
     private @NotNull String displayName = "";
+
     @SerializedName("tier")
     @Enumerated(EnumType.STRING)
+    @Column(name = "rarity", nullable = false)
     private @NotNull Rarity rarity = Rarity.COMMON;
-    @Column(name = "category_id")
+
     @SerializedName("category")
+    @Column(name = "category_id", nullable = false)
     private @NotNull String categoryId = "OTHER";
 
-    // Attributes
     @Getter(AccessLevel.NONE)
+    @Column(name = "can_place", nullable = false)
     private boolean can_place = true;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "can_trade", nullable = false)
     private boolean can_trade = true;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "can_auction", nullable = false)
     private boolean can_auction = true;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "cannot_reforge", nullable = false)
     private boolean cannot_reforge = false;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "can_recombobulate", nullable = false)
     private boolean can_recombobulate = true;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "can_burn_in_furnace", nullable = false)
     private boolean can_burn_in_furnace = false;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "salvageable_from_recipe", nullable = false)
     private boolean salvageable_from_recipe = false;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "museum", nullable = false)
     private boolean museum = false;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "glowing", nullable = false)
     private boolean glowing = false;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "unstackable", nullable = false)
     private boolean unstackable = true;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "dungeon_item", nullable = false)
     private boolean dungeon_item = false;
+
     @Getter(AccessLevel.NONE)
+    @Column(name = "rift_transferrable", nullable = false)
     private boolean rift_transferrable = false;
+
     @Getter(AccessLevel.NONE)
     @Enumerated(EnumType.STRING)
+    @Column(name = "soulbound", nullable = false)
     private @NotNull Soulbound soulbound = Soulbound.NONE;
 
     private transient Attributes attributes;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private transient ItemCategory category;
+    @JoinColumn(name = "category_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull ItemCategory category;
 
     public @NotNull Attributes getAttributes() {
         if (this.attributes == null) {
@@ -108,59 +137,103 @@ public class Item implements JpaModel, PostInit {
         return this.attributes;
     }
 
-    // Possible Data
+    @Column(name = "durability")
     private @NotNull Optional<Integer> durability = Optional.empty();
+
+    @Column(name = "description")
     private @NotNull Optional<String> description = Optional.empty();
+
+    @Column(name = "color")
     private @NotNull Optional<Color> color = Optional.empty();
+
+    @Column(name = "origin")
     private @NotNull Optional<String> origin = Optional.empty();
-    @Transient
+
+    @Column(name = "skin")
     private @NotNull Optional<MojangProperty> skin = Optional.empty();
+
+    @Column(name = "furniture")
     private @NotNull Optional<String> furniture = Optional.empty();
+
+    @Column(name = "crystal")
     private @NotNull Optional<String> crystal = Optional.empty();
+
     @SerializedName("museum_data")
     @Transient
     private @NotNull Optional<MuseumData> museumData = Optional.empty();
+
     @SerializedName("sword_type")
+    @Column(name = "sword_type")
     private @NotNull Optional<String> swordType = Optional.empty();
+
     @SerializedName("private_island")
+    @Column(name = "mini_island_generator")
     private @NotNull Optional<String> miniIslandGenerator = Optional.empty();
+
     @SerializedName("npc_sell_price")
+    @Column(name = "npc_sell_price", nullable = false)
     private double npcSellPrice;
+
     @SerializedName("ability_damage_scaling")
+    @Column(name = "ability_damage_scaling", nullable = false)
     private double abilityDamageScaling;
 
-    // Dungeons
     @SerializedName("gear_score")
+    @Column(name = "gear_score", nullable = false)
     private int gearScore;
+
     @SerializedName("dungeon_item_conversion_cost")
+    @Column(name = "dungeonization_cost", nullable = false)
     private @NotNull ConcurrentMap<String, Object> dungeonizationCost = Concurrent.newMap();
+
     @SerializedName("catacombs_requirements")
+    @Column(name = "catacombs_requirements", nullable = false)
     private @NotNull ConcurrentList<ConcurrentMap<String, Object>> catacombsRequirements = Concurrent.newList();
 
-    // Rift
     @SerializedName("lose_motes_value_on_transfer")
+    @Column(name = "motes_value_lost_on_transfer", nullable = false)
     private boolean motesValueLostOnTransfer;
+
     @SerializedName("motes_sell_price")
+    @Column(name = "motes_sell_price", nullable = false)
     private double motesSellPrice;
 
-    // Minions
+    @Column(name = "generator")
     private @NotNull Optional<String> generator = Optional.empty();
+
     @SerializedName("generator_tier")
+    @Column(name = "generator_tier", nullable = false)
     private int generatorTier;
 
-    // Other
+    @Column(name = "enchantments", nullable = false)
     private @NotNull ConcurrentMap<String, Double> enchantments = Concurrent.newMap();
+
     @SerializedName("gemstone_slots")
+    @Column(name = "gemstone_slots", nullable = false)
     private @NotNull ConcurrentList<ConcurrentMap<String, Object>> gemstoneSlots = Concurrent.newList();
+
     @SerializedName("item_specific")
+    @Column(name = "item_specific", nullable = false)
     private @NotNull ConcurrentMap<String, Object> itemSpecific = Concurrent.newMap();
+
+    @Column(name = "prestige", nullable = false)
     private @NotNull ConcurrentMap<String, Object> prestige = Concurrent.newMap();
+
+    @Column(name = "requirements", nullable = false)
     private @NotNull ConcurrentList<ConcurrentMap<String, Object>> requirements = Concurrent.newList();
+
+    @Column(name = "salvages", nullable = false)
     private @NotNull ConcurrentList<ConcurrentMap<String, Object>> salvages = Concurrent.newList();
+
+    @Column(name = "stats", nullable = false)
     private @NotNull ConcurrentMap<String, Double> stats = Concurrent.newMap();
+
     @SerializedName("tiered_stats")
+    @Column(name = "tiered_stats", nullable = false)
     private @NotNull ConcurrentMap<String, List<Double>> tieredStats = Concurrent.newMap();
+
     @SerializedName("upgrade_costs")
+    @Column(name = "upgrade_costs", nullable = false)
     private @NotNull ConcurrentList<ConcurrentList<ConcurrentMap<String, Object>>> upgradeCosts = Concurrent.newList();
 
     public @NotNull String getMinecraftId() {
@@ -178,98 +251,54 @@ public class Item implements JpaModel, PostInit {
     }
 
     @Override
-    public void postInit() {
-        if (this.category == null) {
-            this.category = MinecraftApi.getRepository(ItemCategory.class)
-                .findFirstOrNull(ItemCategory::getId, "OTHER");
-        }
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
 
         Item item = (Item) o;
 
-        return new EqualsBuilder()
-            .append(this.getNpcSellPrice(), item.getNpcSellPrice())
-            .append(this.getAbilityDamageScaling(), item.getAbilityDamageScaling())
-            .append(this.getAttributes(), item.getAttributes())
-            .append(this.getGearScore(), item.getGearScore())
-            .append(this.isMotesValueLostOnTransfer(), item.isMotesValueLostOnTransfer())
-            .append(this.getMotesSellPrice(), item.getMotesSellPrice())
-            .append(this.getGeneratorTier(), item.getGeneratorTier())
-            .append(this.getMaterial(), item.getMaterial())
-            .append(this.getId(), item.getId())
-            .append(this.getDisplayName(), item.getDisplayName())
-            .append(this.getRarity(), item.getRarity())
-            .append(this.getDurability(), item.getDurability())
-            .append(this.getCategory(), item.getCategory())
-            .append(this.getDescription(), item.getDescription())
-            .append(this.getColor(), item.getColor())
-            .append(this.getOrigin(), item.getOrigin())
-            .append(this.getSkin(), item.getSkin())
-            .append(this.getFurniture(), item.getFurniture())
-            .append(this.getCrystal(), item.getCrystal())
-            .append(this.getMuseumData(), item.getMuseumData())
-            .append(this.getSwordType(), item.getSwordType())
-            .append(this.getMiniIslandGenerator(), item.getMiniIslandGenerator())
-            .append(this.getDungeonizationCost(), item.getDungeonizationCost())
-            .append(this.getCatacombsRequirements(), item.getCatacombsRequirements())
-            .append(this.getGenerator(), item.getGenerator())
-            .append(this.getEnchantments(), item.getEnchantments())
-            .append(this.getGemstoneSlots(), item.getGemstoneSlots())
-            .append(this.getItemSpecific(), item.getItemSpecific())
-            .append(this.getPrestige(), item.getPrestige())
-            .append(this.getRequirements(), item.getRequirements())
-            .append(this.getSalvages(), item.getSalvages())
-            .append(this.getStats(), item.getStats())
-            .append(this.getTieredStats(), item.getTieredStats())
-            .append(this.getUpgradeCosts(), item.getUpgradeCosts())
-            .build();
+        return this.getNpcSellPrice() == item.getNpcSellPrice()
+            && this.getAbilityDamageScaling() == item.getAbilityDamageScaling()
+            && Objects.equals(this.getAttributes(), item.getAttributes())
+            && this.getGearScore() == item.getGearScore()
+            && this.isMotesValueLostOnTransfer() == item.isMotesValueLostOnTransfer()
+            && this.getMotesSellPrice() == item.getMotesSellPrice()
+            && this.getGeneratorTier() == item.getGeneratorTier()
+            && Objects.equals(this.getMaterial(), item.getMaterial())
+            && Objects.equals(this.getId(), item.getId())
+            && Objects.equals(this.getDisplayName(), item.getDisplayName())
+            && Objects.equals(this.getRarity(), item.getRarity())
+            && Objects.equals(this.getDurability(), item.getDurability())
+            && Objects.equals(this.getCategory(), item.getCategory())
+            && Objects.equals(this.getDescription(), item.getDescription())
+            && Objects.equals(this.getColor(), item.getColor())
+            && Objects.equals(this.getOrigin(), item.getOrigin())
+            && Objects.equals(this.getSkin(), item.getSkin())
+            && Objects.equals(this.getFurniture(), item.getFurniture())
+            && Objects.equals(this.getCrystal(), item.getCrystal())
+            && Objects.equals(this.getMuseumData(), item.getMuseumData())
+            && Objects.equals(this.getSwordType(), item.getSwordType())
+            && Objects.equals(this.getMiniIslandGenerator(), item.getMiniIslandGenerator())
+            && Objects.equals(this.getDungeonizationCost(), item.getDungeonizationCost())
+            && Objects.equals(this.getCatacombsRequirements(), item.getCatacombsRequirements())
+            && Objects.equals(this.getGenerator(), item.getGenerator())
+            && Objects.equals(this.getEnchantments(), item.getEnchantments())
+            && Objects.equals(this.getGemstoneSlots(), item.getGemstoneSlots())
+            && Objects.equals(this.getItemSpecific(), item.getItemSpecific())
+            && Objects.equals(this.getPrestige(), item.getPrestige())
+            && Objects.equals(this.getRequirements(), item.getRequirements())
+            && Objects.equals(this.getSalvages(), item.getSalvages())
+            && Objects.equals(this.getStats(), item.getStats())
+            && Objects.equals(this.getTieredStats(), item.getTieredStats())
+            && Objects.equals(this.getUpgradeCosts(), item.getUpgradeCosts());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getMaterial())
-            .append(this.getId())
-            .append(this.getDisplayName())
-            .append(this.getRarity())
-            .append(this.getDurability())
-            .append(this.getCategory())
-            .append(this.getDescription())
-            .append(this.getColor())
-            .append(this.getOrigin())
-            .append(this.getSkin())
-            .append(this.getFurniture())
-            .append(this.getCrystal())
-            .append(this.getMuseumData())
-            .append(this.getSwordType())
-            .append(this.getMiniIslandGenerator())
-            .append(this.getNpcSellPrice())
-            .append(this.getAbilityDamageScaling())
-            .append(this.getAttributes())
-            .append(this.getGearScore())
-            .append(this.getDungeonizationCost())
-            .append(this.getCatacombsRequirements())
-            .append(this.isMotesValueLostOnTransfer())
-            .append(this.getMotesSellPrice())
-            .append(this.getGenerator())
-            .append(this.getGeneratorTier())
-            .append(this.getEnchantments())
-            .append(this.getGemstoneSlots())
-            .append(this.getItemSpecific())
-            .append(this.getPrestige())
-            .append(this.getRequirements())
-            .append(this.getSalvages())
-            .append(this.getStats())
-            .append(this.getTieredStats())
-            .append(this.getUpgradeCosts())
-            .build();
+        return Objects.hash(this.getMaterial(), this.getId(), this.getDisplayName(), this.getRarity(), this.getDurability(), this.getCategory(), this.getDescription(), this.getColor(), this.getOrigin(), this.getSkin(), this.getFurniture(), this.getCrystal(), this.getMuseumData(), this.getSwordType(), this.getMiniIslandGenerator(), this.getNpcSellPrice(), this.getAbilityDamageScaling(), this.getAttributes(), this.getGearScore(), this.getDungeonizationCost(), this.getCatacombsRequirements(), this.isMotesValueLostOnTransfer(), this.getMotesSellPrice(), this.getGenerator(), this.getGeneratorTier(), this.getEnchantments(), this.getGemstoneSlots(), this.getItemSpecific(), this.getPrestige(), this.getRequirements(), this.getSalvages(), this.getStats(), this.getTieredStats(), this.getUpgradeCosts());
     }
 
     @Getter
+    @GsonType
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Attributes {
@@ -288,6 +317,7 @@ public class Item implements JpaModel, PostInit {
         private boolean dungeonItem;
         private boolean riftTransferrable;
         private boolean obtainable;
+        @Enumerated(EnumType.STRING)
         private @NotNull Soulbound soulbound;
 
         public boolean notSellable() { return !this.isNpcSellable(); }
@@ -311,44 +341,26 @@ public class Item implements JpaModel, PostInit {
 
             Attributes that = (Attributes) o;
 
-            return new EqualsBuilder()
-                .append(this.isNpcSellable(), that.isNpcSellable())
-                .append(this.isPlaceable(), that.isPlaceable())
-                .append(this.isTradeable(), that.isTradeable())
-                .append(this.isAuctionable(), that.isAuctionable())
-                .append(this.isReforgeable(), that.isReforgeable())
-                .append(this.isRecombobulatable(), that.isRecombobulatable())
-                .append(this.isBurnableInFurnace(), that.isBurnableInFurnace())
-                .append(this.isSalvageableFromRecipe(), that.isSalvageableFromRecipe())
-                .append(this.isMuseumable(), that.isMuseumable())
-                .append(this.isGlowing(), that.isGlowing())
-                .append(this.isUnstackable(), that.isUnstackable())
-                .append(this.isDungeonItem(), that.isDungeonItem())
-                .append(this.isRiftTransferrable(), that.isRiftTransferrable())
-                .append(this.isObtainable(), that.isObtainable())
-                .append(this.getSoulbound(), that.getSoulbound())
-                .build();
+            return this.isNpcSellable() == that.isNpcSellable()
+                && this.isPlaceable() == that.isPlaceable()
+                && this.isTradeable() == that.isTradeable()
+                && this.isAuctionable() == that.isAuctionable()
+                && this.isReforgeable() == that.isReforgeable()
+                && this.isRecombobulatable() == that.isRecombobulatable()
+                && this.isBurnableInFurnace() == that.isBurnableInFurnace()
+                && this.isSalvageableFromRecipe() == that.isSalvageableFromRecipe()
+                && this.isMuseumable() == that.isMuseumable()
+                && this.isGlowing() == that.isGlowing()
+                && this.isUnstackable() == that.isUnstackable()
+                && this.isDungeonItem() == that.isDungeonItem()
+                && this.isRiftTransferrable() == that.isRiftTransferrable()
+                && this.isObtainable() == that.isObtainable()
+                && Objects.equals(this.getSoulbound(), that.getSoulbound());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.isNpcSellable())
-                .append(this.isPlaceable())
-                .append(this.isTradeable())
-                .append(this.isAuctionable())
-                .append(this.isReforgeable())
-                .append(this.isRecombobulatable())
-                .append(this.isBurnableInFurnace())
-                .append(this.isSalvageableFromRecipe())
-                .append(this.isMuseumable())
-                .append(this.isGlowing())
-                .append(this.isUnstackable())
-                .append(this.isDungeonItem())
-                .append(this.isRiftTransferrable())
-                .append(this.isObtainable())
-                .append(this.getSoulbound())
-                .build();
+            return Objects.hash(this.isNpcSellable(), this.isPlaceable(), this.isTradeable(), this.isAuctionable(), this.isReforgeable(), this.isRecombobulatable(), this.isBurnableInFurnace(), this.isSalvageableFromRecipe(), this.isMuseumable(), this.isGlowing(), this.isUnstackable(), this.isDungeonItem(), this.isRiftTransferrable(), this.isObtainable(), this.getSoulbound());
         }
 
     }
@@ -360,12 +372,14 @@ public class Item implements JpaModel, PostInit {
 
         @SerializedName("donation_xp")
         private int donationXP;
+        @Enumerated(EnumType.STRING)
         private @NotNull MuseumData.Type type = MuseumData.Type.UNKNOWN;
         private @NotNull ConcurrentMap<String, String> parent = Concurrent.newMap();
         @SerializedName("armor_set_donation_xp")
         @Getter(AccessLevel.NONE)
         private @NotNull ConcurrentMap<String, String> armorSetDonationXP = Concurrent.newMap();
         @SerializedName("game_stage")
+        @Enumerated(EnumType.STRING)
         private @NotNull GameStage gameStage = GameStage.UNKNOWN;
 
         public int getActualXP() {
@@ -428,20 +442,14 @@ public class Item implements JpaModel, PostInit {
 
             Cost that = (Cost) o;
 
-            return new EqualsBuilder()
-                .append(this.getCurrencies(), that.getCurrencies())
-                .append(this.getExperience(), that.getExperience())
-                .append(this.getItems(), that.getItems())
-                .build();
+            return Objects.equals(this.getCurrencies(), that.getCurrencies())
+                && this.getExperience() == that.getExperience()
+                && Objects.equals(this.getItems(), that.getItems());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getCurrencies())
-                .append(this.getExperience())
-                .append(this.getItems())
-                .build();
+            return Objects.hash(this.getCurrencies(), this.getExperience(), this.getItems());
         }
 
         public enum Currency {

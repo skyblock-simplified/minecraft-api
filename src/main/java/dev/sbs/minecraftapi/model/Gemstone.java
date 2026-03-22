@@ -1,8 +1,6 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
@@ -19,25 +17,37 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "gemstones")
 public class Gemstone implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "symbol", nullable = false)
     private @NotNull String symbol = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.WHITE;
-    @Column(name = "stat_id")
+
     @SerializedName("stat")
+    @Column(name = "stat_id", nullable = false)
     private @NotNull String statId = "";
+
+    @Column(name = "values", nullable = false)
     private @NotNull ConcurrentMap<Type, ConcurrentMap<Rarity, Double>> values = Concurrent.newMap();
 
     @ManyToOne
-    @JoinColumn(name = "stat_id", referencedColumnName = "id")
-    private transient Stat stat;
+    @JoinColumn(name = "stat_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull Stat stat;
 
     @Override
     public boolean equals(Object o) {
@@ -45,26 +55,17 @@ public class Gemstone implements JpaModel {
 
         Gemstone that = (Gemstone) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getSymbol(), that.getSymbol())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getStatId(), that.getStatId())
-            .append(this.getValues(), that.getValues())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getSymbol(), that.getSymbol())
+            && Objects.equals(this.getFormat(), that.getFormat())
+            && Objects.equals(this.getStatId(), that.getStatId())
+            && Objects.equals(this.getValues(), that.getValues());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getSymbol())
-            .append(this.getFormat())
-            .append(this.getStatId())
-            .append(this.getValues())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getSymbol(), this.getFormat(), this.getStatId(), this.getValues());
     }
 
     public enum Type {

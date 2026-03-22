@@ -1,22 +1,28 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "zodiac_events")
 public class ZodiacEvent implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "release_year", nullable = false)
     private int releaseYear;
 
     public int getRecurringYear() {
@@ -29,20 +35,14 @@ public class ZodiacEvent implements JpaModel {
 
         ZodiacEvent that = (ZodiacEvent) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getReleaseYear(), that.getReleaseYear())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && this.getReleaseYear() == that.getReleaseYear();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getReleaseYear())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getReleaseYear());
     }
 
 }

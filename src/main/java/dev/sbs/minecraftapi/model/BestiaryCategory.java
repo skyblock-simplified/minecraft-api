@@ -1,8 +1,6 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.AccessLevel;
@@ -18,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -45,8 +44,8 @@ public class BestiaryCategory implements JpaModel {
 
     @ManyToOne
     @Getter(AccessLevel.NONE)
-    @JoinColumn(name = "region_id", referencedColumnName = "id")
-    private transient @Nullable Region region;
+    @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @Nullable Region region;
 
     public @NotNull Optional<Region> getRegion() {
         return Optional.ofNullable(this.region);
@@ -58,24 +57,16 @@ public class BestiaryCategory implements JpaModel {
 
         BestiaryCategory that = (BestiaryCategory) o;
 
-        return new EqualsBuilder()
-            .append(this.getOrdinal(), that.getOrdinal())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getRegionId(), that.getRegionId())
-            .append(this.getFormat(), that.getFormat())
-            .build();
+        return this.getOrdinal() == that.getOrdinal()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getRegionId(), that.getRegionId())
+            && Objects.equals(this.getFormat(), that.getFormat());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getRegionId())
-            .append(this.getFormat())
-            .append(this.getOrdinal())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getRegionId(), this.getFormat(), this.getOrdinal());
     }
 
 }

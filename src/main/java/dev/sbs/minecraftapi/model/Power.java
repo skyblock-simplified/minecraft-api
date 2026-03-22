@@ -1,8 +1,6 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
@@ -11,11 +9,13 @@ import dev.sbs.minecraftapi.MinecraftApi;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -23,14 +23,28 @@ import java.util.Optional;
 @Table(name = "powers")
 public class Power implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "stone_id")
     private @NotNull Optional<String> stoneId = Optional.empty();
+
     @SerializedName("requiredLevel")
+    @Column(name = "required_combat_level", nullable = false)
     private int requiredCombatLevel = 0;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "stage", nullable = false)
     private @NotNull Stage stage = Stage.STARTER;
+
+    @Column(name = "base_values", nullable = false)
     private @NotNull ConcurrentMap<String, Double> baseValues = Concurrent.newMap();
+
+    @Column(name = "bonuses", nullable = false)
     private @NotNull ConcurrentMap<String, Double> bonuses = Concurrent.newMap();
 
     public @NotNull Optional<Item> getStone() {
@@ -45,28 +59,18 @@ public class Power implements JpaModel {
 
         Power that = (Power) o;
 
-        return new EqualsBuilder()
-            .append(this.getRequiredCombatLevel(), that.getRequiredCombatLevel())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getStoneId(), that.getStoneId())
-            .append(this.getStage(), that.getStage())
-            .append(this.getBaseValues(), that.getBaseValues())
-            .append(this.getBonuses(), that.getBonuses())
-            .build();
+        return this.getRequiredCombatLevel() == that.getRequiredCombatLevel()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getStoneId(), that.getStoneId())
+            && Objects.equals(this.getStage(), that.getStage())
+            && Objects.equals(this.getBaseValues(), that.getBaseValues())
+            && Objects.equals(this.getBonuses(), that.getBonuses());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getStoneId())
-            .append(this.getRequiredCombatLevel())
-            .append(this.getStage())
-            .append(this.getBaseValues())
-            .append(this.getBonuses())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getStoneId(), this.getRequiredCombatLevel(), this.getStage(), this.getBaseValues(), this.getBonuses());
     }
 
     public enum Stage {

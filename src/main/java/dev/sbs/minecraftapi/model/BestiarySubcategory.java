@@ -1,8 +1,6 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
@@ -16,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -41,8 +40,8 @@ public class BestiarySubcategory implements JpaModel {
     private int ordinal = -1;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private transient @NotNull BestiaryCategory category;
+    @JoinColumn(name = "category_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull BestiaryCategory category;
 
     @Override
     public boolean equals(Object o) {
@@ -50,24 +49,16 @@ public class BestiarySubcategory implements JpaModel {
 
         BestiarySubcategory that = (BestiarySubcategory) o;
 
-        return new EqualsBuilder()
-            .append(this.getOrdinal(), that.getOrdinal())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getCategoryId(), that.getCategoryId())
-            .build();
+        return this.getOrdinal() == that.getOrdinal()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getFormat(), that.getFormat())
+            && Objects.equals(this.getCategoryId(), that.getCategoryId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getFormat())
-            .append(this.getCategoryId())
-            .append(this.getOrdinal())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getFormat(), this.getCategoryId(), this.getOrdinal());
     }
 
 }

@@ -1,10 +1,9 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.persistence.ForeignIds;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
@@ -18,8 +17,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -47,9 +46,11 @@ public class Enchantment implements JpaModel {
     @Column(name = "conflict")
     private @NotNull Optional<String> conflict = Optional.empty();
 
+    @SerializedName("categories")
     @Column(name = "categories", nullable = false)
     private @NotNull ConcurrentList<String> categoryIds = Concurrent.newList();
 
+    @SerializedName("items")
     @Column(name = "items", nullable = false)
     private @NotNull ConcurrentList<String> itemIds = Concurrent.newList();
 
@@ -59,16 +60,17 @@ public class Enchantment implements JpaModel {
     @Column(name = "stats", nullable = false)
     private @NotNull ConcurrentList<Stat.Substitute> stats = Concurrent.newList();
 
+    @SerializedName("mobTypes")
     @Column(name = "mob_types", nullable = false)
     private @NotNull ConcurrentList<String> mobTypeIds = Concurrent.newList();
 
-    @OneToMany
+    @ForeignIds("categoryIds")
     private transient @NotNull ConcurrentList<ItemCategory> categories = Concurrent.newList();
 
-    @OneToMany
+    @ForeignIds("itemIds")
     private transient @NotNull ConcurrentList<Item> items = Concurrent.newList();
 
-    @OneToMany
+    @ForeignIds("mobTypeIds")
     private transient @NotNull ConcurrentList<MobType> mobTypes = Concurrent.newList();
 
     @Override
@@ -77,36 +79,22 @@ public class Enchantment implements JpaModel {
 
         Enchantment that = (Enchantment) o;
 
-        return new EqualsBuilder()
-            .append(this.getRequiredLevel(), that.getRequiredLevel())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getType(), that.getType())
-            .append(this.getConflict(), that.getConflict())
-            .append(this.getCategoryIds(), that.getCategoryIds())
-            .append(this.getItemIds(), that.getItemIds())
-            .append(this.getLevels(), that.getLevels())
-            .append(this.getStats(), that.getStats())
-            .append(this.getMobTypeIds(), that.getMobTypeIds())
-            .build();
+        return this.getRequiredLevel() == that.getRequiredLevel()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getType(), that.getType())
+            && Objects.equals(this.getConflict(), that.getConflict())
+            && Objects.equals(this.getCategoryIds(), that.getCategoryIds())
+            && Objects.equals(this.getItemIds(), that.getItemIds())
+            && Objects.equals(this.getLevels(), that.getLevels())
+            && Objects.equals(this.getStats(), that.getStats())
+            && Objects.equals(this.getMobTypeIds(), that.getMobTypeIds());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getType())
-            .append(this.getRequiredLevel())
-            .append(this.getConflict())
-            .append(this.getCategoryIds())
-            .append(this.getItemIds())
-            .append(this.getLevels())
-            .append(this.getStats())
-            .append(this.getMobTypeIds())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getType(), this.getRequiredLevel(), this.getConflict(), this.getCategoryIds(), this.getItemIds(), this.getLevels(), this.getStats(), this.getMobTypeIds());
     }
 
     @Getter
@@ -151,18 +139,13 @@ public class Enchantment implements JpaModel {
 
             Level that = (Level) o;
 
-            return new EqualsBuilder()
-                .append(this.getLevel(), that.getLevel())
-                .append(this.getApplyCost(), that.getApplyCost())
-                .build();
+            return this.getLevel() == that.getLevel()
+                && Objects.equals(this.getApplyCost(), that.getApplyCost());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getLevel())
-                .append(this.getApplyCost())
-                .build();
+            return Objects.hash(this.getLevel(), this.getApplyCost());
         }
 
     }

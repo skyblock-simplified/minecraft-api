@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
@@ -16,6 +14,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -27,8 +26,9 @@ public class BitsItem implements JpaModel {
     private @NotNull String id = "";
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "id", nullable = false)
+    @Column(name = "type", nullable = false)
     private @NotNull Type type = Type.ITEM;
+
     @Column(name = "cost", nullable = false)
     private int cost;
 
@@ -41,22 +41,15 @@ public class BitsItem implements JpaModel {
 
         BitsItem that = (BitsItem) o;
 
-        return new EqualsBuilder()
-            .append(this.getCost(), that.getCost())
-            .append(this.getId(), that.getId())
-            .append(this.getType(), that.getType())
-            .append(this.getVariants(), that.getVariants())
-            .build();
+        return this.getCost() == that.getCost()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getType(), that.getType())
+            && Objects.equals(this.getVariants(), that.getVariants());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getType())
-            .append(this.getCost())
-            .append(this.getVariants())
-            .build();
+        return Objects.hash(this.getId(), this.getType(), this.getCost(), this.getVariants());
     }
 
     public enum Type {
@@ -91,18 +84,13 @@ public class BitsItem implements JpaModel {
 
             Variant that = (Variant) o;
 
-            return new EqualsBuilder()
-                .append(this.getCost(), that.getCost())
-                .append(this.getId(), that.getId())
-                .build();
+            return this.getCost() == that.getCost()
+                && Objects.equals(this.getId(), that.getId());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getCost())
-                .build();
+            return Objects.hash(this.getId(), this.getCost());
         }
 
     }

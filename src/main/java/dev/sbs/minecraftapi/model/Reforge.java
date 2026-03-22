@@ -1,24 +1,26 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
+import com.google.gson.annotations.SerializedName;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.api.persistence.ForeignIds;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -26,30 +28,40 @@ import java.util.Optional;
 @Table(name = "reforges")
 public class Reforge implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
     @Column(name = "stone_id")
     private @NotNull Optional<String> stoneId = Optional.empty();
+
+    @Column(name = "required_level", nullable = false)
     private int requiredLevel = 0;
+
+    @SerializedName("categories")
+    @Column(name = "categories", nullable = false)
     private @NotNull ConcurrentList<String> categoryIds = Concurrent.newList();
+
+    @SerializedName("items")
+    @Column(name = "items", nullable = false)
     private @NotNull ConcurrentList<String> itemIds = Concurrent.newList();
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "stats", nullable = false)
     private @NotNull ConcurrentList<Substitute> stats = Concurrent.newList();
 
     @ManyToOne
-    @JoinColumn(name = "stone_id", referencedColumnName = "id")
     @Getter(AccessLevel.NONE)
-    private transient Item stone;
+    @JoinColumn(name = "stone_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @Nullable Item stone;
 
-    @OneToMany
-    private transient ConcurrentList<ItemCategory> categories = Concurrent.newList();
+    @ForeignIds("categoryIds")
+    private transient @NotNull ConcurrentList<ItemCategory> categories = Concurrent.newList();
 
-    @OneToMany
-    private transient ConcurrentList<Item> items = Concurrent.newList();
-
-    public @NotNull ConcurrentList<Substitute> getStats() {
-        return this.stats;
-    }
+    @ForeignIds("itemIds")
+    private transient @NotNull ConcurrentList<Item> items = Concurrent.newList();
 
     public @NotNull Optional<Item> getStone() {
         return Optional.ofNullable(this.stone);
@@ -76,31 +88,22 @@ public class Reforge implements JpaModel {
 
         Reforge that = (Reforge) o;
 
-        return new EqualsBuilder()
-            .append(this.getRequiredLevel(), that.getRequiredLevel())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getStoneId(), that.getStoneId())
-            .append(this.getCategoryIds(), that.getCategoryIds())
-            .append(this.getItemIds(), that.getItemIds())
-            .append(this.getStats(), that.getStats())
-            .build();
+        return this.getRequiredLevel() == that.getRequiredLevel()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getStoneId(), that.getStoneId())
+            && Objects.equals(this.getCategoryIds(), that.getCategoryIds())
+            && Objects.equals(this.getItemIds(), that.getItemIds())
+            && Objects.equals(this.getStats(), that.getStats());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getStoneId())
-            .append(this.getRequiredLevel())
-            .append(this.getCategoryIds())
-            .append(this.getItemIds())
-            .append(this.getStats())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getStoneId(), this.getRequiredLevel(), this.getCategoryIds(), this.getItemIds(), this.getStats());
     }
 
     @Getter
+    @GsonType
     public static class Substitute {
 
         private @NotNull String id = "";
@@ -117,18 +120,13 @@ public class Reforge implements JpaModel {
 
             Substitute that = (Substitute) o;
 
-            return new EqualsBuilder()
-                .append(this.getId(), that.getId())
-                .append(this.getValues(), that.getValues())
-                .build();
+            return Objects.equals(this.getId(), that.getId())
+                && Objects.equals(this.getValues(), that.getValues());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getValues())
-                .build();
+            return Objects.hash(this.getId(), this.getValues());
         }
 
     }

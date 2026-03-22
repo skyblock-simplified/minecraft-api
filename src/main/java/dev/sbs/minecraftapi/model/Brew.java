@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.Getter;
@@ -13,6 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -45,26 +44,17 @@ public class Brew implements JpaModel {
 
         Brew that = (Brew) o;
 
-        return new EqualsBuilder()
-            .append(this.isAmplified(), that.isAmplified())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getRarity(), that.getRarity())
-            .append(this.getCost(), that.getCost())
-            .build();
+        return this.isAmplified() == that.isAmplified()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getRarity(), that.getRarity())
+            && Objects.equals(this.getCost(), that.getCost());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getRarity())
-            .append(this.isAmplified())
-            .append(this.getCost())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getRarity(), this.isAmplified(), this.getCost());
     }
 
 }

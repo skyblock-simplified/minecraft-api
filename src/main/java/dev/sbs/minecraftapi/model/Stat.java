@@ -1,11 +1,10 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
@@ -20,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -29,24 +29,45 @@ public class Stat implements JpaModel {
 
     public static final double MAGIC_CONSTANT = 719.28;
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "symbol", nullable = false)
     private @NotNull String symbol = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.WHITE;
-    @Column(name = "category_id")
+
     @SerializedName("category")
+    @Column(name = "category_id", nullable = false)
     private @NotNull String categoryId = "";
+
+    @Column(name = "base", nullable = false)
     private double base = 0.0;
+
+    @Column(name = "cap", nullable = false)
     private double cap = 0.0;
+
+    @Column(name = "enrichment", nullable = false)
     private double enrichment = 0.0;
+
+    @Column(name = "power_multiplier", nullable = false)
     private double powerMultiplier = 0.0;
+
+    @Column(name = "tuning_multiplier", nullable = false)
     private double tuningMultiplier = 0.0;
+
+    @Column(name = "visible", nullable = false)
     private boolean visible;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
-    private transient StatCategory category;
+    @JoinColumn(name = "category_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull StatCategory category;
 
     public double getPowerCoefficient() {
         return (this.getPowerMultiplier() * MAGIC_CONSTANT) / 100.0;
@@ -62,44 +83,33 @@ public class Stat implements JpaModel {
 
         Stat that = (Stat) o;
 
-        return new EqualsBuilder()
-            .append(this.getBase(), that.getBase())
-            .append(this.getCap(), that.getCap())
-            .append(this.getEnrichment(), that.getEnrichment())
-            .append(this.getPowerMultiplier(), that.getPowerMultiplier())
-            .append(this.getTuningMultiplier(), that.getTuningMultiplier())
-            .append(this.isVisible(), that.isVisible())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getSymbol(), that.getSymbol())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getCategoryId(), that.getCategoryId())
-            .build();
+        return this.getBase() == that.getBase()
+            && this.getCap() == that.getCap()
+            && this.getEnrichment() == that.getEnrichment()
+            && this.getPowerMultiplier() == that.getPowerMultiplier()
+            && this.getTuningMultiplier() == that.getTuningMultiplier()
+            && this.isVisible() == that.isVisible()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getSymbol(), that.getSymbol())
+            && Objects.equals(this.getFormat(), that.getFormat())
+            && Objects.equals(this.getCategoryId(), that.getCategoryId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getSymbol())
-            .append(this.getFormat())
-            .append(this.getCategoryId())
-            .append(this.getBase())
-            .append(this.getCap())
-            .append(this.getEnrichment())
-            .append(this.getPowerMultiplier())
-            .append(this.getTuningMultiplier())
-            .append(this.isVisible())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getSymbol(), this.getFormat(), this.getCategoryId(), this.getBase(), this.getCap(), this.getEnrichment(), this.getPowerMultiplier(), this.getTuningMultiplier(), this.isVisible());
     }
 
     @Getter
+    @GsonType
     public static class Substitute {
 
         private @NotNull String id = "";
         private int precision = 0;
+        @Enumerated(EnumType.STRING)
         private @NotNull Type type = Type.NONE;
+        @Enumerated(EnumType.STRING)
         private @NotNull ChatFormat format = ChatFormat.GREEN;
         private @NotNull ConcurrentMap<Integer, Double> values = Concurrent.newMap();
 
@@ -114,24 +124,16 @@ public class Stat implements JpaModel {
 
             Substitute that = (Substitute) o;
 
-            return new EqualsBuilder()
-                .append(this.getPrecision(), that.getPrecision())
-                .append(this.getId(), that.getId())
-                .append(this.getType(), that.getType())
-                .append(this.getFormat(), that.getFormat())
-                .append(this.getValues(), that.getValues())
-                .build();
+            return this.getPrecision() == that.getPrecision()
+                && Objects.equals(this.getId(), that.getId())
+                && Objects.equals(this.getType(), that.getType())
+                && Objects.equals(this.getFormat(), that.getFormat())
+                && Objects.equals(this.getValues(), that.getValues());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getPrecision())
-                .append(this.getType())
-                .append(this.getFormat())
-                .append(this.getValues())
-                .build();
+            return Objects.hash(this.getId(), this.getPrecision(), this.getType(), this.getFormat(), this.getValues());
         }
 
     }

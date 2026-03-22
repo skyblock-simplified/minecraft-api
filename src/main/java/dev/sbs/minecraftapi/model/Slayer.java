@@ -1,15 +1,13 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.minecraftapi.MinecraftApi;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,32 +18,45 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "slayers")
 public class Slayer implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
     private @NotNull String description = "";
+
+    @Column(name = "max_level", nullable = false)
     private int maxLevel = 9;
+
+    @Column(name = "max_tier", nullable = false)
     private int maxTier = 5;
-    @Column(name = "mob_type_id")
+
     @SerializedName("mobType")
+    @Column(name = "mob_type_id", nullable = false)
     private @NotNull String mobTypeId = "";
+
+    @Column(name = "weight_modifier", nullable = false)
     private double weightModifier;
+
+    @Column(name = "weight_divider", nullable = false)
     private int weightDivider;
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "levels", nullable = false)
     private @NotNull ConcurrentList<Level> levels = Concurrent.newList();
 
     @ManyToOne
-    @JoinColumn(name = "mob_type_id")
-    private transient MobType mobType;
-
-    public @NotNull ConcurrentList<Level> getLevels() {
-        return this.levels;
-    }
+    @JoinColumn(name = "mob_type_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull MobType mobType;
 
     public @NotNull ConcurrentMap<String, Double> getEffects() {
         return this.getLevels()
@@ -71,35 +82,24 @@ public class Slayer implements JpaModel {
 
         Slayer that = (Slayer) o;
 
-        return new EqualsBuilder()
-            .append(this.getMaxLevel(), that.getMaxLevel())
-            .append(this.getMaxTier(), that.getMaxTier())
-            .append(this.getWeightModifier(), that.getWeightModifier())
-            .append(this.getWeightDivider(), that.getWeightDivider())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getMobTypeId(), that.getMobTypeId())
-            .append(this.getLevels(), that.getLevels())
-            .build();
+        return this.getMaxLevel() == that.getMaxLevel()
+            && this.getMaxTier() == that.getMaxTier()
+            && this.getWeightModifier() == that.getWeightModifier()
+            && this.getWeightDivider() == that.getWeightDivider()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getMobTypeId(), that.getMobTypeId())
+            && Objects.equals(this.getLevels(), that.getLevels());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getMaxLevel())
-            .append(this.getMaxTier())
-            .append(this.getMobTypeId())
-            .append(this.getWeightModifier())
-            .append(this.getWeightDivider())
-            .append(this.getLevels())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getMaxLevel(), this.getMaxTier(), this.getMobTypeId(), this.getWeightModifier(), this.getWeightDivider(), this.getLevels());
     }
 
     @Getter
+    @GsonType
     public static class Level {
 
         private int level;
@@ -143,22 +143,15 @@ public class Slayer implements JpaModel {
 
             Level that = (Level) o;
 
-            return new EqualsBuilder()
-                .append(this.getLevel(), that.getLevel())
-                .append(this.getTotalRequiredXP(), that.getTotalRequiredXP())
-                .append(this.getTitle(), that.getTitle())
-                .append(this.getUnlocks(), that.getUnlocks())
-                .build();
+            return this.getLevel() == that.getLevel()
+                && this.getTotalRequiredXP() == that.getTotalRequiredXP()
+                && Objects.equals(this.getTitle(), that.getTitle())
+                && Objects.equals(this.getUnlocks(), that.getUnlocks());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getLevel())
-                .append(this.getTotalRequiredXP())
-                .append(this.getTitle())
-                .append(this.getUnlocks())
-                .build();
+            return Objects.hash(this.getLevel(), this.getTotalRequiredXP(), this.getTitle(), this.getUnlocks());
         }
 
     }

@@ -1,10 +1,9 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.persistence.ForeignIds;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.AccessLevel;
@@ -19,8 +18,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -32,7 +31,7 @@ public class BestiaryFamily implements JpaModel {
     @Column(name = "id", nullable = false)
     private @NotNull String id = "";
 
-    @Column(name = "id", nullable = false)
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
 
     @Column(name = "description", nullable = false)
@@ -64,15 +63,15 @@ public class BestiaryFamily implements JpaModel {
     private @NotNull ConcurrentList<String> mobs = Concurrent.newUnmodifiableList();
 
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-    private transient @NotNull BestiaryCategory category;
+    @JoinColumn(name = "category_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull BestiaryCategory category;
 
     @ManyToOne
     @Getter(AccessLevel.NONE)
-    @JoinColumn(name = "subcategory_id", referencedColumnName = "id")
-    private transient @Nullable BestiarySubcategory subcategory;
+    @JoinColumn(name = "subcategory_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @Nullable BestiarySubcategory subcategory;
 
-    @OneToMany
+    @ForeignIds("mobTypeIds")
     private transient @NotNull ConcurrentList<MobType> mobTypes = Concurrent.newList();
 
     public int getMaxKills() {
@@ -95,34 +94,21 @@ public class BestiaryFamily implements JpaModel {
 
         BestiaryFamily that = (BestiaryFamily) o;
 
-        return new EqualsBuilder()
-            .append(this.getBracket(), that.getBracket())
-            .append(this.getMaxTier(), that.getMaxTier())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getCategoryId(), that.getCategoryId())
-            .append(this.getSubcategoryId(), that.getSubcategoryId())
-            .append(this.getMobTypeIds(), that.getMobTypeIds())
-            .append(this.getMobs(), that.getMobs())
-            .build();
+        return this.getBracket() == that.getBracket()
+            && this.getMaxTier() == that.getMaxTier()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getFormat(), that.getFormat())
+            && Objects.equals(this.getCategoryId(), that.getCategoryId())
+            && Objects.equals(this.getSubcategoryId(), that.getSubcategoryId())
+            && Objects.equals(this.getMobTypeIds(), that.getMobTypeIds())
+            && Objects.equals(this.getMobs(), that.getMobs());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getFormat())
-            .append(this.getBracket())
-            .append(this.getMaxTier())
-            .append(this.getCategoryId())
-            .append(this.getSubcategoryId())
-            .append(this.getMobTypeIds())
-            .append(this.getMobs())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getFormat(), this.getBracket(), this.getMaxTier(), this.getCategoryId(), this.getSubcategoryId(), this.getMobTypeIds(), this.getMobs());
     }
 
     public static final @NotNull ConcurrentList<ConcurrentList<Integer>> BRACKETS = Concurrent.newUnmodifiableList(

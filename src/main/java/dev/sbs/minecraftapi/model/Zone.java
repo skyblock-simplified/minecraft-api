@@ -1,8 +1,6 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
@@ -16,25 +14,31 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
-@Table(
-    name = "zones"
-)
+@Table(name = "zones")
 public class Zone implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
     private @NotNull ChatFormat format = ChatFormat.GRAY;
-    @Column(name = "region_id")
+
     @SerializedName("region")
+    @Column(name = "region_id", nullable = false)
     private @NotNull String regionId = "";
 
     @ManyToOne
-    @JoinColumn(name = "region_id", referencedColumnName = "id")
-    private transient Region region;
+    @JoinColumn(name = "region_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull Region region;
 
     @Override
     public boolean equals(Object o) {
@@ -42,22 +46,15 @@ public class Zone implements JpaModel {
 
         Zone that = (Zone) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getRegionId(), that.getRegionId())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getFormat(), that.getFormat())
+            && Objects.equals(this.getRegionId(), that.getRegionId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getFormat())
-            .append(this.getRegionId())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getFormat(), this.getRegionId());
     }
 
 }

@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
@@ -16,6 +14,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -38,20 +37,14 @@ public class Collection implements JpaModel {
 
         Collection that = (Collection) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getItems(), that.getItems())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getItems(), that.getItems());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getItems())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getItems());
     }
 
     @Getter
@@ -78,20 +71,14 @@ public class Collection implements JpaModel {
 
             Item that = (Item) o;
 
-            return new EqualsBuilder()
-                .append(this.getMaxTiers(), that.getMaxTiers())
-                .append(this.getName(), that.getName())
-                .append(this.getTiers(), that.getTiers())
-                .build();
+            return this.getMaxTiers() == that.getMaxTiers()
+                && Objects.equals(this.getName(), that.getName())
+                && Objects.equals(this.getTiers(), that.getTiers());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getName())
-                .append(this.getMaxTiers())
-                .append(this.getTiers())
-                .build();
+            return Objects.hash(this.getName(), this.getMaxTiers(), this.getTiers());
         }
 
     }
@@ -111,20 +98,14 @@ public class Collection implements JpaModel {
 
             Tier that = (Tier) o;
 
-            return new EqualsBuilder()
-                .append(this.getTier(), that.getTier())
-                .append(this.getAmountRequired(), that.getAmountRequired())
-                .append(this.getUnlocks(), that.getUnlocks())
-                .build();
+            return this.getTier() == that.getTier()
+                && this.getAmountRequired() == that.getAmountRequired()
+                && Objects.equals(this.getUnlocks(), that.getUnlocks());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getTier())
-                .append(this.getAmountRequired())
-                .append(this.getUnlocks())
-                .build();
+            return Objects.hash(this.getTier(), this.getAmountRequired(), this.getUnlocks());
         }
 
     }

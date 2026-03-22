@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.MinecraftApi;
@@ -19,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -46,8 +45,8 @@ public class Accessory implements JpaModel {
     private @Nullable Family family;
 
     @ManyToOne
-    @JoinColumn(name = "id", referencedColumnName = "id")
-    private transient @NotNull Item item;
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull Item item;
 
     public @NotNull Optional<Family> getFamily() {
         return Optional.ofNullable(this.family);
@@ -59,24 +58,16 @@ public class Accessory implements JpaModel {
 
         Accessory that = (Accessory) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getSource(), that.getSource())
-            .append(this.getLimit(), that.getLimit())
-            .append(this.getFamily(), that.getFamily())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getSource(), that.getSource())
+            && Objects.equals(this.getLimit(), that.getLimit())
+            && Objects.equals(this.getFamily(), that.getFamily());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getDescription())
-            .append(this.getSource())
-            .append(this.getLimit())
-            .append(this.getFamily())
-            .build();
+        return Objects.hash(this.getId(), this.getDescription(), this.getSource(), this.getLimit(), this.getFamily());
     }
 
     public enum Limit {
@@ -114,18 +105,13 @@ public class Accessory implements JpaModel {
 
             Family that = (Family) o;
 
-            return new EqualsBuilder()
-                .append(this.getRank(), that.getRank())
-                .append(this.getId(), that.getId())
-                .build();
+            return this.getRank() == that.getRank()
+                && Objects.equals(this.getId(), that.getId());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getRank())
-                .build();
+            return Objects.hash(this.getId(), this.getRank());
         }
 
     }
@@ -149,18 +135,13 @@ public class Accessory implements JpaModel {
 
             Substitute that = (Substitute) o;
 
-            return new EqualsBuilder()
-                .append(this.getValue(), that.getValue())
-                .append(this.getId(), that.getId())
-                .build();
+            return this.getValue() == that.getValue()
+                && Objects.equals(this.getId(), that.getId());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getValue())
-                .build();
+            return Objects.hash(this.getId(), this.getValue());
         }
 
     }

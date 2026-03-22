@@ -1,54 +1,47 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.io.gson.PostInit;
+import dev.sbs.api.persistence.ForeignIds;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.minecraftapi.MinecraftApi;
-import lombok.AccessLevel;
+import dev.sbs.api.persistence.type.GsonType;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "shop_perks")
-public class ShopPerk implements JpaModel, PostInit {
+public class ShopPerk implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
     private @NotNull String description = "";
+
     @SerializedName("regions")
+    @Column(name = "regions", nullable = false)
     private @NotNull ConcurrentList<String> regionIds = Concurrent.newList();
 
-    @OneToMany
-    private transient ConcurrentList<Region> regions = Concurrent.newList();
-    @Getter(AccessLevel.NONE)
+    @Column(name = "stats", nullable = false)
     private @NotNull ConcurrentList<Stat.Substitute> stats = Concurrent.newList();
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "unlocks", nullable = false)
     private @NotNull ConcurrentList<Unlock> unlocks = Concurrent.newList();
 
-    public @NotNull ConcurrentList<Stat.Substitute> getStats() {
-        return this.stats;
-    }
-
-    public @NotNull ConcurrentList<Unlock> getUnlocks() {
-        return this.unlocks;
-    }
-
-    @Override
-    public void postInit() {
-        this.regions = MinecraftApi.getRepository(Region.class)
-            .matchAll(region -> this.getRegionIds().contains(region.getId()))
-            .collect(Concurrent.toUnmodifiableList());
-    }
+    @ForeignIds("regionIds")
+    private transient @NotNull ConcurrentList<Region> regions = Concurrent.newList();
 
     @Override
     public boolean equals(Object o) {
@@ -56,29 +49,21 @@ public class ShopPerk implements JpaModel, PostInit {
 
         ShopPerk that = (ShopPerk) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getRegionIds(), that.getRegionIds())
-            .append(this.getStats(), that.getStats())
-            .append(this.getUnlocks(), that.getUnlocks())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getRegionIds(), that.getRegionIds())
+            && Objects.equals(this.getStats(), that.getStats())
+            && Objects.equals(this.getUnlocks(), that.getUnlocks());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getRegionIds())
-            .append(this.getStats())
-            .append(this.getUnlocks())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getRegionIds(), this.getStats(), this.getUnlocks());
     }
 
     @Getter
+    @GsonType
     public static class Unlock {
 
         private int tier;
@@ -90,18 +75,13 @@ public class ShopPerk implements JpaModel, PostInit {
 
             Unlock that = (Unlock) o;
 
-            return new EqualsBuilder()
-                .append(this.getTier(), that.getTier())
-                .append(this.getCost(), that.getCost())
-                .build();
+            return this.getTier() == that.getTier()
+                && Objects.equals(this.getCost(), that.getCost());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getTier())
-                .append(this.getCost())
-                .build();
+            return Objects.hash(this.getTier(), this.getCost());
         }
 
     }

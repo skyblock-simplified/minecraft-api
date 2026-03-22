@@ -1,12 +1,11 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
@@ -22,6 +21,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -34,39 +34,46 @@ public class Pet implements JpaModel {
         225, 275, 325, 375, 450, 500
     );
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "lowest_rarity", nullable = false)
     private @NotNull Rarity lowestRarity = Rarity.COMMON;
-    @Column(name = "skill_id")
+
     @SerializedName("skill")
+    @Column(name = "skill_id", nullable = false)
     private @NotNull String skillId = "";
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
     private @NotNull Type type = Type.PET;
+
+    @Column(name = "max_level", nullable = false)
     private int maxLevel = 100;
+
+    @Column(name = "passive", nullable = false)
     private boolean passive = false;
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "stats", nullable = false)
     private @NotNull ConcurrentList<Substitute> stats = Concurrent.newList();
-    @Getter(AccessLevel.NONE)
+
+    @Column(name = "abilities", nullable = false)
     private @NotNull ConcurrentList<Ability> abilities = Concurrent.newList();
 
     @ManyToOne
-    @JoinColumn(name = "skill_id", referencedColumnName = "id")
-    private transient Skill skill;
-
-    public @NotNull ConcurrentList<Substitute> getStats() {
-        return this.stats;
-    }
+    @JoinColumn(name = "skill_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @NotNull Skill skill;
 
     public @NotNull ConcurrentList<Substitute> getStats(@NotNull Rarity rarity) {
         return this.getStats()
             .stream()
             .filter(stat -> stat.getValues().containsKey(rarity))
             .collect(Concurrent.toUnmodifiableList());
-    }
-
-    public @NotNull ConcurrentList<Ability> getAbilities() {
-        return this.abilities;
     }
 
     public @NotNull ConcurrentList<Ability> getAbilities(@NotNull Rarity rarity) {
@@ -85,32 +92,20 @@ public class Pet implements JpaModel {
 
         Pet that = (Pet) o;
 
-        return new EqualsBuilder()
-            .append(this.getMaxLevel(), that.getMaxLevel())
-            .append(this.isPassive(), that.isPassive())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getLowestRarity(), that.getLowestRarity())
-            .append(this.getSkillId(), that.getSkillId())
-            .append(this.getType(), that.getType())
-            .append(this.getStats(), that.getStats())
-            .append(this.getAbilities(), that.getAbilities())
-            .build();
+        return this.getMaxLevel() == that.getMaxLevel()
+            && this.isPassive() == that.isPassive()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getLowestRarity(), that.getLowestRarity())
+            && Objects.equals(this.getSkillId(), that.getSkillId())
+            && Objects.equals(this.getType(), that.getType())
+            && Objects.equals(this.getStats(), that.getStats())
+            && Objects.equals(this.getAbilities(), that.getAbilities());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getLowestRarity())
-            .append(this.getSkillId())
-            .append(this.getType())
-            .append(this.getMaxLevel())
-            .append(this.isPassive())
-            .append(this.getStats())
-            .append(this.getAbilities())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getLowestRarity(), this.getSkillId(), this.getType(), this.getMaxLevel(), this.isPassive(), this.getStats(), this.getAbilities());
     }
 
     public enum Type {
@@ -127,6 +122,7 @@ public class Pet implements JpaModel {
     }
 
     @Getter
+    @GsonType
     public static class Ability {
 
         private @NotNull String name = "";
@@ -159,32 +155,28 @@ public class Pet implements JpaModel {
 
             Ability that = (Ability) o;
 
-            return new EqualsBuilder()
-                .append(this.isFlatStat(), that.isFlatStat())
-                .append(this.getName(), that.getName())
-                .append(this.getDescription(), that.getDescription())
-                .append(this.getStats(), that.getStats())
-                .build();
+            return this.isFlatStat() == that.isFlatStat()
+                && Objects.equals(this.getName(), that.getName())
+                && Objects.equals(this.getDescription(), that.getDescription())
+                && Objects.equals(this.getStats(), that.getStats());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getName())
-                .append(this.getDescription())
-                .append(this.isFlatStat())
-                .append(this.getStats())
-                .build();
+            return Objects.hash(this.getName(), this.getDescription(), this.isFlatStat(), this.getStats());
         }
 
     }
 
     @Getter
+    @GsonType
     public static class Substitute {
 
         private @NotNull String id = "";
         private int precision = 0;
+        @Enumerated(EnumType.STRING)
         private @NotNull Stat.Type type = Stat.Type.NONE;
+        @Enumerated(EnumType.STRING)
         private @NotNull ChatFormat format = ChatFormat.GREEN;
         @Getter(AccessLevel.NONE)
         private @NotNull ConcurrentMap<Rarity, Value> values = Concurrent.newMap();
@@ -204,27 +196,20 @@ public class Pet implements JpaModel {
 
             Substitute that = (Substitute) o;
 
-            return new EqualsBuilder()
-                .append(this.getPrecision(), that.getPrecision())
-                .append(this.getId(), that.getId())
-                .append(this.getType(), that.getType())
-                .append(this.getFormat(), that.getFormat())
-                .append(this.getValues(), that.getValues())
-                .build();
+            return this.getPrecision() == that.getPrecision()
+                && Objects.equals(this.getId(), that.getId())
+                && Objects.equals(this.getType(), that.getType())
+                && Objects.equals(this.getFormat(), that.getFormat())
+                && Objects.equals(this.getValues(), that.getValues());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getPrecision())
-                .append(this.getType())
-                .append(this.getFormat())
-                .append(this.getValues())
-                .build();
+            return Objects.hash(this.getId(), this.getPrecision(), this.getType(), this.getFormat(), this.getValues());
         }
 
         @Getter
+        @GsonType
         public static class Value {
 
             private double base = 0.0;

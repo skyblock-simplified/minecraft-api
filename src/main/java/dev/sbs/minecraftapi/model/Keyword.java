@@ -1,17 +1,15 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -19,12 +17,21 @@ import java.util.Optional;
 @Table(name = "keywords")
 public class Keyword implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
+    @Column(name = "plural")
     private @NotNull Optional<String> plural = Optional.empty();
+
+    @Column(name = "symbol")
     private @NotNull Optional<String> symbol = Optional.empty();
-    @Enumerated(EnumType.STRING)
-    private @NotNull ChatFormat format = ChatFormat.GREEN;
+
+    @Column(name = "format")
+    private @NotNull Optional<ChatFormat> format = Optional.empty();
 
     public boolean hasPlural() {
         return this.getPlural().isPresent();
@@ -40,24 +47,16 @@ public class Keyword implements JpaModel {
 
         Keyword that = (Keyword) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getPlural(), that.getPlural())
-            .append(this.getSymbol(), that.getSymbol())
-            .append(this.getFormat(), that.getFormat())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getPlural(), that.getPlural())
+            && Objects.equals(this.getSymbol(), that.getSymbol())
+            && Objects.equals(this.getFormat(), that.getFormat());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getPlural())
-            .append(this.getSymbol())
-            .append(this.getFormat())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getPlural(), this.getSymbol(), this.getFormat());
     }
 
 }

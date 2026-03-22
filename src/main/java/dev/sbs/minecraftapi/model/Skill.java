@@ -1,40 +1,51 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.minecraftapi.MinecraftApi;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "skills")
 public class Skill implements JpaModel {
 
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
-    private @NotNull String description = "";
-    private int maxLevel = 50;
-    private boolean cosmetic;
-    private double weightExponent;
-    private int weightDivider;
-    @Getter(AccessLevel.NONE)
-    private @NotNull ConcurrentList<Level> levels = Concurrent.newList();
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
 
-    public @NotNull ConcurrentList<Level> getLevels() {
-        return this.levels;
-    }
+    @Column(name = "name", nullable = false)
+    private @NotNull String name = "";
+
+    @Column(name = "description", nullable = false)
+    private @NotNull String description = "";
+
+    @Column(name = "max_level", nullable = false)
+    private int maxLevel = 50;
+
+    @Column(name = "cosmetic", nullable = false)
+    private boolean cosmetic;
+
+    @Column(name = "weight_exponent", nullable = false)
+    private double weightExponent;
+
+    @Column(name = "weight_divider", nullable = false)
+    private int weightDivider;
+
+    @Column(name = "levels", nullable = false)
+    private @NotNull ConcurrentList<Level> levels = Concurrent.newList();
 
     public boolean notCosmetic() {
         return !this.isCosmetic();
@@ -64,33 +75,23 @@ public class Skill implements JpaModel {
 
         Skill that = (Skill) o;
 
-        return new EqualsBuilder()
-            .append(this.getMaxLevel(), that.getMaxLevel())
-            .append(this.isCosmetic(), that.isCosmetic())
-            .append(this.getWeightExponent(), that.getWeightExponent())
-            .append(this.getWeightDivider(), that.getWeightDivider())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getDescription(), that.getDescription())
-            .append(this.getLevels(), that.getLevels())
-            .build();
+        return this.getMaxLevel() == that.getMaxLevel()
+            && this.isCosmetic() == that.isCosmetic()
+            && this.getWeightExponent() == that.getWeightExponent()
+            && this.getWeightDivider() == that.getWeightDivider()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getDescription(), that.getDescription())
+            && Objects.equals(this.getLevels(), that.getLevels());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getDescription())
-            .append(this.getMaxLevel())
-            .append(this.isCosmetic())
-            .append(this.getWeightExponent())
-            .append(this.getWeightDivider())
-            .append(this.getLevels())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getMaxLevel(), this.isCosmetic(), this.getWeightExponent(), this.getWeightDivider(), this.getLevels());
     }
 
     @Getter
+    @GsonType
     public static class Level {
 
         private int level;
@@ -134,22 +135,15 @@ public class Skill implements JpaModel {
 
             Level that = (Level) o;
 
-            return new EqualsBuilder()
-                .append(this.getLevel(), that.getLevel())
-                .append(this.getTotalRequiredXP(), that.getTotalRequiredXP())
-                .append(this.getTitle(), that.getTitle())
-                .append(this.getUnlocks(), that.getUnlocks())
-                .build();
+            return this.getLevel() == that.getLevel()
+                && this.getTotalRequiredXP() == that.getTotalRequiredXP()
+                && Objects.equals(this.getTitle(), that.getTitle())
+                && Objects.equals(this.getUnlocks(), that.getUnlocks());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getLevel())
-                .append(this.getTotalRequiredXP())
-                .append(this.getTitle())
-                .append(this.getUnlocks())
-                .build();
+            return Objects.hash(this.getLevel(), this.getTotalRequiredXP(), this.getTitle(), this.getUnlocks());
         }
 
     }

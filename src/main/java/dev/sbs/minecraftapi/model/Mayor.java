@@ -1,37 +1,42 @@
 package dev.sbs.minecraftapi.model;
 
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.persistence.JpaModel;
+import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
-import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(name = "mayors")
 public class Mayor implements JpaModel {
 
-    private @Id @NotNull String id = "";
-    private @NotNull String name = "";
-    private boolean special;
-    @Enumerated(EnumType.STRING)
-    private @NotNull ChatFormat format = ChatFormat.LIGHT_PURPLE;
-    @Getter(AccessLevel.NONE)
-    private @NotNull ConcurrentList<Perk> perks = Concurrent.newList();
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
 
-    public @NotNull ConcurrentList<Perk> getPerks() {
-        return this.perks;
-    }
+    @Column(name = "name", nullable = false)
+    private @NotNull String name = "";
+
+    @Column(name = "special", nullable = false)
+    private boolean special;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "format", nullable = false)
+    private @NotNull ChatFormat format = ChatFormat.LIGHT_PURPLE;
+
+    @Column(name = "perks", nullable = false)
+    private @NotNull ConcurrentList<Perk> perks = Concurrent.newList();
 
     @Override
     public boolean equals(Object o) {
@@ -39,38 +44,26 @@ public class Mayor implements JpaModel {
 
         Mayor that = (Mayor) o;
 
-        return new EqualsBuilder()
-            .append(this.isSpecial(), that.isSpecial())
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getPerks(), that.getPerks())
-            .build();
+        return this.isSpecial() == that.isSpecial()
+            && Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getFormat(), that.getFormat())
+            && Objects.equals(this.getPerks(), that.getPerks());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.isSpecial())
-            .append(this.getFormat())
-            .append(this.getPerks())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.isSpecial(), this.getFormat(), this.getPerks());
     }
 
     @Getter
+    @GsonType
     public static class Perk {
 
         private @NotNull String id = "";
         private @NotNull String name = "";
         private @NotNull String description = "";
-        @Getter(AccessLevel.NONE)
         private @NotNull ConcurrentList<Substitute> stats = Concurrent.newList();
-
-        public @NotNull ConcurrentList<Substitute> getStats() {
-            return this.stats;
-        }
 
         @Override
         public boolean equals(Object o) {
@@ -78,32 +71,28 @@ public class Mayor implements JpaModel {
 
             Perk that = (Perk) o;
 
-            return new EqualsBuilder()
-                .append(this.getId(), that.getId())
-                .append(this.getName(), that.getName())
-                .append(this.getDescription(), that.getDescription())
-                .append(this.getStats(), that.getStats())
-                .build();
+            return Objects.equals(this.getId(), that.getId())
+                && Objects.equals(this.getName(), that.getName())
+                && Objects.equals(this.getDescription(), that.getDescription())
+                && Objects.equals(this.getStats(), that.getStats());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getName())
-                .append(this.getDescription())
-                .append(this.getStats())
-                .build();
+            return Objects.hash(this.getId(), this.getName(), this.getDescription(), this.getStats());
         }
 
     }
 
     @Getter
+    @GsonType
     public static class Substitute {
 
         private @NotNull String id = "";
         private int precision = 0;
+        @Enumerated(EnumType.STRING)
         private @NotNull Stat.Type type = Stat.Type.NONE;
+        @Enumerated(EnumType.STRING)
         private @NotNull ChatFormat format = ChatFormat.GREEN;
         private double value;
 
@@ -113,24 +102,16 @@ public class Mayor implements JpaModel {
 
             Substitute that = (Substitute) o;
 
-            return new EqualsBuilder()
-                .append(this.getPrecision(), that.getPrecision())
-                .append(this.getValue(), that.getValue())
-                .append(this.getId(), that.getId())
-                .append(this.getType(), that.getType())
-                .append(this.getFormat(), that.getFormat())
-                .build();
+            return this.getPrecision() == that.getPrecision()
+                && this.getValue() == that.getValue()
+                && Objects.equals(this.getId(), that.getId())
+                && Objects.equals(this.getType(), that.getType())
+                && Objects.equals(this.getFormat(), that.getFormat());
         }
 
         @Override
         public int hashCode() {
-            return new HashCodeBuilder()
-                .append(this.getId())
-                .append(this.getPrecision())
-                .append(this.getType())
-                .append(this.getFormat())
-                .append(this.getValue())
-                .build();
+            return Objects.hash(this.getId(), this.getPrecision(), this.getType(), this.getFormat(), this.getValue());
         }
 
     }
