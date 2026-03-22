@@ -9,8 +9,9 @@ import dev.sbs.api.persistence.JpaConfig;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.Repository;
 import dev.sbs.api.persistence.SessionManager;
-import dev.sbs.api.persistence.driver.H2Driver;
+import dev.sbs.api.persistence.driver.H2MemoryDriver;
 import dev.sbs.api.scheduler.Scheduler;
+import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.mojang.MojangClient;
@@ -50,7 +51,7 @@ import java.io.File;
  *     <li>Registers Minecraft/Hypixel {@link Gson} type adapters for NBT content,
  *         SkyBlock dates, and SBS API response types.</li>
  *     <li>Registers {@link NbtFactory} as a service for reading/writing NBT data.</li>
- *     <li>Registers {@link dev.sbs.api.builder.ClassBuilder ClassBuilder} entries for
+ *     <li>Registers {@link ClassBuilder ClassBuilder} entries for
  *         {@link SbsClient}, {@link MojangClient}, {@link HypixelClient}, and text segment types.</li>
  *     <li>Instantiates and registers the {@link MojangProxy} (with IPv6 rotation),
  *         {@link SbsClient}, {@link HypixelClient}, and {@link MinecraftServerPing} clients.</li>
@@ -105,13 +106,17 @@ public class MinecraftApi extends SimplifiedApi {
         serviceManager.add(HypixelClient.class, new HypixelClient());
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
 
-        // Provide Json Persistence (H2-backed JPA session) TODO
+        // Provide Json Persistence (H2-backed JPA session)
         getSessionManager().connect(
             JpaConfig.builder()
-                .withDriver(new H2Driver())
+                .withDriver(new H2MemoryDriver())
                 .withPackageOf(Item.class)
                 .withJsonResourceBase("skyblock")
-                .withGsonSettings(gsonSettings)
+                .withGsonSettings(
+                    gsonSettings.mutate()
+                        .withStringType(GsonSettings.StringType.DEFAULT)
+                        .build()
+                )
                 .withLogLevel(Level.WARN)
                 .isUsingQueryCache()
                 .isUsing2ndLevelCache()
