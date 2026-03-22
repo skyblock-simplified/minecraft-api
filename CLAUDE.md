@@ -51,7 +51,7 @@ Each client follows the pattern: `Client<Endpoint>` with `configureErrorDecoder(
 - `SkyBlockMember` — Player data within an island: skills, pets, dungeons, slayers, rift, crimson isle, mining, inventory, etc. Implements `PostInit` for post-deserialization processing.
 - Sub-packages (`member/dungeon/`, `member/crimson/`, `member/rift/`, `member/mining/`, `member/pet/`, `member/slayer/`, `member/skill/`, `member/hoppity/`) contain nested progression data.
 
-**`model/`** — JPA entities backed by JSON resource files in `src/main/resources/skyblock/`. Each model implements `JpaModel` and maps to a JSON file (e.g., `Item` -> `items.json`, `Stat` -> `stats.json`). These are loaded into an embedded H2 database at startup. Models use `@Entity`, `@Table`, `@Id`, `@Column`, `@ManyToOne`/`@JoinColumn` for relationships, and manual `equals()`/`hashCode()` via `EqualsBuilder`/`HashCodeBuilder`.
+**`model/`** — JPA entities backed by JSON resource files in `src/main/resources/skyblock/`. Each model implements `JpaModel` and maps to a JSON file (e.g., `Item` -> `items.json`, `Stat` -> `stats.json`). These are loaded into an embedded H2 database at startup. Models use `@Entity`, `@Table`, `@Id`, `@Column`, `@ManyToOne`/`@JoinColumn` for relationships, and manual `equals()`/`hashCode()` via `Objects.equals()`/`Objects.hash()`.
 
 **`nbt/`** — Minecraft NBT (Named Binary Tag) serialization. `NbtFactory` is the main API for reading/writing NBT data in multiple formats: Base64, byte arrays, files, streams, SNBT strings, and JSON. Tag hierarchy: `Tag` -> primitives (`IntTag`, `StringTag`, etc.), arrays (`ByteArrayTag`, etc.), collections (`CompoundTag`, `ListTag`).
 
@@ -73,7 +73,7 @@ Each client follows the pattern: `Client<Endpoint>` with `configureErrorDecoder(
 - **`ConcurrentList`/`ConcurrentMap`** (from `:api` module) are used instead of standard Java collections. Created via `Concurrent.newList()`, `Concurrent.newMap()`, etc.
 - **`@SerializedName`** maps JSON field names to Java fields. `@SerializedPath` handles nested JSON paths.
 - **`@GsonType`** marks inner classes that need Gson type registration.
-- **`EqualsBuilder`/`HashCodeBuilder`** — Models implement `equals()`/`hashCode()` manually using these builders (not Lombok's `@EqualsAndHashCode`).
+- **`Objects.equals()`/`Objects.hash()`** — Models implement `equals()`/`hashCode()` manually using `java.util.Objects` (not Lombok's `@EqualsAndHashCode`).
 - **Feign endpoints** use `@RequestLine("GET /path?param={param}")` with `@Param` for substitution. Routes are set via `@Route` (class-level) or `@MojangDomain` (method-level).
 - **`optionalProject()`** in `build.gradle.kts` — Falls back to JitPack snapshot (`com.github.skyblock-simplified:api:master-SNAPSHOT`) if the `:api` subproject is not present locally.
 
