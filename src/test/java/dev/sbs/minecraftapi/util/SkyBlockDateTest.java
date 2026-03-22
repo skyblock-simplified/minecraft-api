@@ -21,6 +21,33 @@ public class SkyBlockDateTest {
         SkyBlockDate currentDate = new SkyBlockDate(givenDate, true);
         //SkyBlockDate currentDate = new SkyBlockDate(System.currentTimeMillis(), true);
 
+        SkyBlockDate last_year_of_the_pig   = new SkyBlockDate(479, Season.EARLY_SPRING, 1, 12, 0).subtract(12);
+        SkyBlockDate last_year_of_the_seal  = new SkyBlockDate(486, Season.EARLY_SPRING, 1, 12, 0).subtract(12);
+        SkyBlockDate last_year_of_the_witch = new SkyBlockDate(488, Season.EARLY_SPRING, 1, 12, 0).subtract(12);
+
+/*
+// 12-year cycle
+const YEARLY_EVENTS = {
+    yearOfTheSeal: { 6
+        name: 'Year of the Seal',
+        url: 'https://wiki.hypixel.net/Year_of_the_Seal',
+        year: 414 % 12, // Event happened in year 414
+    },
+    yearOfTheWitch: { 8
+        name: 'Year of the Witch',
+        url: 'https://wiki.hypixel.net/Year_of_the_Witch',
+        year: 476 % 12, // Event happened in year 476
+    },
+    yearOfThePig: { 11
+        name: 'Year of the Pig',
+        url: 'https://wiki.hypixel.net/Year_of_the_Pig',
+        year: 407 % 12, // Event happened in year 407
+    },
+};
+*/
+
+        // year
+
         long currentYear = currentDate.getYear();
         long currentMonth = currentDate.getMonth();
         Season currentSeason = currentDate.getSeason();
@@ -62,7 +89,7 @@ public class SkyBlockDateTest {
         SpecialElection nextSpecialMayor = SkyBlockDate.getNextSpecialMayor();
         ConcurrentList<SpecialElection> specialMayors = SkyBlockDate.getSpecialMayors(
             5,
-            new SkyBlockDate(System.currentTimeMillis()).append(-16)
+            new SkyBlockDate(System.currentTimeMillis()).add(-16)
         );
         int specialYear = nextSpecialMayor.getVoting().getStart().getYear();
 
