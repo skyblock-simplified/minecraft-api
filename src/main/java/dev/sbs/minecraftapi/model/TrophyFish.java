@@ -1,18 +1,22 @@
 package dev.sbs.minecraftapi.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.sbs.api.builder.EqualsBuilder;
-import dev.sbs.api.builder.HashCodeBuilder;
 import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.minecraftapi.render.text.ChatFormat;
+import dev.sbs.minecraftapi.skyblock.common.Rarity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -20,12 +24,29 @@ import java.util.Optional;
 @Table(name = "trophy_fishes")
 public class TrophyFish implements JpaModel {
 
-    private @Id @NotNull String id = "";
+    @Id
+    @Column(name = "id", nullable = false)
+    private @NotNull String id = "";
+
+    @Column(name = "name", nullable = false)
     private @NotNull String name = "";
+
     @Enumerated(EnumType.STRING)
-    private @NotNull ChatFormat format = ChatFormat.WHITE;
+    @Column(name = "rarity", nullable = false)
+    private @NotNull Rarity rarity = Rarity.COMMON;
+
     @SerializedName("zone")
+    @Column(name = "zone_id")
     private @NotNull Optional<String> zoneId = Optional.empty();
+
+    @ManyToOne
+    @Getter(AccessLevel.NONE)
+    @JoinColumn(name = "zone_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private @Nullable Zone zone;
+
+    public @NotNull Optional<Zone> getZone() {
+        return Optional.ofNullable(this.zone);
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -33,22 +54,15 @@ public class TrophyFish implements JpaModel {
 
         TrophyFish that = (TrophyFish) o;
 
-        return new EqualsBuilder()
-            .append(this.getId(), that.getId())
-            .append(this.getName(), that.getName())
-            .append(this.getFormat(), that.getFormat())
-            .append(this.getZoneId(), that.getZoneId())
-            .build();
+        return Objects.equals(this.getId(), that.getId())
+            && Objects.equals(this.getName(), that.getName())
+            && Objects.equals(this.getRarity(), that.getRarity())
+            && Objects.equals(this.getZoneId(), that.getZoneId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-            .append(this.getId())
-            .append(this.getName())
-            .append(this.getFormat())
-            .append(this.getZoneId())
-            .build();
+        return Objects.hash(this.getId(), this.getName(), this.getRarity(), this.getZoneId());
     }
 
     public enum Tier {
