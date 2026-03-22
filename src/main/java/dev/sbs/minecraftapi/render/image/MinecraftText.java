@@ -1,11 +1,11 @@
 package dev.sbs.minecraftapi.render.image;
 
-import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.io.stream.ByteArrayDataOutput;
 import dev.sbs.api.math.Range;
 import dev.sbs.api.util.SystemUtil;
+import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.render.font.Font;
 import dev.sbs.minecraftapi.render.font.MinecraftFont;
 import dev.sbs.minecraftapi.render.image.exception.ImageException;

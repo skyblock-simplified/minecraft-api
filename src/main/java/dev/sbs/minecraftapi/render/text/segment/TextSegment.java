@@ -2,8 +2,8 @@ package dev.sbs.minecraftapi.render.text.segment;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.util.StringUtil;
+import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import dev.sbs.minecraftapi.render.text.event.ClickEvent;
 import dev.sbs.minecraftapi.render.text.event.HoverEvent;

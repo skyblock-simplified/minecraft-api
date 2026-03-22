@@ -2,11 +2,11 @@ package dev.sbs.minecraftapi.render.text.segment;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import dev.sbs.api.builder.ClassBuilder;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.StreamUtil;
 import dev.sbs.api.util.StringUtil;
+import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.render.text.ChatFormat;
 import lombok.AccessLevel;
 import lombok.Getter;
