@@ -34,7 +34,7 @@ public class MojangProxyTest {
     public void makeMojangProfile_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
         //MojangProfileResponse mojangProfileResponse = mojangProxy.getMojangProfile("CraftedFury");
-        SbsEndpoint sbsEndpoints = SimplifiedApi.getClient(SbsClient.class).getEndpoints();
+        SbsEndpoint sbsEndpoints = SimplifiedApi.getClient(SbsClient.class).getEndpoint();
 
         for (int i = 0; i < 1_000; i++) {
             int x = i;

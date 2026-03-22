@@ -48,7 +48,7 @@ public class MinecraftNbtTest {
     public void getAuctionHouse_ok() {
         SimplifiedApi.getKeyManager().add(SystemUtil.getEnvPair("HYPIXEL_API_KEY"));
 
-        HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
+        HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoint();
         SkyBlockAuctionsResponse auctionsResponse = hypixelEndpoints.getAuctions();
         ConcurrentList<SkyBlockAuction> auctions = Concurrent.newList(auctionsResponse.getAuctions());
 

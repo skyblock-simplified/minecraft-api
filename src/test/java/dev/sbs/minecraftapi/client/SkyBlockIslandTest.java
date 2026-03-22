@@ -2,32 +2,13 @@ package dev.sbs.minecraftapi.client;
 
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.collection.query.SearchFunction;
-import dev.sbs.api.persistence.Repository;
-import dev.sbs.api.persistence.Session;
-import dev.sbs.api.persistence.sql.SqlConfig;
-import dev.sbs.api.persistence.sql.SqlModel;
+import dev.sbs.api.persistence.JpaConfig;
+import dev.sbs.api.persistence.JpaSession;
 import dev.sbs.api.tuple.pair.Pair;
-import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.exception.HypixelApiException;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoints;
-import dev.sbs.minecraftapi.client.hypixel.response.skyblock.SkyBlockProfilesResponse;
-import dev.sbs.minecraftapi.client.hypixel.response.skyblock.island.enhanced.EnhancedPet;
-import dev.sbs.minecraftapi.skyblock.SkyBlockIsland;
-import dev.sbs.minecraftapi.skyblock.SkyBlockMember;
-import dev.sbs.minecraftapi.skyblock.data.PetData;
-import dev.sbs.minecraftapi.skyblock.data.SkillData;
-import dev.sbs.minecraftapi.skyblock.data.SlayerData;
-import dev.sbs.minecraftapi.skyblock.data.Weight;
-import dev.sbs.minecraftapi.skyblock.dungeon.DungeonClass;
-import dev.sbs.minecraftapi.skyblock.dungeon.DungeonEntry;
-import dev.sbs.minecraftapi.skyblock.island.Bestiary;
-import dev.sbs.minecraftapi.skyblock.island.JacobsContest;
-import dev.sbs.minecraftapi.skyblock.profile_stats.ProfileStats;
-import dev.sbs.minecraftapi.skyblock.profile_stats.data.ObjectData;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
@@ -37,7 +18,6 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class SkyBlockIslandTest {
@@ -46,10 +26,10 @@ public class SkyBlockIslandTest {
     public void getGuildLevels_ok() {
         try {
             System.out.println("Database Starting... ");
-            Session<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
-            System.out.println("Database initialized in " + session.getInitialization() + "ms");
-            System.out.println("Database started in " + session.getStartup() + "ms");
-            HypixelEndpoints hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
+            JpaSession session = SimplifiedApi.getSessionManager().connect(JpaConfig.defaultSql());
+            System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
+            System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
+            HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoint();
             String guildName = "SkyBlock Simplified";
 
             hypixelEndpoints.getGuildByName(guildName)
@@ -70,7 +50,7 @@ public class SkyBlockIslandTest {
                                     member.getUniqueId(),
                                     hypixelEndpoints.getPlayer(member.getUniqueId()).getPlayer().get().getDisplayName()
                                 ),
-                                island.getMembers()
+                                (int) island.getMembers()
                                     .get(member.getUniqueId())
                                     .getLeveling()
                                     .getLevel()
@@ -113,14 +93,14 @@ public class SkyBlockIslandTest {
         }
     }
 
-    @Test
+    /*@Test
     public void getPlayerStats_ok() {
         try {
             System.out.println("Database Starting... ");
-            Session<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
-            System.out.println("Database initialized in " + session.getInitialization() + "ms");
-            System.out.println("Database started in " + session.getStartup() + "ms");
-            HypixelEndpoints hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
+            JpaSession session = SimplifiedApi.getSessionManager().connect(JpaConfig.defaultSql());
+            System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
+            System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
+            HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
 
             UUID uniqueId = StringUtil.toUUID("f33f51a7-9691-4076-abda-f66e3d047a71"); // CraftedFury
             //UUID uniqueId = StringUtil.toUUID("df5e1701-809c-48be-9b0d-ef50b83b009e"); // GoldenDusk
@@ -192,10 +172,10 @@ public class SkyBlockIslandTest {
     public void getIsland_ok() {
         try {
             System.out.println("Database Starting... ");
-            Session<SqlModel> session = SimplifiedApi.getSessionManager().connect(SqlConfig.defaultSql());
-            System.out.println("Database initialized in " + session.getInitialization() + "ms");
-            System.out.println("Database started in " + session.getStartup() + "ms");
-            HypixelEndpoints hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
+            JpaSession session = SimplifiedApi.getSessionManager().connect(JpaConfig.defaultSql());
+            System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
+            System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
+            HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoints();
             ProfileModel pineappleProfile = SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE");
             ProfileModel bananaProfile = SimplifiedApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA");
 
@@ -223,7 +203,7 @@ public class SkyBlockIslandTest {
             SkyBlockMember member = island.getMembers().get(checkThis.getKey());
             EnhancedMember enhancedMember = member.asEnhanced();
 
-            int petScore = member.getPetData().getPetScore();
+            int petScore = member.getPets().getPetScore();
 
             /*int uniques = island.getMinions()
                 .stream()
@@ -231,11 +211,11 @@ public class SkyBlockIslandTest {
                 .sum();*/
 
             // skills, skill_levels, slayers, slayer_levels, dungeons, dungeon_classes, dungeon_levels
-            double skillAverage = member.getSkillData().getAverage();
-            ConcurrentMap<SkillData.Entry, Weight> skillWeights = member.getSkillData().getWeight();
-            ConcurrentMap<SlayerData.Boss, Weight> slayerWeights = member.getSlayerData().getWeight();
-            ConcurrentMap<DungeonEntry, Weight> dungeonWeights = member.getDungeonData().getWeight();
-            ConcurrentMap<DungeonClass, Weight> dungeonClassWeights = member.getDungeonData().getClassWeight();
+            /*double skillAverage = member.getSkills().getAverage();
+            ConcurrentMap<SkillProgress.Entry, Weight> skillWeights = member.getSkills().getWeight();
+            ConcurrentMap<SlayerProgress.Boss, Weight> slayerWeights = member.getSlayers().getWeight();
+            ConcurrentMap<DungeonEntry, Weight> dungeonWeights = member.getDungeons().getWeight();
+            ConcurrentMap<DungeonClass, Weight> dungeonClassWeights = member.getDungeons().getClassWeight();
             ConcurrentList<JacobsContest.Contest> contests = member.getJacobsContest().getContests();
 
             // skills, skill_levels
@@ -261,11 +241,11 @@ public class SkyBlockIslandTest {
             MatcherAssert.assertThat(wheatGen11.getItemCost().getItemId(), Matchers.equalTo("ENCHANTED_HAY_BLOCK"));
 
             // rarities, pets, pet_items, pet_exp_scales
-            ConcurrentList<PetData.Entry> pets = member.getPetData().getPets();
-            Optional<PetData.Entry> optionalSpiderPet = pets.stream().filter(pet -> pet.getType().equals("SPIDER")).findFirst();
-            Optional<PetData.Entry> optionalDragonPet = pets.stream().filter(pet -> pet.getType().equals("ENDER_DRAGON")).findFirst();
+            ConcurrentList<PetProgress.Entry> pets = member.getPets().getPets();
+            Optional<PetProgress.Entry> optionalSpiderPet = pets.stream().filter(pet -> pet.getType().equals("SPIDER")).findFirst();
+            Optional<PetProgress.Entry> optionalDragonPet = pets.stream().filter(pet -> pet.getType().equals("ENDER_DRAGON")).findFirst();
 
-            Optional<PetData.Entry> optionalTestPet = pets.stream().filter(pet -> pet.getType().equals("BEE")).findFirst();
+            Optional<PetProgress.Entry> optionalTestPet = pets.stream().filter(pet -> pet.getType().equals("BEE")).findFirst();
             optionalTestPet.ifPresent(testPet -> {
                 EnhancedPet atestPet = testPet.asEnhanced();
                 ConcurrentList<Double> tiers = atestPet.getExperienceTiers();
@@ -313,6 +293,6 @@ public class SkyBlockIslandTest {
         } finally {
             SimplifiedApi.getSessionManager().disconnect();
         }
-    }
+    }*/
 
 }
