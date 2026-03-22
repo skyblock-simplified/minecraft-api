@@ -254,11 +254,11 @@ public class SkyBlockDateTest {
     }
 
     @Test
-    public void getMayors_spacedEightYearsApart() {
+    public void getMayors_spacedOneYearApart() {
         SkyBlockDate fromDate = new SkyBlockDate(1, 1, 1, 0);
         ConcurrentList<Election> mayors = SkyBlockDate.getMayors(3, fromDate);
-        assertThat(mayors.get(1).getYear() - mayors.get(0).getYear(), is(8));
-        assertThat(mayors.get(2).getYear() - mayors.get(1).getYear(), is(8));
+        assertThat(mayors.get(1).getYear() - mayors.get(0).getYear(), is(1));
+        assertThat(mayors.get(2).getYear() - mayors.get(1).getYear(), is(1));
     }
 
     @Test
