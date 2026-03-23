@@ -3,12 +3,12 @@ package dev.sbs.minecraftapi.client.sbs.request;
 import dev.sbs.api.client.request.Endpoint;
 import dev.sbs.api.client.route.Route;
 import dev.sbs.minecraftapi.client.mojang.profile.MojangProfile;
-import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
+import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
 import dev.sbs.minecraftapi.client.sbs.exception.SbsApiException;
+import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojiData;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
-import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
-import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
-import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
+import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
+import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
 import feign.Param;
 import feign.RequestLine;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +20,7 @@ public interface SbsEndpoint extends Endpoint {
 
     @RequestLine("GET /test/{username}")
     @Deprecated
-    @NotNull MojangUsernameResponse getTestProfileFromUsername(@NotNull @Param("username") String username) throws SbsApiException;
+    @NotNull MojangUsername getTestProfileFromUsername(@NotNull @Param("username") String username) throws SbsApiException;
 
     @RequestLine("GET /mojang/user/{username}")
     @NotNull MojangProfile getProfileFromUsername(@NotNull @Param("username") String username) throws SbsApiException;
@@ -29,16 +29,16 @@ public interface SbsEndpoint extends Endpoint {
     @NotNull MojangProfile getProfileFromUniqueId(@NotNull @Param("uniqueId") UUID uniqueId) throws SbsApiException;
 
     @RequestLine("GET /skyblock/emojis.json")
-    @NotNull SkyBlockEmojisResponse getEmojis() throws SbsApiException;
+    @NotNull SkyBlockEmojis getEmojis() throws SbsApiException;
 
     @RequestLine("GET /skyblock/images.json")
-    @NotNull SkyBlockImagesResponse getImages() throws SbsApiException;
+    @NotNull SkyBlockImages getImages() throws SbsApiException;
 
     @RequestLine("GET /skyblock/items.json")
-    @NotNull SkyBlockItemsResponse getItems() throws SbsApiException;
+    @NotNull SkyBlockItems getItems() throws SbsApiException;
 
-    default @NotNull SkyBlockEmojis getItemEmojis() throws SbsApiException {
-        return new SkyBlockEmojis(
+    default @NotNull SkyBlockEmojiData getItemEmojis() throws SbsApiException {
+        return new SkyBlockEmojiData(
             this.getItems(),
             this.getEmojis(),
             this.getImages()

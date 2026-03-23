@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SkyBlockImagesResponse {
+public class SkyBlockImages {
 
     private final ConcurrentMap<String, Image> items;
 
@@ -28,11 +28,11 @@ public class SkyBlockImagesResponse {
 
     }
 
-    public static class Deserializer implements JsonDeserializer<SkyBlockImagesResponse> {
+    public static class Deserializer implements JsonDeserializer<SkyBlockImages> {
 
         @Override
-        public SkyBlockImagesResponse deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
-            return new SkyBlockImagesResponse(
+        public SkyBlockImages deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
+            return new SkyBlockImages(
                 jsonElement.getAsJsonObject()
                     .entrySet()
                     .stream()

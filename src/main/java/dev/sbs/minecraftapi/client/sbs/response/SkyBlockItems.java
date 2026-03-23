@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class SkyBlockItemsResponse {
+public class SkyBlockItems {
 
     private final ConcurrentMap<String, String> items;
 
@@ -33,11 +33,11 @@ public class SkyBlockItemsResponse {
         return Optional.ofNullable(this.getItems().get("RUNE_" + runeName));
     }
 
-    public static class Deserializer implements JsonDeserializer<SkyBlockItemsResponse> {
+    public static class Deserializer implements JsonDeserializer<SkyBlockItems> {
 
         @Override
-        public SkyBlockItemsResponse deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
-            return new SkyBlockItemsResponse(
+        public SkyBlockItems deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
+            return new SkyBlockItems(
                 jsonElement.getAsJsonObject()
                     .entrySet()
                     .stream()
