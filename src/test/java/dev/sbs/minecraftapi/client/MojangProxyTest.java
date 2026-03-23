@@ -17,7 +17,7 @@ public class MojangProxyTest {
     @Test
     public void makeMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangEndpoint apiRequest = mojangProxy.getEndpoints();
+        MojangEndpoint apiRequest = mojangProxy.getEndpoint();
         MojangUsername usernameResponse = apiRequest.getPlayer("CraftedFury");
         System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId());
     }
@@ -25,7 +25,7 @@ public class MojangProxyTest {
     @Test
     public void makeMultiMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangEndpoint apiRequest = mojangProxy.getEndpoints();
+        MojangEndpoint apiRequest = mojangProxy.getEndpoint();
         MojangMultiUsername multiUsernameResponse = apiRequest.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
         multiUsernameResponse.getProfiles().forEach(usernameResponse -> System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId()));
     }
