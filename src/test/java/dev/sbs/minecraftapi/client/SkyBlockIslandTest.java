@@ -104,7 +104,7 @@ public class SkyBlockIslandTest {
 
             UUID uniqueId = StringUtil.toUUID("f33f51a7-9691-4076-abda-f66e3d047a71"); // CraftedFury
             //UUID uniqueId = StringUtil.toUUID("df5e1701-809c-48be-9b0d-ef50b83b009e"); // GoldenDusk
-            SkyBlockProfilesResponse profiles = hypixelEndpoints.getProfiles(uniqueId);
+            SkyBlockProfiles profiles = hypixelEndpoints.getProfiles(uniqueId);
 
             // Did Hypixel Reply
             MatcherAssert.assertThat(profiles.isSuccess(), Matchers.equalTo(true));
@@ -193,7 +193,7 @@ public class SkyBlockIslandTest {
             );
             Pair<UUID, ProfileModel> checkThis = pair_CraftedFury;
 
-            SkyBlockProfilesResponse profiles = hypixelEndpoints.getProfiles(checkThis.getKey());
+            SkyBlockProfiles profiles = hypixelEndpoints.getProfiles(checkThis.getKey());
             MatcherAssert.assertThat(profiles.isSuccess(), Matchers.equalTo(true));
 
             //SkyBlockIsland island = profiles.getSelected(); // Bingo Profile = 0

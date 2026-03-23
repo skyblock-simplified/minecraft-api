@@ -6,8 +6,8 @@ import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.exception.MojangApiException;
 import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoint;
-import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
-import dev.sbs.minecraftapi.client.mojang.response.MojangUsernameResponse;
+import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
+import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
 import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ public class MojangProxyTest {
     public void makeMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
         MojangEndpoint apiRequest = mojangProxy.getEndpoints();
-        MojangUsernameResponse usernameResponse = apiRequest.getPlayer("CraftedFury");
+        MojangUsername usernameResponse = apiRequest.getPlayer("CraftedFury");
         System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId());
     }
 
@@ -26,7 +26,7 @@ public class MojangProxyTest {
     public void makeMultiMojangRequests_ok() {
         MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
         MojangEndpoint apiRequest = mojangProxy.getEndpoints();
-        MojangMultiUsernameResponse multiUsernameResponse = apiRequest.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
+        MojangMultiUsername multiUsernameResponse = apiRequest.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
         multiUsernameResponse.getProfiles().forEach(usernameResponse -> System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId()));
     }
 
@@ -40,7 +40,7 @@ public class MojangProxyTest {
             int x = i;
             try {
                 SimplifiedApi.getScheduler().scheduleAsync(() -> {
-                    MojangUsernameResponse mojangUsernameResponse = sbsEndpoints.getTestProfileFromUsername("CraftedFury");
+                    MojangUsername mojangUsernameResponse = sbsEndpoints.getTestProfileFromUsername("CraftedFury");
                     System.out.println("Finished request #" + x);
                 });
             } catch (MojangApiException mojangApiException) {

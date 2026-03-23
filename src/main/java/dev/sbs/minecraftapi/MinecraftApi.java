@@ -18,12 +18,12 @@ import dev.sbs.minecraftapi.client.mojang.MojangClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
 import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoint;
-import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsernameResponse;
+import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
 import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
-import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojisResponse;
-import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImagesResponse;
-import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItemsResponse;
+import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
+import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
+import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
 import dev.sbs.minecraftapi.model.Item;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
@@ -77,12 +77,12 @@ public class MinecraftApi extends SimplifiedApi {
         GsonSettings gsonSettings = serviceManager.get(GsonSettings.class)
             .mutate()
             .withTypeAdapter(NbtContent.class, new NbtContent.Adapter())
-            .withTypeAdapter(MojangMultiUsernameResponse.class, new MojangMultiUsernameResponse.Deserializer())
+            .withTypeAdapter(MojangMultiUsername.class, new MojangMultiUsername.Deserializer())
             .withTypeAdapter(SkyBlockDate.RealTime.class, new SkyBlockDate.RealTime.Adapter())
             .withTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDate.SkyBlockTime.Adapter())
-            .withTypeAdapter(SkyBlockEmojisResponse.class, new SkyBlockEmojisResponse.Deserializer())
-            .withTypeAdapter(SkyBlockImagesResponse.class, new SkyBlockImagesResponse.Deserializer())
-            .withTypeAdapter(SkyBlockItemsResponse.class, new SkyBlockItemsResponse.Deserializer())
+            .withTypeAdapter(SkyBlockEmojis.class, new SkyBlockEmojis.Deserializer())
+            .withTypeAdapter(SkyBlockImages.class, new SkyBlockImages.Deserializer())
+            .withTypeAdapter(SkyBlockItems.class, new SkyBlockItems.Deserializer())
             .build();
         serviceManager.update(GsonSettings.class, gsonSettings);
         serviceManager.update(Gson.class, gsonSettings.create());
