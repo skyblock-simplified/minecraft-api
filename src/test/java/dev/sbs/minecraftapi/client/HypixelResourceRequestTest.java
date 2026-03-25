@@ -2,6 +2,7 @@ package dev.sbs.minecraftapi.client;
 
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.util.SystemUtil;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceCollections;
@@ -16,7 +17,7 @@ public class HypixelResourceRequestTest {
     private static final HypixelEndpoint HYPIXEL_RESOURCE_REQUEST;
 
     static {
-        HYPIXEL_RESOURCE_REQUEST = SimplifiedApi.getClient(HypixelClient.class).getEndpoint();
+        HYPIXEL_RESOURCE_REQUEST = MinecraftApi.getClient(HypixelClient.class).getEndpoint();
     }
 
     @Test
