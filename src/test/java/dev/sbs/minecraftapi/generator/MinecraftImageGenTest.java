@@ -2,7 +2,7 @@ package dev.sbs.minecraftapi.generator;
 
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.client.mojang.profile.MojangProfile;
+import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
 import dev.sbs.minecraftapi.render.image.MinecraftHead;
 import dev.sbs.minecraftapi.render.image.MinecraftText;

@@ -6,7 +6,7 @@ import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.type.GsonType;
-import dev.sbs.minecraftapi.client.mojang.profile.MojangProperty;
+import dev.sbs.minecraftapi.client.mojang.response.MojangProperty;
 import dev.sbs.minecraftapi.skyblock.common.GameStage;
 import dev.sbs.minecraftapi.skyblock.common.Rarity;
 import lombok.AccessLevel;
