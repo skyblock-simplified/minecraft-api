@@ -37,10 +37,7 @@ public final class SchemaExporter {
                 .filter(session -> session.getConfig().getDriver().isEmbedded())
                 .forEach(session -> {
                     Metadata metadata = session.getMetadata();
-                    String baseName = session.getConfig().getJsonResourceBase();
-
-                    if (baseName.isEmpty())
-                        baseName = "embedded";
+                    String baseName = session.getConfig().getSchema();
 
                     outputDir.toFile().mkdirs();
 
