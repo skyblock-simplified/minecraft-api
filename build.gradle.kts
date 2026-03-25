@@ -40,4 +40,11 @@ tasks {
     test {
         useJUnitPlatform()
     }
+    register<JavaExec>("generateSchema") {
+        description = "Generates H2 DDL schema for IntelliJ JPA column resolution"
+        group = "ide"
+        mainClass.set("dev.sbs.minecraftapi.schema.SchemaExporter")
+        classpath = sourceSets["test"].runtimeClasspath
+        args = listOf(layout.projectDirectory.dir(".schema").asFile.absolutePath)
+    }
 }
