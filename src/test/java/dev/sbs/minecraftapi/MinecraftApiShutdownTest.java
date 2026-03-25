@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -8,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MinecraftApiShutdownTest {
 
+    @Tag("slow")
     @Test
     void fullShutdown_completesCleanly() throws Exception {
         // MinecraftApi static init connects the H2 session with 33 models

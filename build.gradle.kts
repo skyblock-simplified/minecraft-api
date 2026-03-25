@@ -38,7 +38,16 @@ dependencies {
 
 tasks {
     test {
-        useJUnitPlatform()
+        useJUnitPlatform {
+            excludeTags("slow")
+        }
+    }
+    register<Test>("slowTest") {
+        description = "Runs slow integration tests (shutdown, thread leak detection)"
+        group = "verification"
+        useJUnitPlatform {
+            includeTags("slow")
+        }
     }
     register<JavaExec>("generateSchema") {
         description = "Generates H2 DDL schema for IntelliJ JPA column resolution"
