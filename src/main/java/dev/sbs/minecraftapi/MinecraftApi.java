@@ -5,6 +5,7 @@ import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.client.Client;
 import dev.sbs.api.client.request.Endpoint;
 import dev.sbs.api.io.gson.GsonSettings;
+import dev.sbs.api.persistence.CacheMissingStrategy;
 import dev.sbs.api.persistence.JpaConfig;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.Repository;
@@ -36,7 +37,6 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.Level;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.cache.jcache.MissingCacheStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -121,7 +121,7 @@ public class MinecraftApi extends SimplifiedApi {
                 .isUsingQueryCache()
                 .isUsing2ndLevelCache()
                 .withCacheConcurrencyStrategy(CacheConcurrencyStrategy.READ_WRITE)
-                .withMissingCacheStrategy(MissingCacheStrategy.CREATE_WARN)
+                .withCacheMissingStrategy(CacheMissingStrategy.CREATE_WARN)
                 .withQueryResultsTTL(30)
                 .build()
         );
