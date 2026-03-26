@@ -180,11 +180,13 @@ after loading.
 | Format | Read | Write |
 |--------|------|-------|
 | Base64 | `fromBase64()` | `toBase64()` |
-| Byte array | `fromBytes()` | `toBytes()` |
+| Byte array | `fromByteArray()` | `toByteArray()` |
 | File | `fromFile()` | `toFile()` |
-| InputStream | `fromStream()` | `toStream()` |
+| InputStream / OutputStream | `fromStream()` | `toStream()` |
 | SNBT (string) | `fromSnbt()` | `toSnbt()` |
-| JSON | `fromJson()` | `toJson()` |
+| JSON | - | `toJson()` |
+| Classpath resource | `fromResource()` | - |
+| URL | `fromUrl()` | - |
 
 Tag hierarchy: `Tag` -> primitives (`IntTag`, `StringTag`, etc.), arrays
 (`ByteArrayTag`, etc.), collections (`CompoundTag`, `ListTag`).
