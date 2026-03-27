@@ -12,7 +12,6 @@ import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -22,13 +21,21 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public class SkyBlockIslandTest {
 
-    @Test
+    private static JpaSession session;
+
+    //@BeforeAll
+    static void setup() {
+        session = SimplifiedApi.getSessionManager().connect(JpaConfig.commonSql());
+    }
+
+    //@AfterAll
+    static void teardown() {
+        session.shutdown();
+    }
+
+    //@Test
     public void getGuildLevels_ok() {
         try {
-            System.out.println("Database Starting... ");
-            JpaSession session = SimplifiedApi.getSessionManager().connect(JpaConfig.defaultSql());
-            System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
-            System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
             HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoint();
             String guildName = "SkyBlock Simplified";
 
