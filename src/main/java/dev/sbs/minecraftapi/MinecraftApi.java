@@ -9,8 +9,10 @@ import dev.sbs.api.persistence.CacheMissingStrategy;
 import dev.sbs.api.persistence.JpaConfig;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.Repository;
+import dev.sbs.api.persistence.RepositoryFactory;
 import dev.sbs.api.persistence.SessionManager;
 import dev.sbs.api.persistence.driver.H2MemoryDriver;
+import dev.sbs.api.persistence.strategy.RefreshStrategy;
 import dev.sbs.api.scheduler.Scheduler;
 import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
@@ -110,8 +112,13 @@ public class MinecraftApi extends SimplifiedApi {
         getSessionManager().connect(
             JpaConfig.builder()
                 .withDriver(new H2MemoryDriver())
-                .withPackageOf(Item.class)
-                .withJsonResourceBase("skyblock")
+                .withSchema("skyblock")
+                .withRepositoryFactory(
+                    RepositoryFactory.builder()
+                        .withPackageOf(Item.class)
+                        .withDefault(RefreshStrategy.json("skyblock"))
+                        .build()
+                )
                 .withGsonSettings(
                     gsonSettings.mutate()
                         .withStringType(GsonSettings.StringType.DEFAULT)
