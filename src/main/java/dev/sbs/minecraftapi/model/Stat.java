@@ -65,6 +65,9 @@ public class Stat implements JpaModel {
     @Column(name = "visible", nullable = false)
     private boolean visible;
 
+    @Column(name = "multiplicable", nullable = false)
+    private boolean multiplicable;
+
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id", insertable = false, updatable = false)
     private @NotNull StatCategory category;
@@ -89,6 +92,7 @@ public class Stat implements JpaModel {
             && this.getPowerMultiplier() == that.getPowerMultiplier()
             && this.getTuningMultiplier() == that.getTuningMultiplier()
             && this.isVisible() == that.isVisible()
+            && this.isMultiplicable() == that.isMultiplicable()
             && Objects.equals(this.getId(), that.getId())
             && Objects.equals(this.getName(), that.getName())
             && Objects.equals(this.getSymbol(), that.getSymbol())
@@ -98,7 +102,7 @@ public class Stat implements JpaModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getId(), this.getName(), this.getSymbol(), this.getFormat(), this.getCategoryId(), this.getBase(), this.getCap(), this.getEnrichment(), this.getPowerMultiplier(), this.getTuningMultiplier(), this.isVisible());
+        return Objects.hash(this.getId(), this.getName(), this.getSymbol(), this.getFormat(), this.getCategoryId(), this.getBase(), this.getCap(), this.getEnrichment(), this.getPowerMultiplier(), this.getTuningMultiplier(), this.isVisible(), this.isMultiplicable());
     }
 
     @Getter
