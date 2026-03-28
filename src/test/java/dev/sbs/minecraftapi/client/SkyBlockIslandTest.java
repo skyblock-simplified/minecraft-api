@@ -30,7 +30,7 @@ public class SkyBlockIslandTest {
 
     //@AfterAll
     static void teardown() {
-        session.shutdown();
+        SimplifiedApi.getSessionManager().shutdown(session);
     }
 
     //@Test
@@ -96,7 +96,7 @@ public class SkyBlockIslandTest {
             exception.printStackTrace();
             Assertions.fail();
         } finally {
-            SimplifiedApi.getSessionManager().disconnect();
+            SimplifiedApi.getSessionManager().shutdown();
         }
     }
 

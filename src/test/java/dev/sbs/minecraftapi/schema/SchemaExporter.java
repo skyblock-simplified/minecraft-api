@@ -29,73 +29,68 @@ public final class SchemaExporter {
     public static void main(String[] args) {
         Path outputDir = Path.of(args.length > 0 ? args[0] : ".schema").normalize().toAbsolutePath();
 
-        try {
-            // Triggers MinecraftApi static init, which builds all H2 sessions
-            MinecraftApi.getSessionManager()
-                .getSessions()
-                .stream()
-                .filter(session -> session.getConfig().getDriver().isEmbedded())
-                .forEach(session -> {
-                    Metadata metadata = session.getMetadata();
-                    String baseName = session.getConfig().getSchema();
+        // Triggers MinecraftApi static init, which builds all H2 sessions
+        MinecraftApi.getSessionManager()
+            .getSessions()
+            .stream()
+            .filter(session -> session.getConfig().getDriver().isEmbedded())
+            .forEach(session -> {
+                Metadata metadata = session.getMetadata();
+                String baseName = session.getConfig().getSchema();
 
-                    outputDir.toFile().mkdirs();
+                outputDir.toFile().mkdirs();
 
-                    // Export DDL to a temporary SQL file (keeps quoted identifiers for reserved keywords)
-                    Path sqlFile = outputDir.resolve(baseName + "-schema.sql");
+                // Export DDL to a temporary SQL file (keeps quoted identifiers for reserved keywords)
+                Path sqlFile = outputDir.resolve(baseName + "-schema.sql");
 
-                    try {
-                        Files.deleteIfExists(sqlFile);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                try {
+                    Files.deleteIfExists(sqlFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                new SchemaExport()
+                    .setOutputFile(sqlFile.toString())
+                    .setDelimiter(";")
+                    .setFormat(true)
+                    .createOnly(EnumSet.of(TargetType.SCRIPT), metadata);
+
+                // Create a persistent H2 file database from the DDL
+                Path dbFile = outputDir.resolve(baseName);
+                String jdbcUrl = "jdbc:h2:file:" + dbFile;
+
+                try {
+                    Files.deleteIfExists(Path.of(dbFile + ".mv.db"));
+                    Files.deleteIfExists(Path.of(dbFile + ".trace.db"));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                try (
+                    Connection conn = DriverManager.getConnection(jdbcUrl, "sa", "");
+                    Statement stmt = conn.createStatement()
+                ) {
+                    String ddl = Files.readString(sqlFile);
+
+                    for (String sql : ddl.split(";")) {
+                        sql = sql.trim();
+
+                        if (!sql.isEmpty())
+                            stmt.execute(sql);
                     }
+                } catch (SQLException | IOException e) {
+                    throw new RuntimeException(e);
+                }
 
-                    new SchemaExport()
-                        .setOutputFile(sqlFile.toString())
-                        .setDelimiter(";")
-                        .setFormat(true)
-                        .createOnly(EnumSet.of(TargetType.SCRIPT), metadata);
+                // DDL file was only needed to seed the H2 file database
+                try {
+                    Files.deleteIfExists(sqlFile);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
-                    // Create a persistent H2 file database from the DDL
-                    Path dbFile = outputDir.resolve(baseName);
-                    String jdbcUrl = "jdbc:h2:file:" + dbFile;
-
-                    try {
-                        Files.deleteIfExists(Path.of(dbFile + ".mv.db"));
-                        Files.deleteIfExists(Path.of(dbFile + ".trace.db"));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    try (
-                        Connection conn = DriverManager.getConnection(jdbcUrl, "sa", "");
-                        Statement stmt = conn.createStatement()
-                    ) {
-                        String ddl = Files.readString(sqlFile);
-
-                        for (String sql : ddl.split(";")) {
-                            sql = sql.trim();
-
-                            if (!sql.isEmpty())
-                                stmt.execute(sql);
-                        }
-                    } catch (SQLException | IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    // DDL file was only needed to seed the H2 file database
-                    try {
-                        Files.deleteIfExists(sqlFile);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    System.out.printf("Exported %d entities to %s%n", session.getModels().size(), dbFile);
-                });
-        } finally {
-            MinecraftApi.getSessionManager().disconnect();
-            MinecraftApi.getScheduler().shutdown();
-        }
+                System.out.printf("Exported %d entities to %s%n", session.getModels().size(), dbFile);
+            });
     }
 
 }

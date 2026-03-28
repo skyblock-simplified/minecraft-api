@@ -16,7 +16,7 @@ class MinecraftApiShutdownTest {
         assertTrue(MinecraftApi.getSessionManager().isActive());
 
         // Disconnect sessions (cancels repository refresh tasks, closes SessionFactory)
-        MinecraftApi.getSessionManager().disconnect();
+        MinecraftApi.getSessionManager().shutdown();
         assertFalse(MinecraftApi.getSessionManager().isActive(),
             "SessionManager should be inactive after disconnect()");
 
