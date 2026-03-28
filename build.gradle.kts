@@ -31,6 +31,7 @@ dependencies {
     testImplementation(libs.hamcrest)
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.junit.platform.launcher)
 
     // Projects
     api("dev.sbs:api:0.1.0")

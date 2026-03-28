@@ -49,7 +49,7 @@ NBT serialization, and Minecraft text/image rendering.
 | Requirement | Version | Notes |
 |-------------|---------|-------|
 | [JDK](https://adoptium.net/) | **21+** | Required |
-| [Gradle](https://gradle.org/) | **8.12+** | Included via wrapper (`./gradlew`) |
+| [Gradle](https://gradle.org/) | **9.4+** | Included via wrapper (`./gradlew`) |
 
 ### Installation
 

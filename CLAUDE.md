@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build & Test Commands
 
-This is a Gradle submodule (Java 17) of the SkyBlock-Simplified multi-module project. It can be built standalone or as part of the parent project.
+This is a Gradle submodule (Java 21, Gradle 9.4+) of the SkyBlock-Simplified multi-module project. It can be built standalone or as part of the parent project.
 
 ```bash
 # Build (from parent root)
