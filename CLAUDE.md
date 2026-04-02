@@ -65,22 +65,7 @@ Each client follows the pattern: `Client<Endpoint>` with `configureErrorDecoder(
 - `common/` — Shared enums/types: `Rarity`, `GameMode`, `GameStage`, `Profile`, `NbtContent`, `Weight`, `Experience`
 - `crafting/` — Recipe data structures
 
-## Key Patterns
+## Module-Specific Patterns
 
-- **Lombok** is used extensively: `@Getter`, `@NoArgsConstructor`, `@RequiredArgsConstructor`, `@Getter(AccessLevel.NONE)` for fields with custom accessor logic.
-- **`@NotNull`** from JetBrains annotations on parameters and return types throughout.
 - **`Optional<T>`** fields are common — Gson deserializes missing JSON fields as `Optional.empty()`.
-- **`ConcurrentList`/`ConcurrentMap`** (from `:api` module) are used instead of standard Java collections. Created via `Concurrent.newList()`, `Concurrent.newMap()`, etc.
-- **`@SerializedName`** maps JSON field names to Java fields. `@SerializedPath` handles nested JSON paths.
-- **`@GsonType`** marks inner classes that need Gson type registration.
 - **`Objects.equals()`/`Objects.hash()`** — Models implement `equals()`/`hashCode()` manually using `java.util.Objects` (not Lombok's `@EqualsAndHashCode`).
-- **Feign endpoints** use `@RequestLine("GET /path?param={param}")` with `@Param` for substitution. Routes are set via `@Route` (class-level) or `@MojangDomain` (method-level).
-- **`optionalProject()`** in `build.gradle.kts` — Falls back to JitPack snapshot (`com.github.skyblock-simplified:api:master-SNAPSHOT`) if the `:api` subproject is not present locally.
-
-## Dependencies
-
-- Hibernate 5.6 with JCache (ehcache) for ORM and caching
-- OpenFeign for declarative HTTP clients
-- Gson for JSON serialization (not Jackson)
-- MariaDB driver for production, H2 for embedded/test
-- Log4j2 for logging (via Lombok `@Log4j2`)
