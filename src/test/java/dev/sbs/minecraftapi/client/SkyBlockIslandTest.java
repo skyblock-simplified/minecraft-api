@@ -219,9 +219,9 @@ public class SkyBlockIslandTest {
 
             // skills, skill_levels, slayers, slayer_levels, dungeons, dungeon_classes, dungeon_levels
             /*double skillAverage = member.getSkills().getAverage();
-            ConcurrentMap<SkillProgress.Entry, Weight> skillWeights = member.getSkills().getWeight();
-            ConcurrentMap<SlayerProgress.Boss, Weight> slayerWeights = member.getSlayers().getWeight();
-            ConcurrentMap<DungeonEntry, Weight> dungeonWeights = member.getDungeons().getWeight();
+            ConcurrentMap<Skills.Entry, Weight> skillWeights = member.getSkills().getWeight();
+            ConcurrentMap<Slayers.Boss, Weight> slayerWeights = member.getSlayers().getWeight();
+            ConcurrentMap<MemberDungeon, Weight> dungeonWeights = member.getDungeons().getWeight();
             ConcurrentMap<DungeonClass, Weight> dungeonClassWeights = member.getDungeons().getClassWeight();
             ConcurrentList<JacobsContest.Contest> contests = member.getJacobsContest().getContests();
 
@@ -248,11 +248,11 @@ public class SkyBlockIslandTest {
             MatcherAssert.assertThat(wheatGen11.getItemCost().getItemId(), Matchers.equalTo("ENCHANTED_HAY_BLOCK"));
 
             // rarities, pets, pet_items, pet_exp_scales
-            ConcurrentList<PetProgress.Entry> pets = member.getPets().getPets();
-            Optional<PetProgress.Entry> optionalSpiderPet = pets.stream().filter(pet -> pet.getType().equals("SPIDER")).findFirst();
-            Optional<PetProgress.Entry> optionalDragonPet = pets.stream().filter(pet -> pet.getType().equals("ENDER_DRAGON")).findFirst();
+            ConcurrentList<Pets.Entry> pets = member.getPets().getPets();
+            Optional<Pets.Entry> optionalSpiderPet = pets.stream().filter(pet -> pet.getType().equals("SPIDER")).findFirst();
+            Optional<Pets.Entry> optionalDragonPet = pets.stream().filter(pet -> pet.getType().equals("ENDER_DRAGON")).findFirst();
 
-            Optional<PetProgress.Entry> optionalTestPet = pets.stream().filter(pet -> pet.getType().equals("BEE")).findFirst();
+            Optional<Pets.Entry> optionalTestPet = pets.stream().filter(pet -> pet.getType().equals("BEE")).findFirst();
             optionalTestPet.ifPresent(testPet -> {
                 EnhancedPet atestPet = testPet.asEnhanced();
                 ConcurrentList<Double> tiers = atestPet.getExperienceTiers();
