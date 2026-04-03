@@ -1,5 +1,7 @@
 plugins {
     id("java-library")
+    alias(libs.plugins.jmh)
+    idea
 }
 
 group = "dev.sbs"
@@ -35,6 +37,13 @@ dependencies {
 
     // Projects
     api("dev.sbs:api:0.1.0")
+}
+
+idea {
+    module {
+        testSources.from(sourceSets["jmh"].java.srcDirs)
+        testResources.from(sourceSets["jmh"].resources.srcDirs)
+    }
 }
 
 tasks {
