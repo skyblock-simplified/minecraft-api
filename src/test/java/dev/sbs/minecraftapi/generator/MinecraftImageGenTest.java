@@ -4,11 +4,11 @@ import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
-import dev.sbs.minecraftapi.render.image.MinecraftHead;
-import dev.sbs.minecraftapi.render.image.MinecraftText;
-import dev.sbs.minecraftapi.render.text.ChatFormat;
-import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.render.text.segment.LineSegment;
+import dev.sbs.minecraftapi.generator.image.MinecraftHead;
+import dev.sbs.minecraftapi.generator.image.MinecraftText;
+import dev.sbs.minecraftapi.generator.text.ChatFormat;
+import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
+import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
