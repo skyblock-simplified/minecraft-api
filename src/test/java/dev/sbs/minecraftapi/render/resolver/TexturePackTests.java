@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.render.resolver;
 
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
-import dev.sbs.minecraftapi.asset.texture.pack.TexturePackStack;
+import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
 import dev.sbs.minecraftapi.render.BlockRenderer;
 import dev.sbs.minecraftapi.render.IntegrationTestBase;
 import dev.sbs.minecraftapi.render.ItemRenderer;

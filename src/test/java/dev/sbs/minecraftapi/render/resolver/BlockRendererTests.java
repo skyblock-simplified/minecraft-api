@@ -10,7 +10,7 @@ import dev.sbs.minecraftapi.asset.model.BlockModel.Face;
 import dev.sbs.minecraftapi.asset.model.BlockModel.FaceData;
 import dev.sbs.minecraftapi.asset.model.ItemInfo;
 import dev.sbs.minecraftapi.asset.model.ItemInfo.TintInfo;
-import dev.sbs.minecraftapi.asset.model.TextureReference;
+import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.collection.ListTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.ByteTag;

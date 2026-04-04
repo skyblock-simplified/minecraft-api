@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.asset.model;
 
-import dev.sbs.minecraftapi.asset.AssetNamespaceRegistry;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

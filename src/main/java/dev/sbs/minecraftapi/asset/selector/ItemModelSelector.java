@@ -109,7 +109,7 @@ public sealed interface ItemModelSelector
         }
 
         @Override
-        public @Nullable String resolve(Context context) {
+        public @Nullable String resolve(@NotNull Context context) {
             return model != null ? model : baseModel;
         }
     }
@@ -128,7 +128,7 @@ public sealed interface ItemModelSelector
         }
 
         @Override
-        public @Nullable String resolve(Context context) {
+        public @Nullable String resolve(@NotNull Context context) {
             if (nested != null) {
                 String result = nested.resolve(context);
                 if (result != null) return result;
@@ -153,7 +153,7 @@ public sealed interface ItemModelSelector
         private final @Nullable ItemModelSelector onFalse;
 
         @Override
-        public @Nullable String resolve(Context context) {
+        public @Nullable String resolve(@NotNull Context context) {
             return evaluateCondition(context)
                 ? (onTrue != null ? onTrue.resolve(context) : null)
                 : (onFalse != null ? onFalse.resolve(context) : null);
@@ -213,7 +213,7 @@ public sealed interface ItemModelSelector
             }
 
             if (!isBlank(valueLiteral) && customData.containsType("id", TagType.STRING)) {
-                StringTag idTag = customData.getTag("id");
+                StringTag idTag = customData.getTagOrDefault("id", StringTag.EMPTY);
                 if (idTag.notEmpty())
                     return idTag.getValue().equalsIgnoreCase(valueLiteral);
             }
@@ -280,7 +280,7 @@ public sealed interface ItemModelSelector
                     return matchNumeric(tag, prim);
                 }
                 if (prim.isBoolean()) {
-                    return matchesPrimitiveValue(tag, prim.getAsBoolean() ? "true" : "false");
+                    return matchesPrimitiveValue(tag, Boolean.toString(prim.getAsBoolean()));
                 }
             }
             if (expected.isJsonNull()) {
@@ -374,7 +374,7 @@ public sealed interface ItemModelSelector
         private final @Nullable ItemModelSelector fallback;
 
         @Override
-        public @Nullable String resolve(Context context) {
+        public @Nullable String resolve(@NotNull Context context) {
             for (SelectCase selectCase : cases) {
                 if (matches(selectCase.when(), context)) {
                     String resolved = selectCase.selector() != null ? selectCase.selector().resolve(context) : null;
@@ -436,7 +436,7 @@ public sealed interface ItemModelSelector
         private final @Nullable ItemModelSelector fallback;
 
         @Override
-        public @Nullable String resolve(Context context) {
+        public @Nullable String resolve(@NotNull Context context) {
             Double value = getPropertyValue(context);
             if (value == null) {
                 return fallback != null ? fallback.resolve(context) : null;
@@ -503,12 +503,12 @@ public sealed interface ItemModelSelector
                 String customDataKey = null;
 
                 if (customData.containsType("id", TagType.STRING)) {
-                    StringTag idString = customData.getTag("id");
+                    StringTag idString = customData.getTagOrDefault("id", StringTag.EMPTY);
                     if (idString.notEmpty())
                         customDataKey = idString.getValue();
                 }
                 if (customDataKey == null && customData.containsType("model", TagType.STRING)) {
-                    StringTag modelString = customData.getTag("model");
+                    StringTag modelString = customData.getTagOrDefault("model", StringTag.EMPTY);
                     if (modelString.notEmpty())
                         customDataKey = modelString.getValue();
                 }
@@ -551,7 +551,7 @@ public sealed interface ItemModelSelector
      */
     final class Empty implements ItemModelSelector {
         @Override
-        public @Nullable String resolve(Context context) {
+        public @Nullable String resolve(@NotNull Context context) {
             return null;
         }
     }

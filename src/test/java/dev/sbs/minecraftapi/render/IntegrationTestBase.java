@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.render;
 
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.asset.AssetContext;
-import dev.sbs.minecraftapi.asset.PackSnapshot;
+import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.render.context.RenderContext;
 
 import java.io.File;
@@ -54,12 +54,9 @@ public class IntegrationTestBase {
     /**
      * Creates a render context with optional pack IDs.
      */
-    protected static RenderContext createRenderContext(String assetsDirectory, List<String> packIds) throws IOException {
-        if (packIds != null && !packIds.isEmpty()) {
-            PackSnapshot snapshot = MinecraftApi.getAssetFactory().loadPackSnapshot(packIds);
-            AssetContext ctx = MinecraftApi.getServiceManager().get(AssetContext.class);
-            return new RenderContext(snapshot, assetsDirectory, ctx.getBaseOverlayRoots());
-        }
+    protected static RenderContext createRenderContext(String assetsDirectory, ConcurrentList<String> packIds) throws IOException {
+        if (packIds != null && !packIds.isEmpty())
+            return new RenderContext(MinecraftApi.getAssetFactory().loadPackContext(packIds));
         return new RenderContext(MinecraftApi.getServiceManager().get(AssetContext.class));
     }
 

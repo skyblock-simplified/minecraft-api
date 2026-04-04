@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
@@ -43,7 +44,7 @@ class SnbtItemAtlasGeneratorTests extends IntegrationTestBase {
         registerPacks(List.of(packRoot.toString()));
 
         RenderContext context = createRenderContext(
-            assetsDir, List.of(packId));
+            assetsDir, Concurrent.newList(packId));
 
         // Verify direct render with custom data uses the pack texture
         CompoundTag customData = new CompoundTag();

@@ -1,7 +1,8 @@
 package dev.sbs.minecraftapi.asset.texture;
 
-import dev.sbs.minecraftapi.asset.AssetNamespaceRegistry;
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * Requires the Minecraft assets directory to be available. If not found locally,
  * the tests attempt to download assets via the Piston Meta API.
  */
-class TextureRepositoryTests {
+class TextureContextTests {
 
     private static final String ASSETS_DIR;
 
@@ -40,37 +41,37 @@ class TextureRepositoryTests {
         ASSETS_DIR = found;
     }
 
-    private TextureRepository repository;
+    private TextureContext context;
 
     @BeforeEach
     void setUp() {
         assumeTrue(ASSETS_DIR != null && Files.isDirectory(Path.of(ASSETS_DIR)),
             "Minecraft assets directory not found - skipping integration test");
-        AssetNamespaceRegistry namespaces = AssetNamespaceRegistry.buildFromRoots(ASSETS_DIR, List.of());
-        repository = new TextureRepository(ASSETS_DIR, List.of(), namespaces);
+        AssetNamespaceRegistry namespaces = AssetNamespaceRegistry.buildFromRoots(ASSETS_DIR, Concurrent.newList());
+        context = new TextureContext(ASSETS_DIR, List.of(), namespaces);
     }
 
     @AfterEach
     void tearDown() {
-        if (repository != null)
-            repository.close();
+        if (context != null)
+            context.close();
     }
 
     @Test
     void animatedTextureUsesFirstFrameDimensions() {
-        BufferedImage texture = repository.getTexture("minecraft:block/campfire_fire");
+        BufferedImage texture = context.getTexture("minecraft:block/campfire_fire");
         assertEquals(16, texture.getWidth());
         assertEquals(16, texture.getHeight());
     }
 
     @Test
     void armorTrimBootsPaletteIsApplied() {
-        BufferedImage baseOverlay = repository.getTexture("minecraft:trims/items/boots_trim");
-        BufferedImage tintedOverlay = repository.getTexture("minecraft:trims/items/boots_trim_amethyst");
-        BufferedImage genericPalette = repository.getTexture("minecraft:trims/color_palettes/trim_palette");
-        BufferedImage amethystPalette = repository.getTexture("minecraft:trims/color_palettes/amethyst");
+        BufferedImage baseOverlay = context.getTexture("minecraft:trims/items/boots_trim");
+        BufferedImage tintedOverlay = context.getTexture("minecraft:trims/items/boots_trim_amethyst");
+        BufferedImage genericPalette = context.getTexture("minecraft:trims/color_palettes/trim_palette");
+        BufferedImage amethystPalette = context.getTexture("minecraft:trims/color_palettes/amethyst");
 
-        assertNotSame(repository.getTexture("minecraft:missingno"), tintedOverlay);
+        assertNotSame(context.getTexture("minecraft:missingno"), tintedOverlay);
 
         int mappedPixels = 0;
         for (int y = 0; y < baseOverlay.getHeight(); y++) {
@@ -99,13 +100,13 @@ class TextureRepositoryTests {
 
     @Test
     void armorTrimLeggingsUseBasePaletteWhenMaterialIsNotDarker() {
-        BufferedImage baseOverlay = repository.getTexture("minecraft:trims/items/leggings_trim");
-        BufferedImage tintedOverlay = repository.getTexture("minecraft:trims/items/leggings_trim_netherite");
-        BufferedImage genericPalette = repository.getTexture("minecraft:trims/color_palettes/trim_palette");
-        BufferedImage netheritePalette = repository.getTexture("minecraft:trims/color_palettes/netherite");
-        BufferedImage netheriteDarkerPalette = repository.getTexture("minecraft:trims/color_palettes/netherite_darker");
+        BufferedImage baseOverlay = context.getTexture("minecraft:trims/items/leggings_trim");
+        BufferedImage tintedOverlay = context.getTexture("minecraft:trims/items/leggings_trim_netherite");
+        BufferedImage genericPalette = context.getTexture("minecraft:trims/color_palettes/trim_palette");
+        BufferedImage netheritePalette = context.getTexture("minecraft:trims/color_palettes/netherite");
+        BufferedImage netheriteDarkerPalette = context.getTexture("minecraft:trims/color_palettes/netherite_darker");
 
-        assertNotSame(repository.getTexture("minecraft:missingno"), tintedOverlay);
+        assertNotSame(context.getTexture("minecraft:missingno"), tintedOverlay);
 
         int mappedPixels = 0;
         boolean observedMatchBase = false;
@@ -149,12 +150,12 @@ class TextureRepositoryTests {
 
     @Test
     void armorTrimUsesExplicitDarkerPaletteWhenMaterialIncludesSuffix() {
-        BufferedImage baseOverlay = repository.getTexture("minecraft:trims/items/boots_trim");
-        BufferedImage tintedOverlay = repository.getTexture("minecraft:trims/items/boots_trim_netherite_darker");
-        BufferedImage genericPalette = repository.getTexture("minecraft:trims/color_palettes/trim_palette");
-        BufferedImage netheriteDarkerPalette = repository.getTexture("minecraft:trims/color_palettes/netherite_darker");
+        BufferedImage baseOverlay = context.getTexture("minecraft:trims/items/boots_trim");
+        BufferedImage tintedOverlay = context.getTexture("minecraft:trims/items/boots_trim_netherite_darker");
+        BufferedImage genericPalette = context.getTexture("minecraft:trims/color_palettes/trim_palette");
+        BufferedImage netheriteDarkerPalette = context.getTexture("minecraft:trims/color_palettes/netherite_darker");
 
-        assertNotSame(repository.getTexture("minecraft:missingno"), tintedOverlay);
+        assertNotSame(context.getTexture("minecraft:missingno"), tintedOverlay);
 
         int mappedPixels = 0;
         for (int y = 0; y < baseOverlay.getHeight(); y++) {

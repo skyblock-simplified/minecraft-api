@@ -1,6 +1,6 @@
 package dev.sbs.minecraftapi.asset.texture;
 
-import dev.sbs.minecraftapi.asset.AssetNamespaceRegistry;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,9 +55,9 @@ class NamespacePriorityTests {
         registry.addNamespace("minecraft", packATextures, "packA", true);
         registry.addNamespace("minecraft", packBTextures, "packB", false);
 
-        TextureRepository repository = new TextureRepository(packATextures, null, List.of(packBTextures), registry);
+        TextureContext context = new TextureContext(packATextures, null, List.of(packBTextures), registry);
 
-        BufferedImage texture = repository.getTexture("minecraft:block/stone");
+        BufferedImage texture = context.getTexture("minecraft:block/stone");
 
         // The overlay (Pack B) should win because it has higher priority
         int argb = texture.getRGB(0, 0);
@@ -69,7 +69,7 @@ class NamespacePriorityTests {
         assertEquals(0, g, "Expected blue, but got green channel=" + g);
         assertEquals(255, b, "Expected blue (overlay Pack B should win), but got blue channel=" + b);
 
-        repository.close();
+        context.close();
     }
 
     private static void writeSolidColorPng(Path path, int width, int height, Color color) throws IOException {
