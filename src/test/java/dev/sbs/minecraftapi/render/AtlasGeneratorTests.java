@@ -1,5 +1,7 @@
 package dev.sbs.minecraftapi.render;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
 import dev.sbs.minecraftapi.render.context.RenderContext;
 import org.junit.jupiter.api.Disabled;
@@ -24,10 +26,10 @@ class AtlasGeneratorTests extends IntegrationTestBase {
         Path tempDirectory = Files.createTempDirectory("MinecraftRenderer.AtlasTests");
 
         try {
-            List<String> blockSubset = context.getKnownBlockNames().stream().limit(4).toList();
-            List<String> itemSubset = context.getKnownItemNames().stream().limit(4).toList();
+            ConcurrentList<String> blockSubset = context.getKnownBlockNames().stream().limit(4).collect(Concurrent.toList());
+            ConcurrentList<String> itemSubset = context.getKnownItemNames().stream().limit(4).collect(Concurrent.toList());
 
-            List<AtlasGenerator.AtlasView> views = List.of(
+            ConcurrentList<AtlasGenerator.AtlasView> views = Concurrent.newList(
                 new AtlasGenerator.AtlasView("test", BlockRenderOptions.builder()
                     .withSize(256)
                     .build())

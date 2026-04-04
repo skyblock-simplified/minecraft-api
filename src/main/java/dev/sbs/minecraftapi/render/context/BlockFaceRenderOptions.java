@@ -1,13 +1,12 @@
 package dev.sbs.minecraftapi.render.context;
 
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Face;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Immutable options for rendering a single block face.
@@ -25,7 +24,7 @@ public final class BlockFaceRenderOptions {
     private final @NotNull Face direction;
     private final int size;
     private final int rotation;
-    private final @Nullable List<String> packIds;
+    private final @Nullable ConcurrentList<String> packIds;
 
     /**
      * Creates a new empty {@link Builder}.
@@ -67,7 +66,7 @@ public final class BlockFaceRenderOptions {
         private Face direction = Face.UP;
         private int size = 512;
         private int rotation;
-        private List<String> packIds;
+        private ConcurrentList<String> packIds;
 
         /**
          * Sets the face direction to render.
@@ -104,7 +103,7 @@ public final class BlockFaceRenderOptions {
          *
          * @param packIds the pack IDs, or null for no pack override
          */
-        public @NotNull Builder withPackIds(@Nullable List<String> packIds) {
+        public @NotNull Builder withPackIds(@Nullable ConcurrentList<String> packIds) {
             this.packIds = packIds;
             return this;
         }

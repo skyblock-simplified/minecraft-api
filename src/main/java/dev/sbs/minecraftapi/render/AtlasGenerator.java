@@ -8,7 +8,6 @@ import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.RendererApi;
 import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
 import dev.sbs.minecraftapi.asset.ResourcePackDiscovery;
 import dev.sbs.minecraftapi.asset.context.AssetContext;
@@ -122,7 +121,7 @@ public final class AtlasGenerator {
     /**
      * The default set of atlas views covering isometric right, isometric left, and front perspectives.
      */
-    public static final List<AtlasView> DEFAULT_VIEWS = List.of(
+    public static final ConcurrentList<AtlasView> DEFAULT_VIEWS = Concurrent.newUnmodifiableList(
         new AtlasView("isometric_right", BlockRenderOptions.DEFAULT),
         new AtlasView("isometric_left", BlockRenderOptions.builder().withYawInDegrees(45f).build()),
         new AtlasView("front", BlockRenderOptions.builder().build())
@@ -230,8 +229,7 @@ public final class AtlasGenerator {
     }
 
     /**
-     * Initializes resource packs from the given directories and discovered defaults,
-     * caching them into the JPA repository via {@link RendererApi#cacheResourcePacks}.
+     * Initializes resource packs from the given directories and discovered defaults.
      *
      * @param texturePackDirectories directories to register, or null
      * @param texturePackIds pack IDs to validate, or null
