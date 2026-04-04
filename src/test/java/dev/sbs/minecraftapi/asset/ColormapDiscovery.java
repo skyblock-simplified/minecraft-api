@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.asset;
 
-import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,14 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-class ColormapDiscoveryTest {
+/**
+ * Downloads multiple Minecraft versions and scans for colormap directories.
+ * Run directly from the IDE - not a test.
+ */
+class ColormapDiscovery {
 
     private static final List<String> VERSIONS = List.of(
         "1.8.9", "1.13", "1.14", "1.16", "1.17", "1.19", "1.20", "1.21", "latest"
     );
 
-    @Test
-    void downloadAndFindColormaps() throws Exception {
+    public static void main(String[] args) throws Exception {
         Path testRoot = Path.of(System.getProperty("user.dir"), "test");
         Files.createDirectories(testRoot);
 
