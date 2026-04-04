@@ -13,6 +13,11 @@ import dev.sbs.api.persistence.SessionManager;
 import dev.sbs.api.persistence.driver.H2MemoryDriver;
 import dev.sbs.api.scheduler.Scheduler;
 import dev.sbs.api.util.builder.ClassBuilder;
+import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
+import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
+import dev.sbs.minecraftapi.asset.context.AssetContext;
+import dev.sbs.minecraftapi.asset.context.VanillaContext;
+import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.mojang.MojangClient;
@@ -25,12 +30,12 @@ import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
+import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
+import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
+import dev.sbs.minecraftapi.generator.text.segment.TextSegment;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.persistence.SkyBlockFactory;
 import dev.sbs.minecraftapi.persistence.model.Item;
-import dev.sbs.minecraftapi.render.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.render.text.segment.LineSegment;
-import dev.sbs.minecraftapi.render.text.segment.TextSegment;
 import dev.sbs.minecraftapi.skyblock.common.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import lombok.AccessLevel;
@@ -41,6 +46,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Minecraft- and Hypixel-specific extension of {@link SimplifiedApi} that bootstraps all
@@ -83,6 +89,7 @@ public class MinecraftApi extends SimplifiedApi {
             .withTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDate.SkyBlockTime.Adapter())
             .withTypeAdapter(SkyBlockEmojis.class, new SkyBlockEmojis.Deserializer())
             .withTypeAdapter(SkyBlockImages.class, new SkyBlockImages.Deserializer())
+            .withTypeAdapter(TextureReference.class, new TextureReference.Adapter())
             .withTypeAdapter(SkyBlockItems.class, new SkyBlockItems.Deserializer())
             .build();
         serviceManager.update(GsonSettings.class, gsonSettings);
@@ -108,24 +115,7 @@ public class MinecraftApi extends SimplifiedApi {
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
 
         // Provide Json Persistence (H2-backed JPA session)
-        getSessionManager().connect(
-            JpaConfig.builder()
-                .withDriver(new H2MemoryDriver())
-                .withSchema("skyblock")
-                .withRepositoryFactory(new SkyBlockFactory())
-                .withGsonSettings(
-                    gsonSettings.mutate()
-                        .withStringType(GsonSettings.StringType.DEFAULT)
-                        .build()
-                )
-                .withLogLevel(Level.WARN)
-                .isUsingQueryCache()
-                .isUsing2ndLevelCache()
-                .withCacheConcurrencyStrategy(CacheConcurrencyStrategy.READ_WRITE)
-                .withCacheMissingStrategy(CacheMissingStrategy.CREATE_WARN)
-                .withQueryResultsTTL(30)
-                .build()
-        );
+        connectSkyBlockSession();
     }
 
     /**
@@ -216,6 +206,79 @@ public class MinecraftApi extends SimplifiedApi {
      */
     public static @NotNull SessionManager getSessionManager() {
         return serviceManager.get(SessionManager.class);
+    }
+
+    public static void connectSkyBlockSession() {
+        getSessionManager().connect(
+            JpaConfig.builder()
+                .withDriver(new H2MemoryDriver())
+                .withSchema("skyblock")
+                .withRepositoryFactory(new SkyBlockFactory())
+                .withGsonSettings(
+                    getServiceManager()
+                        .get(GsonSettings.class)
+                        .mutate()
+                        .withStringType(GsonSettings.StringType.DEFAULT)
+                        .build()
+                )
+                .withLogLevel(Level.WARN)
+                .isUsingQueryCache()
+                .isUsing2ndLevelCache()
+                .withCacheConcurrencyStrategy(CacheConcurrencyStrategy.READ_WRITE)
+                .withCacheMissingStrategy(CacheMissingStrategy.CREATE_WARN)
+                .withQueryResultsTTL(30)
+                .build()
+        );
+    }
+
+    // ---- Asset loading ----
+
+    /**
+     * Loads Minecraft assets using the given options, connects the H2 asset session, and
+     * registers the factory and asset context in the service manager.
+     *
+     * @param options the asset loading configuration
+     * @return the initialized asset factory
+     * @throws IOException if asset loading fails
+     */
+    public static @NotNull MinecraftAssetFactory loadAssets(@NotNull MinecraftAssetOptions options) throws IOException {
+        MinecraftAssetFactory factory = MinecraftAssetFactory.initialize(options);
+
+        serviceManager.put(MinecraftAssetFactory.class, factory);
+        AssetContext assetContext = VanillaContext.fromFactory(factory);
+        serviceManager.put(AssetContext.class, assetContext);
+
+        GsonSettings gsonSettings = serviceManager.get(GsonSettings.class);
+        JpaConfig assetJpaConfig = JpaConfig.builder()
+            .withDriver(new H2MemoryDriver())
+            .withSchema("assets")
+            .withRepositoryFactory(factory)
+            .withGsonSettings(
+                gsonSettings.mutate()
+                    .withStringType(GsonSettings.StringType.DEFAULT)
+                    .build()
+            )
+            .withLogLevel(org.apache.logging.log4j.Level.WARN)
+            .isUsingQueryCache()
+            .isUsing2ndLevelCache()
+            .withCacheConcurrencyStrategy(org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
+            .withCacheMissingStrategy(CacheMissingStrategy.CREATE_WARN)
+            .withQueryResultsTTL(30)
+            .build();
+
+        factory.setAssetJpaConfig(assetJpaConfig);
+        getSessionManager().connect(assetJpaConfig);
+
+        return factory;
+    }
+
+    /**
+     * Returns the registered asset factory instance.
+     *
+     * @return the asset factory
+     */
+    public static @NotNull MinecraftAssetFactory getAssetFactory() {
+        return serviceManager.get(MinecraftAssetFactory.class);
     }
 
 }
