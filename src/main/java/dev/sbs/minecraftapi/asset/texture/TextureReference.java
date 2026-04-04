@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.asset.model;
+package dev.sbs.minecraftapi.asset.texture;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

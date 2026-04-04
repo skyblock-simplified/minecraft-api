@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.asset;
+package dev.sbs.minecraftapi.asset.namespace;
 
 import org.jetbrains.annotations.NotNull;
 

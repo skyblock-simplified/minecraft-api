@@ -1,10 +1,9 @@
-package dev.sbs.minecraftapi.asset.texture.pack;
+package dev.sbs.minecraftapi.asset.texture;
 
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.asset.ResourcePackDiscovery;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
-import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;

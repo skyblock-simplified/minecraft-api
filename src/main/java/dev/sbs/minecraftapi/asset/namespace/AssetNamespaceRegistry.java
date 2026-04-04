@@ -1,20 +1,18 @@
-package dev.sbs.minecraftapi.asset;
+package dev.sbs.minecraftapi.asset.namespace;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * An ordered list of namespace roots that should be consulted when resolving Minecraft assets.
@@ -25,9 +23,9 @@ import java.util.stream.Collectors;
  */
 public final class AssetNamespaceRegistry {
 
-    private final List<AssetNamespace> roots = new ArrayList<>();
-    private final Map<String, List<AssetNamespace>> rootsByNamespace = new HashMap<>();
-    private final Set<String> deduplicationSet = new HashSet<>();
+    private final ConcurrentList<AssetNamespace> roots = Concurrent.newList();
+    private final ConcurrentMap<String, ConcurrentList<AssetNamespace>> rootsByNamespace = Concurrent.newMap();
+    private final ConcurrentSet<String> deduplicationSet = Concurrent.newSet();
 
     /**
      * Adds a namespace root to the registry using the provided insertion order. Duplicate
@@ -63,15 +61,15 @@ public final class AssetNamespaceRegistry {
         roots.add(root);
 
         rootsByNamespace
-            .computeIfAbsent(namespaceName.toLowerCase(Locale.ROOT), k -> new ArrayList<>())
+            .computeIfAbsent(namespaceName.toLowerCase(Locale.ROOT), k -> Concurrent.newList())
             .add(root);
     }
 
     /**
      * All roots tracked by the registry in insertion order (vanilla first, overlays last).
      */
-    public @NotNull List<AssetNamespace> getRoots() {
-        return Collections.unmodifiableList(roots);
+    public @NotNull ConcurrentList<AssetNamespace> getRoots() {
+        return Concurrent.newUnmodifiableList(roots);
     }
 
     /**
@@ -81,13 +79,12 @@ public final class AssetNamespaceRegistry {
      * @param namespaceName the namespace to look up
      * @return an unmodifiable list of roots for the given namespace
      */
-    public @NotNull List<AssetNamespace> getRoots(@NotNull String namespaceName) {
-        if (namespaceName.isBlank()) {
+    public @NotNull ConcurrentList<AssetNamespace> getRoots(@NotNull String namespaceName) {
+        if (namespaceName.isBlank())
             namespaceName = "minecraft";
-        }
 
-        List<AssetNamespace> bucket = rootsByNamespace.get(namespaceName.toLowerCase(Locale.ROOT));
-        return bucket != null ? Collections.unmodifiableList(bucket) : List.of();
+        ConcurrentList<AssetNamespace> bucket = rootsByNamespace.get(namespaceName.toLowerCase(Locale.ROOT));
+        return bucket != null ? Concurrent.newUnmodifiableList(bucket) : Concurrent.newList();
     }
 
     /**
@@ -99,13 +96,12 @@ public final class AssetNamespaceRegistry {
      * @param fallBackToMinecraft whether to fall back to the {@code "minecraft"} namespace
      * @return an unmodifiable list of resolved roots
      */
-    public @NotNull List<AssetNamespace> resolveRoots(@NotNull String namespaceName,
-                                                          boolean fallBackToMinecraft) {
-        List<AssetNamespace> result = getRoots(namespaceName);
-        if (result.isEmpty() && fallBackToMinecraft &&
-            !namespaceName.equalsIgnoreCase("minecraft")) {
+    public @NotNull ConcurrentList<AssetNamespace> resolveRoots(@NotNull String namespaceName, boolean fallBackToMinecraft) {
+        ConcurrentList<AssetNamespace> result = getRoots(namespaceName);
+
+        if (result.isEmpty() && fallBackToMinecraft && !namespaceName.equalsIgnoreCase("minecraft"))
             return getRoots("minecraft");
-        }
+
         return result;
     }
 
@@ -116,7 +112,7 @@ public final class AssetNamespaceRegistry {
      * @param namespaceName the namespace to resolve
      * @return an unmodifiable list of resolved roots
      */
-    public @NotNull List<AssetNamespace> resolveRoots(@NotNull String namespaceName) {
+    public @NotNull ConcurrentList<AssetNamespace> resolveRoots(@NotNull String namespaceName) {
         return resolveRoots(namespaceName, true);
     }
 
@@ -169,20 +165,17 @@ public final class AssetNamespaceRegistry {
      * @param sourceId the source identifier to filter by
      * @return an unmodifiable list of matching roots
      */
-    public @NotNull List<AssetNamespace> getRoots(@NotNull String namespaceName,
-                                                      @NotNull String sourceId) {
-        if (namespaceName.isBlank()) {
+    public @NotNull ConcurrentList<AssetNamespace> getRoots(@NotNull String namespaceName, @NotNull String sourceId) {
+        if (namespaceName.isBlank())
             namespaceName = "minecraft";
-        }
 
-        List<AssetNamespace> bucket = rootsByNamespace.get(namespaceName.toLowerCase(Locale.ROOT));
-        if (bucket == null) {
-            return List.of();
-        }
+        ConcurrentList<AssetNamespace> bucket = rootsByNamespace.get(namespaceName.toLowerCase(Locale.ROOT));
+        if (bucket == null)
+            return Concurrent.newList();
 
         return bucket.stream()
             .filter(root -> root.sourceId().equalsIgnoreCase(sourceId))
-            .collect(Collectors.toUnmodifiableList());
+            .collect(Concurrent.toUnmodifiableList());
     }
 
     // ================================================================
@@ -198,10 +191,7 @@ public final class AssetNamespaceRegistry {
      * @param overlayRoots the overlay roots to register after vanilla
      * @return a populated registry
      */
-    public static @NotNull AssetNamespaceRegistry buildFromRoots(
-        @NotNull String assetsDirectory,
-        @NotNull List<OverlayRoot> overlayRoots
-    ) {
+    public static @NotNull AssetNamespaceRegistry buildFromRoots(@NotNull String assetsDirectory, @NotNull ConcurrentList<OverlayRoot> overlayRoots) {
         AssetNamespaceRegistry registry = new AssetNamespaceRegistry();
 
         if (!assetsDirectory.isBlank() && Files.isDirectory(Path.of(assetsDirectory)))
@@ -214,15 +204,25 @@ public final class AssetNamespaceRegistry {
     }
 
     private static void addOverlayNamespaces(@NotNull AssetNamespaceRegistry registry, @NotNull OverlayRoot overlay) {
-        if (overlay.path() == null || overlay.path().isBlank() || !Files.isDirectory(Path.of(overlay.path())))
+        if (overlay.path() == null)
             return;
 
-        Path normalized = Path.of(overlay.path()).toAbsolutePath();
+        Path path = Path.of(overlay.path());
+
+        if (overlay.path().isBlank() || !Files.isDirectory(path))
+            return;
+
+        Path normalized = path.toAbsolutePath();
         Path parent = normalized.getParent();
-        if (parent != null && parent.getFileName() != null
-            && parent.getFileName().toString().equalsIgnoreCase("assets")) {
-            registerNamespaceRoot(registry, normalized.getFileName().toString(),
-                normalized.toString(), overlay.sourceId(), overlay.kind() == OverlayRoot.Kind.VANILLA);
+        if (parent != null && parent.getFileName() != null && parent.getFileName().toString().equalsIgnoreCase("assets")) {
+            registerNamespaceRoot(
+                registry,
+                normalized.getFileName().toString(),
+                normalized.toString(),
+                overlay.sourceId(),
+                overlay.kind() == OverlayRoot.Kind.VANILLA
+            );
+
             return;
         }
 
@@ -234,8 +234,8 @@ public final class AssetNamespaceRegistry {
                     .forEach(nsDir -> registerNamespaceRoot(registry, nsDir.getFileName().toString(),
                         nsDir.toAbsolutePath().toString(), overlay.sourceId(),
                         overlay.kind() == OverlayRoot.Kind.VANILLA));
-            } catch (Exception ignored) {
-            }
+            } catch (Exception ignored) { }
+
             return;
         }
 
@@ -243,11 +243,10 @@ public final class AssetNamespaceRegistry {
             overlay.kind() == OverlayRoot.Kind.VANILLA);
     }
 
-    private static void registerNamespaceRoot(@NotNull AssetNamespaceRegistry registry,
-                                               @NotNull String namespaceName, @NotNull String path,
-                                               @NotNull String sourceId, boolean isVanilla) {
+    private static void registerNamespaceRoot(@NotNull AssetNamespaceRegistry registry, @NotNull String namespaceName, @NotNull String path, @NotNull String sourceId, boolean isVanilla) {
         registry.addNamespace(namespaceName, path, sourceId, isVanilla);
         Path texturesPath = Path.of(path, "textures");
+
         if (Files.isDirectory(texturesPath))
             registry.addNamespace(namespaceName, texturesPath.toString(), sourceId, isVanilla);
     }
