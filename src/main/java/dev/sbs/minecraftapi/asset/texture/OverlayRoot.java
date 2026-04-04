@@ -1,14 +1,13 @@
 package dev.sbs.minecraftapi.asset.texture;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * An overlay root path paired with its source identifier and kind.
@@ -23,9 +22,11 @@ public record OverlayRoot(String path, String sourceId, Kind kind) {
      * The kind of overlay root used for asset resolution priority ordering.
      */
     public enum Kind {
+
         CUSTOM_DATA,
         RESOURCE_PACK,
         VANILLA
+
     }
 
     /**
@@ -35,8 +36,8 @@ public record OverlayRoot(String path, String sourceId, Kind kind) {
      * @param assetsDirectory the Minecraft assets root directory
      * @return a list of discovered overlay roots
      */
-    public static @NotNull List<OverlayRoot> discoverFromAssetsDirectory(@NotNull String assetsDirectory) {
-        List<OverlayRoot> overlays = new ArrayList<>();
+    public static @NotNull ConcurrentList<OverlayRoot> discoverFromAssetsDirectory(@NotNull String assetsDirectory) {
+        ConcurrentList<OverlayRoot> overlays = Concurrent.newList();
         Path assetRoot = Path.of(assetsDirectory).toAbsolutePath();
         Path parent = assetRoot.getParent();
 
@@ -47,7 +48,7 @@ public record OverlayRoot(String path, String sourceId, Kind kind) {
         return overlays;
     }
 
-    private static void tryAddOverlay(@NotNull List<OverlayRoot> overlays, @NotNull String candidate) {
+    private static void tryAddOverlay(@NotNull ConcurrentList<OverlayRoot> overlays, @NotNull String candidate) {
         Path fullPath = Path.of(candidate).toAbsolutePath();
         if (!Files.isDirectory(fullPath))
             return;
@@ -68,13 +69,15 @@ public record OverlayRoot(String path, String sourceId, Kind kind) {
      * @param roots the overlay roots to extract paths from
      * @return a list of unique overlay paths
      */
-    public static @NotNull List<String> extractUniquePaths(@NotNull List<OverlayRoot> roots) {
-        List<String> paths = new ArrayList<>();
-        Set<String> seen = new HashSet<>();
+    public static @NotNull ConcurrentList<String> extractUniquePaths(@NotNull ConcurrentList<OverlayRoot> roots) {
+        ConcurrentList<String> paths = Concurrent.newList();
+        ConcurrentSet<String> seen = Concurrent.newSet();
+
         for (OverlayRoot root : roots) {
             if (seen.add(root.path().toLowerCase(Locale.ROOT)))
                 paths.add(root.path());
         }
+
         return paths;
     }
 }

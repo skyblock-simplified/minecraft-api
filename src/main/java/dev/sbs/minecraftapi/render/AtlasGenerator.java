@@ -5,10 +5,9 @@ import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.RendererApi;
-import dev.sbs.minecraftapi.asset.AssetContext;
 import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
-import dev.sbs.minecraftapi.asset.PackSnapshot;
 import dev.sbs.minecraftapi.asset.ResourcePackDiscovery;
+import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
@@ -163,12 +162,10 @@ public final class AtlasGenerator {
 
         MinecraftApi.loadAssets(MinecraftAssetOptions.builder().withAssetsDirectory(options.getAssetsDirectory()).build());
         List<String> packIds = options.getTexturePackIds();
-        PackSnapshot snapshot = (packIds != null && !packIds.isEmpty())
-            ? MinecraftApi.getAssetFactory().loadPackSnapshot(packIds) : null;
-        try (RenderContext context = snapshot != null
-            ? new RenderContext(snapshot, options.getAssetsDirectory(),
-                MinecraftApi.getServiceManager().get(AssetContext.class).getBaseOverlayRoots())
-            : new RenderContext(MinecraftApi.getServiceManager().get(AssetContext.class))) {
+        AssetContext renderAssetContext = (packIds != null && !packIds.isEmpty())
+            ? MinecraftApi.getAssetFactory().loadPackContext(packIds)
+            : MinecraftApi.getServiceManager().get(AssetContext.class);
+        try (RenderContext context = new RenderContext(renderAssetContext)) {
 
             List<AtlasResult> results = new ArrayList<>();
 

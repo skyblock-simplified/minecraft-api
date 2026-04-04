@@ -1,6 +1,6 @@
 package dev.sbs.minecraftapi.render.data;
 
-import dev.sbs.minecraftapi.asset.Namespace;
+import dev.sbs.minecraftapi.asset.namespace.Namespace;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -9,6 +9,7 @@ import dev.sbs.api.math.Vector4f;
 import dev.sbs.api.persistence.JpaModel;
 import dev.sbs.api.persistence.type.GsonType;
 import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
