@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render.resolver;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.render.IntegrationTestBase;
 import dev.sbs.minecraftapi.render.ItemRenderer;
@@ -29,7 +30,7 @@ class HypixelPackTests extends IntegrationTestBase {
             "Hypixel+ texture pack not found - skipping integration test");
 
         RenderContext context = createRenderContext(
-            assetsDir, List.of("hypixelplus"));
+            assetsDir, Concurrent.newList("hypixelplus"));
 
         CompoundTag customData = new CompoundTag();
         customData.put("id", "AATROX_BATPHONE");
