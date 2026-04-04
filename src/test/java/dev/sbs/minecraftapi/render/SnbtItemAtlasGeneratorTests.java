@@ -1,6 +1,7 @@
 package dev.sbs.minecraftapi.render;
 
 import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,7 +41,7 @@ class SnbtItemAtlasGeneratorTests extends IntegrationTestBase {
         String packId = "snbt_custom_head_pack";
         Path packRoot = createCustomHeadPack(packId, new Color(0xD4, 0x34, 0x2C));
 
-        registerPacks(List.of(packRoot.toString()));
+        registerPacks(Concurrent.newUnmodifiableList(packRoot.toString()));
 
         RenderContext context = createRenderContext(
             assetsDir, Concurrent.newList(packId));
@@ -55,7 +55,7 @@ class SnbtItemAtlasGeneratorTests extends IntegrationTestBase {
 
         BlockRenderOptions directOptions = BlockRenderOptions.builder()
             .withSize(64)
-            .withPackIds(List.of(packId))
+            .withPackIds(Concurrent.newUnmodifiableList(packId))
             .build();
 
         BufferedImage directRender = new ItemRenderer(context, "player_head", itemData, directOptions).render();
@@ -84,20 +84,21 @@ class SnbtItemAtlasGeneratorTests extends IntegrationTestBase {
             rootCompound,
             null);
 
-        List<AtlasGenerator.AtlasView> views = List.of(
+        ConcurrentList<AtlasGenerator.AtlasView> views = Concurrent.newUnmodifiableList(
             new AtlasGenerator.AtlasView("front", BlockRenderOptions.builder()
                 .withSize(64)
-                .withPackIds(List.of(packId))
+                .withPackIds(Concurrent.newUnmodifiableList(packId))
                 .build())
         );
 
         Path outputDirectory = tempRoot.resolve("output");
-        List<AtlasGenerator.AtlasResult> results = AtlasGenerator.generateSnbtAtlases(
+        ConcurrentList<AtlasGenerator.AtlasResult> results = AtlasGenerator.generateSnbtAtlases(
             context,
             outputDirectory.toString(),
             views,
             32, 1, 1,
-            List.of(entry));
+            Concurrent.newUnmodifiableList(entry)
+        );
 
         assertEquals(1, results.size());
         AtlasGenerator.AtlasResult atlas = results.get(0);

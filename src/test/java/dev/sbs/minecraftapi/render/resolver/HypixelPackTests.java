@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -39,7 +38,7 @@ class HypixelPackTests extends IntegrationTestBase {
 
         BlockRenderOptions options = BlockRenderOptions.builder()
             .withSize(64)
-            .withPackIds(List.of("hypixelplus"))
+            .withPackIds(Concurrent.newUnmodifiableList("hypixelplus"))
             .withItemData(itemData)
             .build();
 

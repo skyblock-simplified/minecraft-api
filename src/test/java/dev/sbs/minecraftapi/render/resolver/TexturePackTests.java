@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render.resolver;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
 import dev.sbs.minecraftapi.render.BlockRenderer;
@@ -8,6 +9,7 @@ import dev.sbs.minecraftapi.render.ItemRenderer;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
 import dev.sbs.minecraftapi.render.context.ItemRenderData;
 import dev.sbs.minecraftapi.render.context.RenderContext;
+import lombok.Cleanup;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +53,7 @@ class TexturePackTests extends IntegrationTestBase {
 
         BlockRenderOptions packOptions = BlockRenderOptions.builder()
             .withSize(128)
-            .withPackIds(List.of("testpack"))
+            .withPackIds(Concurrent.newUnmodifiableList("testpack"))
             .build();
 
         BufferedImage packStone = new BlockRenderer(context, "stone", packOptions).render();
@@ -98,9 +100,9 @@ class TexturePackTests extends IntegrationTestBase {
             "cit", new Color(220, 20, 60)
         ));
 
-        registerPacks(List.of(packRoot.toString()));
+        registerPacks(Concurrent.newList(packRoot.toString()));
 
-        TexturePackStack stack = TexturePackStack.buildPackStack(List.of("prioritypack"));
+        TexturePackStack stack = TexturePackStack.buildPackStack(Concurrent.newList("prioritypack"));
         List<String> overlayPaths = stack.getOverlayRoots().stream()
             .filter(overlay -> overlay.sourceId().equalsIgnoreCase("prioritypack"))
             .map(OverlayRoot::path)
@@ -142,7 +144,7 @@ class TexturePackTests extends IntegrationTestBase {
         context.preloadRegisteredPacks();
 
         BlockRenderOptions packOptions = BlockRenderOptions.builder()
-            .withPackIds(List.of("warmup-pack"))
+            .withPackIds(Concurrent.newUnmodifiableList("warmup-pack"))
             .build();
         ResourceIdResult result = context.computeResourceId("stone", packOptions);
         assertNotNull(result);
@@ -164,7 +166,7 @@ class TexturePackTests extends IntegrationTestBase {
         assertEquals(vanillaFirst.getSourcePackId(), vanillaSecond.getSourcePackId());
 
         BlockRenderOptions packOptions = BlockRenderOptions.builder()
-            .withPackIds(List.of("stable-pack"))
+            .withPackIds(Concurrent.newUnmodifiableList("stable-pack"))
             .build();
 
         ResourceIdResult packFirst = context.computeResourceId("stone", packOptions);
@@ -196,7 +198,9 @@ class TexturePackTests extends IntegrationTestBase {
             .withSize(128)
             .build();
 
-        BlockRenderOptions packOptions = baselineOptions.mutate().withPackIds(List.of("combined-id-pack")).build();
+        BlockRenderOptions packOptions = baselineOptions.mutate()
+            .withPackIds(Concurrent.newUnmodifiableList("combined-id-pack"))
+            .build();
 
         ItemRenderData tintedItemData = new ItemRenderData(
             new int[]{80, 25, 180}, null, false, null, null);
@@ -210,7 +214,7 @@ class TexturePackTests extends IntegrationTestBase {
         );
 
         for (TestCase tc : testCases) {
-            RenderedResource combined = new ItemRenderer(context, tc.target, tc.options).renderWithResourceId();
+            @Cleanup RenderedResource combined = new ItemRenderer(context, tc.target, tc.options).renderWithResourceId();
             BufferedImage separateImage = new ItemRenderer(context, tc.target, tc.options).render();
             ResourceIdResult resourceId = context.computeResourceId(tc.target, tc.options);
 

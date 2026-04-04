@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render.resolver;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.ByteTag;
 import dev.sbs.minecraftapi.render.IntegrationTestBase;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import java.awt.image.BufferedImage;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -31,7 +31,7 @@ class PotionRenderingTests extends IntegrationTestBase {
 
         BlockRenderOptions options = BlockRenderOptions.builder()
             .withSize(128)
-            .withPackIds(List.of("hypixelplus"))
+            .withPackIds(Concurrent.newUnmodifiableList("hypixelplus"))
             .build();
 
         CompoundTag customData = new CompoundTag();

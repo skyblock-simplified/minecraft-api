@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render.resolver;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.nbt.tags.array.IntArrayTag;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.collection.ListTag;
@@ -51,7 +52,7 @@ class ItemModelSelectorTests extends IntegrationTestBase {
 
         BlockRenderOptions options = BlockRenderOptions.builder()
             .withSize(64)
-            .withPackIds(List.of(packId))
+            .withPackIds(Concurrent.newUnmodifiableList(packId))
             .build();
 
         CompoundTag customData = new CompoundTag();
@@ -112,13 +113,13 @@ class ItemModelSelectorTests extends IntegrationTestBase {
 
         Path packRoot = createCustomHeadPack(packId, new Color(0x12, 0x34, 0x56), itemDefinition, modelName);
 
-        registerPacks(List.of(packRoot.toString()));
+        registerPacks(Concurrent.newUnmodifiableList(packRoot.toString()));
 
         RenderContext context = createRenderContext(assetsDir, null);
 
         BlockRenderOptions options = BlockRenderOptions.builder()
             .withSize(64)
-            .withPackIds(List.of(packId))
+            .withPackIds(Concurrent.newUnmodifiableList(packId))
             .build();
 
         CompoundTag runesCompound = new CompoundTag();
@@ -161,7 +162,7 @@ class ItemModelSelectorTests extends IntegrationTestBase {
 
         BlockRenderOptions options = BlockRenderOptions.builder()
             .withSize(64)
-            .withPackIds(List.of(packId))
+            .withPackIds(Concurrent.newUnmodifiableList(packId))
             .build();
 
         CompoundTag customData = new CompoundTag();
