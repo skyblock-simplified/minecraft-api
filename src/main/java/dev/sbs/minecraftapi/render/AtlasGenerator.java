@@ -2,6 +2,10 @@ package dev.sbs.minecraftapi.render;
 
 import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
+import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.RendererApi;
@@ -32,14 +36,8 @@ import java.io.UncheckedIOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 /**
@@ -149,10 +147,10 @@ public final class AtlasGenerator {
 
         Files.createDirectories(Path.of(options.getOutputDirectory()));
 
-        List<AtlasView> views = resolveViews(options.getViewNames());
+        ConcurrentList<AtlasView> views = resolveViews(options.getViewNames());
         if (options.getTexturePackIds() != null && !options.getTexturePackIds().isEmpty()) {
-            List<String> packList = List.copyOf(options.getTexturePackIds());
-            List<AtlasView> updated = new ArrayList<>(views.size());
+            ConcurrentList<String> packList = Concurrent.newList(options.getTexturePackIds());
+            ConcurrentList<AtlasView> updated = Concurrent.newList(views.size());
             for (AtlasView view : views)
                 updated.add(new AtlasView(view.getName(), view.getOptions().mutate().withPackIds(packList).build()));
             views = updated;
@@ -161,20 +159,20 @@ public final class AtlasGenerator {
         initializeResourcePacks(options.getTexturePackDirectories(), options.getTexturePackIds(), options.getAssetsDirectory());
 
         MinecraftApi.loadAssets(MinecraftAssetOptions.builder().withAssetsDirectory(options.getAssetsDirectory()).build());
-        List<String> packIds = options.getTexturePackIds();
+        ConcurrentList<String> packIds = options.getTexturePackIds();
         AssetContext renderAssetContext = (packIds != null && !packIds.isEmpty())
             ? MinecraftApi.getAssetFactory().loadPackContext(packIds)
             : MinecraftApi.getServiceManager().get(AssetContext.class);
         try (RenderContext context = new RenderContext(renderAssetContext)) {
 
-            List<AtlasResult> results = new ArrayList<>();
+            List<AtlasResult> results = Concurrent.newList();
 
             if (options.getSnbtItemDirectory() != null && !options.getSnbtItemDirectory().isBlank()) {
                 Path snbtDir = Path.of(options.getSnbtItemDirectory()).toAbsolutePath();
                 if (!Files.isDirectory(snbtDir))
                     throw new IllegalArgumentException("SNBT directory '%s' does not exist".formatted(snbtDir));
 
-                List<SnbtItemEntry> snbtEntries = loadSnbtDirectory(snbtDir.toString());
+                ConcurrentList<SnbtItemEntry> snbtEntries = loadSnbtDirectory(snbtDir.toString());
                 if (!snbtEntries.isEmpty()) {
                     String snbtOutput = Path.of(options.getOutputDirectory(), "snbt").toString();
                     results.addAll(generateSnbtAtlases(context, snbtOutput, views,
@@ -212,20 +210,22 @@ public final class AtlasGenerator {
      * @param viewNames the requested view names, or null for all defaults
      * @return the resolved views
      */
-    public static @NotNull List<AtlasView> resolveViews(@Nullable List<String> viewNames) {
+    public static @NotNull ConcurrentList<AtlasView> resolveViews(@Nullable ConcurrentList<String> viewNames) {
         if (viewNames == null || viewNames.isEmpty())
-            return new ArrayList<>(DEFAULT_VIEWS);
+            return Concurrent.newList(DEFAULT_VIEWS);
 
-        LinkedHashMap<String, AtlasView> allViews = new LinkedHashMap<>();
+        ConcurrentMap<String, AtlasView> allViews = Concurrent.newLinkedMap();
         for (AtlasView view : DEFAULT_VIEWS)
             allViews.put(view.getName().toLowerCase(Locale.ROOT), view);
 
-        List<AtlasView> selected = new ArrayList<>(viewNames.size());
+        ConcurrentList<AtlasView> selected = Concurrent.newList(viewNames.size());
         for (String name : viewNames) {
             AtlasView view = allViews.get(name.toLowerCase(Locale.ROOT));
+            
             if (view != null)
                 selected.add(view);
         }
+        
         return selected;
     }
 
@@ -237,28 +237,24 @@ public final class AtlasGenerator {
      * @param texturePackIds pack IDs to validate, or null
      * @param assetsPath the assets directory for default pack discovery
      */
-    static void initializeResourcePacks(
-        @Nullable List<String> texturePackDirectories,
-        @Nullable List<String> texturePackIds,
-        @NotNull String assetsPath) throws IOException {
-
+    static void initializeResourcePacks(@Nullable ConcurrentList<String> texturePackDirectories, @Nullable ConcurrentList<String> texturePackIds, @NotNull String assetsPath) throws IOException {
         boolean needsPacks = (texturePackDirectories != null && !texturePackDirectories.isEmpty())
             || (texturePackIds != null && !texturePackIds.isEmpty());
-        List<String> discovered = discoverDefaultTexturePacks(assetsPath);
+        ConcurrentList<String> discovered = discoverDefaultTexturePacks(assetsPath);
 
         if (!needsPacks && discovered.isEmpty())
             return;
 
-        List<String> allDirectories = new ArrayList<>(discovered);
+        ConcurrentList<String> allDirectories = Concurrent.newList(discovered);
         if (texturePackDirectories != null)
             allDirectories.addAll(texturePackDirectories);
 
         ResourcePackDiscovery.discoverPacks(allDirectories);
     }
 
-    private static @NotNull List<String> discoverDefaultTexturePacks(@NotNull String assetsPath) {
-        List<String> results = new ArrayList<>();
-        Set<String> searchRoots = new HashSet<>();
+    private static @NotNull ConcurrentList<String> discoverDefaultTexturePacks(@NotNull String assetsPath) {
+        ConcurrentList<String> results = Concurrent.newList();
+        ConcurrentSet<String> searchRoots = Concurrent.newSet();
         searchRoots.add(Path.of(System.getProperty("user.dir"), "texturepacks").toString());
 
         Path assetsParent = Path.of(assetsPath).toAbsolutePath().getParent();
@@ -266,9 +262,11 @@ public final class AtlasGenerator {
             searchRoots.add(assetsParent.resolve("texturepacks").toString());
 
         for (String root : searchRoots) {
-            if (!Files.isDirectory(Path.of(root)))
+            Path path = Path.of(root);
+            if (!Files.isDirectory(path))
                 continue;
-            try (DirectoryStream<Path> stream = Files.newDirectoryStream(Path.of(root), Files::isDirectory)) {
+            
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(path, Files::isDirectory)) {
                 for (Path directory : stream) {
                     if (Files.exists(directory.resolve("meta.json")))
                         results.add(directory.toString());
@@ -300,15 +298,15 @@ public final class AtlasGenerator {
      * @param includeItems whether to include items in the atlas
      * @return the list of generated atlas result metadata
      */
-    public static @NotNull List<AtlasResult> generateBlockItemAtlases(
+    public static @NotNull ConcurrentList<AtlasResult> generateBlockItemAtlases(
         @NotNull RenderContext context,
         @NotNull String outputDirectory,
-        @NotNull List<AtlasView> views,
+        @NotNull ConcurrentList<AtlasView> views,
         int tileSize,
         int columns,
         int rows,
-        @Nullable List<String> blockFilter,
-        @Nullable List<String> itemFilter,
+        @Nullable ConcurrentList<String> blockFilter,
+        @Nullable ConcurrentList<String> itemFilter,
         boolean includeBlocks,
         boolean includeItems
     ) {
@@ -316,10 +314,10 @@ public final class AtlasGenerator {
 
         Path outDir = ensureOutputDirectory(outputDirectory);
 
-        List<String> blockNames = getCandidateBlockNames(context, blockFilter, includeBlocks);
-        List<String> itemNames = getCandidateItemNames(context, itemFilter, includeItems);
+        ConcurrentList<String> blockNames = getCandidateBlockNames(context, blockFilter, includeBlocks);
+        ConcurrentList<String> itemNames = getCandidateItemNames(context, itemFilter, includeItems);
 
-        List<AtlasResult> results = new ArrayList<>();
+        ConcurrentList<AtlasResult> results = Concurrent.newList();
         int perPage = columns * rows;
 
         if (!blockNames.isEmpty()) {
@@ -349,10 +347,10 @@ public final class AtlasGenerator {
      * @param views the list of view configurations
      * @return the list of generated atlas result metadata
      */
-    public static @NotNull List<AtlasResult> generateBlockItemAtlases(
+    public static @NotNull ConcurrentList<AtlasResult> generateBlockItemAtlases(
         @NotNull RenderContext context,
         @NotNull String outputDirectory,
-        @NotNull List<AtlasView> views
+        @NotNull ConcurrentList<AtlasView> views
     ) {
         return generateBlockItemAtlases(context, outputDirectory, views, 128, 16, 16, null, null, true, true);
     }
@@ -367,28 +365,30 @@ public final class AtlasGenerator {
      * @param directory the directory containing SNBT files
      * @return the list of loaded entries, sorted by file name
      */
-    public static @NotNull List<SnbtItemEntry> loadSnbtDirectory(@NotNull String directory) {
-        if (directory == null || directory.isBlank())
+    public static @NotNull ConcurrentList<SnbtItemEntry> loadSnbtDirectory(@NotNull String directory) {
+        if (StringUtil.isEmpty(directory))
             throw new IllegalArgumentException("directory must not be null or blank");
 
         Path dir = Path.of(directory);
         if (!Files.isDirectory(dir))
             throw new IllegalArgumentException("SNBT item directory '" + directory + "' does not exist.");
 
-        List<Path> snbtFiles = new ArrayList<>();
+        ConcurrentList<Path> snbtFiles = Concurrent.newList();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.snbt")) {
-            for (Path path : stream)
+            for (Path path : stream) {
                 if (Files.isRegularFile(path))
                     snbtFiles.add(path);
+            }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
 
         snbtFiles.sort((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(a.toString(), b.toString()));
 
-        List<SnbtItemEntry> results = new ArrayList<>();
+        ConcurrentList<SnbtItemEntry> results = Concurrent.newList();
         for (Path path : snbtFiles) {
             String name = getFileNameWithoutExtension(path);
+
             try {
                 String content = Files.readString(path);
                 CompoundTag rootCompound = new NbtFactory().fromSnbt(content);
@@ -413,22 +413,22 @@ public final class AtlasGenerator {
      * @param items the list of SNBT item entries to render
      * @return the list of generated atlas result metadata
      */
-    public static @NotNull List<AtlasResult> generateSnbtAtlases(
+    public static @NotNull ConcurrentList<AtlasResult> generateSnbtAtlases(
         @NotNull RenderContext context,
         @NotNull String outputDirectory,
-        @NotNull List<AtlasView> views,
+        @NotNull ConcurrentList<AtlasView> views,
         int tileSize,
         int columns,
         int rows,
-        @NotNull List<SnbtItemEntry> items
+        @NotNull ConcurrentList<SnbtItemEntry> items
     ) {
         if (items.isEmpty())
-            return Collections.emptyList();
+            return Concurrent.newUnmodifiableList();
 
         validateGridParameters(tileSize, columns, rows, views);
         Path outDir = ensureOutputDirectory(outputDirectory);
 
-        List<AtlasResult> results = new ArrayList<>();
+        ConcurrentList<AtlasResult> results = Concurrent.newList();
         int perPage = columns * rows;
         String category = "snbt-items";
 
@@ -441,8 +441,8 @@ public final class AtlasGenerator {
                 if (count <= 0)
                     continue;
 
-                List<AtlasManifestEntry> manifestEntries = new ArrayList<>(count);
-                List<BufferedImage> pageTiles = new ArrayList<>(count);
+                ConcurrentList<AtlasManifestEntry> manifestEntries = Concurrent.newList(count);
+                ConcurrentList<BufferedImage> pageTiles = Concurrent.newList(count);
 
                 for (int localIndex = 0; localIndex < count; localIndex++) {
                     SnbtItemEntry entry = items.get(startIndex + localIndex);
@@ -452,7 +452,7 @@ public final class AtlasGenerator {
                     String label = entry.name;
                     String error = entry.error;
                     String model = null;
-                    List<String> textures = null;
+                    ConcurrentList<String> textures = null;
                     String texturePack = null;
 
                     if (entry.rootCompound != null) {
@@ -534,7 +534,7 @@ public final class AtlasGenerator {
             throw new UncheckedIOException("Failed to read inventory data file", e);
         }
 
-        List<HypixelItemData> items = InventoryParser.parseInventory(base64Data);
+        ConcurrentList<HypixelItemData> items = InventoryParser.parseInventory(base64Data);
         System.out.println("[HypixelInventoryAtlas] Parsed " + items.size() + " items from inventory");
 
         if (items.isEmpty()) {
@@ -543,8 +543,8 @@ public final class AtlasGenerator {
         }
 
         int rows = (items.size() + columns - 1) / columns;
-        List<Map<String, Object>> manifest = new ArrayList<>();
-        List<BufferedImage> tiles = new ArrayList<>(items.size());
+        ConcurrentList<ConcurrentMap<String, Object>> manifest = Concurrent.newList();
+        ConcurrentList<BufferedImage> tiles = Concurrent.newList(items.size());
         int errorCount = 0;
 
         for (int i = 0; i < items.size(); i++) {
@@ -561,7 +561,8 @@ public final class AtlasGenerator {
                 CompoundTag customData = null;
                 CompoundTag tag = item.getTag();
                 if (tag != null && tag.containsPath("ExtraAttributes.id")) {
-                    StringTag skyblockIdTag = tag.getPath("ExtraAttributes.id");
+                    StringTag skyblockIdTag = tag.getPathOrDefault("ExtraAttributes.id", StringTag.EMPTY);
+
                     if (skyblockIdTag.notEmpty()) {
                         CompoundTag customDataCompound = new CompoundTag();
                         customDataCompound.put("id", skyblockIdTag.getValue());
@@ -584,7 +585,7 @@ public final class AtlasGenerator {
                     System.out.println("  WARNING: Unknown item format, using fallback");
                 }
 
-                List<String> packIds = texturePackId != null ? List.of(texturePackId) : null;
+                ConcurrentList<String> packIds = texturePackId != null ? Concurrent.newList(texturePackId) : null;
                 BlockRenderOptions renderOptions = BlockRenderOptions.builder()
                     .withSize(tileSize)
                     .withPackIds(packIds)
@@ -610,7 +611,7 @@ public final class AtlasGenerator {
 
                 tiles.add(new ItemRenderer(context, itemKey, itemRenderData, renderOptions).render());
 
-                Map<String, Object> entry = new LinkedHashMap<>();
+                ConcurrentMap<String, Object> entry = Concurrent.newLinkedMap();
                 entry.put("index", i);
                 entry.put("skyblock_id", item.getSkyblockId());
                 entry.put("item_id", item.getItemId());
@@ -622,7 +623,7 @@ public final class AtlasGenerator {
                 entry.put("has_gems", item.getGems() != null);
                 entry.put("has_attributes", item.getAttributes() != null);
 
-                Map<String, Object> position = new LinkedHashMap<>();
+                ConcurrentMap<String, Object> position = Concurrent.newLinkedMap();
                 position.put("x", col);
                 position.put("y", row);
                 entry.put("position", position);
@@ -633,7 +634,7 @@ public final class AtlasGenerator {
                 errorCount++;
                 tiles.add(createPlaceholderTile());
 
-                Map<String, Object> entry = new LinkedHashMap<>();
+                ConcurrentMap<String, Object> entry = Concurrent.newLinkedMap();
                 entry.put("index", i);
                 entry.put("skyblock_id", item.getSkyblockId());
                 entry.put("item_id", item.getItemId());
@@ -641,7 +642,7 @@ public final class AtlasGenerator {
                 entry.put("display_name", item.getDisplayName());
                 entry.put("error", ex.getMessage());
 
-                Map<String, Object> position = new LinkedHashMap<>();
+                ConcurrentMap<String, Object> position = Concurrent.newLinkedMap();
                 position.put("x", col);
                 position.put("y", row);
                 entry.put("position", position);
@@ -662,7 +663,7 @@ public final class AtlasGenerator {
         Path atlasPath = outDir.resolve("hypixel_inventory_" + baseName + ".png");
         Path manifestPath = outDir.resolve("hypixel_inventory_" + baseName + ".json");
 
-        Map<String, Object> manifestRoot = new LinkedHashMap<>();
+        ConcurrentMap<String, Object> manifestRoot = Concurrent.newLinkedMap();
         manifestRoot.put("source", inventoryDataPath);
         manifestRoot.put("texture_pack", texturePackId);
         manifestRoot.put("tile_size", tileSize);
@@ -697,13 +698,13 @@ public final class AtlasGenerator {
      * @param includeBlocks whether blocks should be included at all
      * @return the sorted candidate block name list
      */
-    public static @NotNull List<String> getCandidateBlockNames(
-        @NotNull RenderContext context, @Nullable List<String> blockFilter, boolean includeBlocks) {
+    public static @NotNull ConcurrentList<String> getCandidateBlockNames(@NotNull RenderContext context, @Nullable List<String> blockFilter, boolean includeBlocks) {
         if (!includeBlocks)
-            return Collections.emptyList();
-        List<String> names = blockFilter != null
-            ? new ArrayList<>(blockFilter)
-            : new ArrayList<>(context.getKnownBlockNames());
+            return Concurrent.newUnmodifiableList();
+
+        ConcurrentList<String> names = blockFilter != null
+            ? Concurrent.newList(blockFilter)
+            : Concurrent.newList(context.getKnownBlockNames());
         names.sort(String.CASE_INSENSITIVE_ORDER);
         return names;
     }
@@ -716,13 +717,13 @@ public final class AtlasGenerator {
      * @param includeItems whether items should be included at all
      * @return the sorted candidate item name list
      */
-    public static @NotNull List<String> getCandidateItemNames(
-        @NotNull RenderContext context, @Nullable List<String> itemFilter, boolean includeItems) {
+    public static @NotNull ConcurrentList<String> getCandidateItemNames(@NotNull RenderContext context, @Nullable List<String> itemFilter, boolean includeItems) {
         if (!includeItems)
-            return Collections.emptyList();
-        List<String> names = itemFilter != null
-            ? new ArrayList<>(itemFilter)
-            : new ArrayList<>(context.getKnownItemNames());
+            return Concurrent.newUnmodifiableList();
+
+        ConcurrentList<String> names = itemFilter != null
+            ? Concurrent.newList(itemFilter)
+            : Concurrent.newList(context.getKnownItemNames());
         names.sort(String.CASE_INSENSITIVE_ORDER);
         return names;
     }
@@ -784,8 +785,8 @@ public final class AtlasGenerator {
             if (count <= 0)
                 continue;
 
-            List<AtlasManifestEntry> manifestEntries = new ArrayList<>(count);
-            List<BufferedImage> pageTiles = new ArrayList<>(count);
+            List<AtlasManifestEntry> manifestEntries = Concurrent.newList(count);
+            List<BufferedImage> pageTiles = Concurrent.newList(count);
 
             for (int localIndex = 0; localIndex < count; localIndex++) {
                 String name = names.get(startIndex + localIndex);
@@ -878,15 +879,17 @@ public final class AtlasGenerator {
 
     private static @Nullable String tryGetItemId(@NotNull CompoundTag compound) {
         if (compound.containsPath("id")) {
-            StringTag tag = compound.getPath("id");
+            StringTag tag = compound.getPathOrDefault("id", StringTag.EMPTY);
             if (tag.notEmpty())
                 return tag.getValue();
         }
 
         for (String key : NESTED_KEYS) {
             String path = key + ".id";
+
             if (compound.containsPath(path)) {
-                StringTag tag = compound.getPath(path);
+                StringTag tag = compound.getPathOrDefault(path, StringTag.EMPTY);
+
                 if (tag.notEmpty())
                     return tag.getValue();
             }

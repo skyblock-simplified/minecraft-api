@@ -1,16 +1,19 @@
 package dev.sbs.minecraftapi.render.resolver;
 
+import dev.sbs.api.collection.concurrent.Concurrent;
+import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.asset.AssetContext;
-import dev.sbs.minecraftapi.asset.AssetNamespace;
-import dev.sbs.minecraftapi.asset.AssetNamespaceRegistry;
-import dev.sbs.minecraftapi.asset.Namespace;
-import dev.sbs.minecraftapi.asset.PackSnapshot;
+import dev.sbs.minecraftapi.asset.context.AssetContext;
+import dev.sbs.minecraftapi.asset.context.PackContext;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
 import dev.sbs.minecraftapi.asset.model.ItemInfo;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
-import dev.sbs.minecraftapi.asset.model.TextureReference;
-import dev.sbs.minecraftapi.asset.texture.pack.TexturePackStack;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespace;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
+import dev.sbs.minecraftapi.asset.namespace.Namespace;
+import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
+import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.nbt.tags.Tag;
 import dev.sbs.minecraftapi.nbt.tags.array.ByteArrayTag;
 import dev.sbs.minecraftapi.nbt.tags.array.IntArrayTag;
@@ -22,6 +25,8 @@ import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
 import dev.sbs.minecraftapi.render.context.ItemRenderData;
 import dev.sbs.minecraftapi.render.context.RenderContext;
+import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -31,7 +36,6 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
@@ -44,47 +48,51 @@ import java.util.TreeSet;
  * <p>Contains the pack-aware fingerprinting, texture pack stack management, overlay/namespace
  * resolution, and the {@link PackContext} that ties all pack information together.
  */
+@UtilityClass
 public final class PackContextManager {
 
     private static final String RENDERER_VERSION = "1.0";
-
-    private PackContextManager() {
-    }
 
     // ----------------------------------------------------------------
     // Renderer resolution
     // ----------------------------------------------------------------
 
-    public static RenderContext resolveContext(RenderContext context, @Nullable List<String> packIds) {
+    public static RenderContext resolveContext(@NotNull RenderContext context, @Nullable ConcurrentList<String> packIds) {
         if (!context.hasResourcePacks() || packIds == null || packIds.isEmpty())
             return context;
+
         if (!context.getPackAssetContext().getPackIds().isEmpty()
             && packSequencesEqual(packIds, context.getPackAssetContext().getPackIds()))
             return context;
+
         return getContextForPackStack(context, packIds);
     }
 
-    public static BlockRenderOptions forwardOptions(RenderContext context,
-                                                    BlockRenderOptions options) {
+    public static BlockRenderOptions forwardOptions(@NotNull RenderContext context, BlockRenderOptions options) {
         if (!context.hasResourcePacks() || options.getPackIds() == null || options.getPackIds().isEmpty())
             return options;
+
         return options.mutate().withPackIds(null).build();
     }
 
-    private static boolean packSequencesEqual(List<String> candidate, List<String> baseline) {
-        if (candidate.size() != baseline.size()) return false;
+    private static boolean packSequencesEqual(@NotNull ConcurrentList<String> candidate, @NotNull ConcurrentList<String> baseline) {
+        if (candidate.size() != baseline.size())
+            return false;
+
         for (int i = 0; i < candidate.size(); i++) {
-            if (!candidate.get(i).equalsIgnoreCase(baseline.get(i))) return false;
+            if (!candidate.get(i).equalsIgnoreCase(baseline.get(i)))
+                return false;
         }
+
         return true;
     }
 
-    private static RenderContext getContextForPackStack(RenderContext context,
-                                                        List<String> packIds) {
+    private static RenderContext getContextForPackStack(@NotNull RenderContext context, ConcurrentList<String> packIds) {
         if (!context.hasResourcePacks()) {
             throw new IllegalStateException(
                 "No resource packs are loaded and cannot resolve pack combinations.");
         }
+
         if (context.getAssetsDirectory() == null || context.getAssetsDirectory().isBlank()) {
             throw new IllegalStateException(
                 "Texture pack rendering requires a context created from Minecraft assets.");
@@ -98,9 +106,13 @@ public final class PackContextManager {
     private static RenderContext createPackContext(RenderContext context,
                                                     TexturePackStack packStack) {
         try {
-            PackSnapshot snapshot = MinecraftApi.getAssetFactory().loadPackSnapshot(
-                packStack.getPacks().stream().map(ResourcePack::getId).toList());
-            return new RenderContext(snapshot, context.getAssetsDirectory(), context.getBaseOverlayRoots());
+            AssetContext packAssetContext = MinecraftApi.getAssetFactory().loadPackContext(
+                packStack.getPacks()
+                    .stream()
+                    .map(ResourcePack::getId)
+                    .collect(Concurrent.toList())
+            );
+            return new RenderContext(packAssetContext);
         } catch (java.io.IOException e) {
             throw new RuntimeException("Failed to create pack context", e);
         }
@@ -169,19 +181,16 @@ public final class PackContextManager {
             }
         }
 
-        if (variantKey[0] == null) {
+        if (variantKey[0] == null)
             variantKey[0] = "literal:" + normalizedTarget;
-        }
 
         String sourcePackId = determineSourcePackId(context, modelPath[0], resolvedTextures);
 
         String descriptor = RENDERER_VERSION + "|" + context.getPackAssetContext().getPackStackHash() + "|" + variantKey[0];
         String resourceId = computeResourceIdHash(descriptor);
-        List<String> texturesList = resolvedTextures.isEmpty() ? Collections.emptyList()
-            : new ArrayList<>(resolvedTextures);
+        ConcurrentList<String> texturesList = resolvedTextures.isEmpty() ? Concurrent.newUnmodifiableList() : Concurrent.newList(resolvedTextures);
 
-        ResourceIdResult result = new ResourceIdResult(resourceId, sourcePackId,
-            context.getPackAssetContext().getPackStackHash());
+        ResourceIdResult result = new ResourceIdResult(resourceId, sourcePackId, context.getPackAssetContext().getPackStackHash());
         result.setModel(modelPath[0]);
         result.setTextures(texturesList);
         return result;
@@ -201,14 +210,13 @@ public final class PackContextManager {
 
         String referenceModel = null;
         String itemModel = context.getItemModel(lookupTarget);
-        if (itemModel != null && !itemModel.isBlank()) {
+        if (itemModel != null && !itemModel.isBlank())
             referenceModel = normalizeModelIdentifier(itemModel);
-        }
 
         BlockModel effectiveModel = null;
-        List<String> modelCandidates = null;
+        List<String> modelCandidates;
         String resolvedModelName = null;
-        String effectiveModelIdentifier = null;
+        String effectiveModelIdentifier;
 
         if (preResolvedItem != null && preResolvedItem.getLookupTarget().equalsIgnoreCase(lookupTarget)) {
             effectiveModel = preResolvedItem.getModel();
@@ -303,12 +311,14 @@ public final class PackContextManager {
 
     private static Collection<String> collectResolvedTextures(BlockModel model) {
         Set<String> set = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+
         for (TextureReference ref : model.getTextures().values()) {
             String resolved = model.resolveTexture(ref.sprite());
-            if (resolved != null && !resolved.isBlank()) {
+
+            if (StringUtil.isNotEmpty(resolved))
                 set.add(resolved);
-            }
         }
+
         return set;
     }
 
@@ -447,12 +457,10 @@ public final class PackContextManager {
         return "";
     }
 
-    private static String determineSourcePackId(RenderContext context, @Nullable String modelPath,
-                                                 Collection<String> textureIds) {
+    private static String determineSourcePackId(RenderContext context, @Nullable String modelPath, Collection<String> textureIds) {
         AssetNamespaceRegistry assetNamespaces = context.getPackAssetContext().getAssetNamespaces();
-        if (assetNamespaces == null) {
+        if (assetNamespaces == null)
             return AssetContext.VANILLA_PACK_ID;
-        }
 
         for (String textureId : textureIds) {
             if (textureId == null || textureId.isBlank()) continue;
@@ -461,9 +469,8 @@ public final class PackContextManager {
             String namespace = parsed.name();
             String path = parsed.path();
 
-            if (!path.startsWith("textures/")) {
+            if (!path.startsWith("textures/"))
                 path = "textures/" + path;
-            }
 
             String[] pathVariants = { path, path.replace("blocks/", "block/").replace("items/", "item/") };
 
@@ -471,13 +478,15 @@ public final class PackContextManager {
             List<AssetNamespace> roots = assetNamespaces.resolveRoots(namespace);
             for (int i = roots.size() - 1; i >= 0; i--) {
                 AssetNamespace root = roots.get(i);
+
                 for (String variant : pathVariants) {
                     String withExtension = variant.replace('/', File.separatorChar) + ".png";
                     Path candidate = Path.of(root.path(), withExtension);
+
                     if (Files.exists(candidate)) {
-                        if (!root.vanilla()) {
+                        if (!root.vanilla())
                             return root.sourceId();
-                        }
+
                         // Found in vanilla - stop checking this texture
                         break;
                     }

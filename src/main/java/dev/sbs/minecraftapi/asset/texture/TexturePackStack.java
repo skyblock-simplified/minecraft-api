@@ -1,6 +1,7 @@
 package dev.sbs.minecraftapi.asset.texture;
 
 import dev.sbs.api.SimplifiedApi;
+import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.asset.ResourcePackDiscovery;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
@@ -8,9 +9,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
@@ -20,8 +18,8 @@ import java.util.NoSuchElementException;
 @Getter
 public final class TexturePackStack {
 
-    private final @NotNull List<ResourcePack> packs;
-    private final @NotNull List<OverlayRoot> overlayRoots;
+    private final @NotNull ConcurrentList<ResourcePack> packs;
+    private final @NotNull ConcurrentList<OverlayRoot> overlayRoots;
     private final @NotNull String fingerprint;
 
     /**
@@ -33,12 +31,12 @@ public final class TexturePackStack {
      * @param fingerprint the SHA-256 fingerprint of the combined stack
      */
     public TexturePackStack(
-        @NotNull List<ResourcePack> packs,
-        @NotNull List<OverlayRoot> overlayRoots,
+        @NotNull ConcurrentList<ResourcePack> packs,
+        @NotNull ConcurrentList<OverlayRoot> overlayRoots,
         @NotNull String fingerprint
     ) {
-        this.packs = Collections.unmodifiableList(packs);
-        this.overlayRoots = Collections.unmodifiableList(overlayRoots);
+        this.packs = packs.toUnmodifiableList();
+        this.overlayRoots = overlayRoots.toUnmodifiableList();
         this.fingerprint = fingerprint;
     }
 
@@ -62,13 +60,13 @@ public final class TexturePackStack {
      * @return the assembled texture pack stack
      * @throws NoSuchElementException if any pack id is not found in the repository
      */
-    public static @NotNull TexturePackStack buildPackStack(@NotNull List<String> packIds) {
+    public static @NotNull TexturePackStack buildPackStack(@NotNull ConcurrentList<String> packIds) {
         if (packIds.isEmpty())
-            return new TexturePackStack(List.of(), List.of(), "vanilla");
+            return new TexturePackStack(Concurrent.newUnmodifiableList(), Concurrent.newUnmodifiableList(), "vanilla");
 
         ConcurrentList<ResourcePack> allPacks = SimplifiedApi.getRepository(ResourcePack.class).findAll();
-        List<ResourcePack> ordered = getResourcePacks(packIds, allPacks);
-        List<OverlayRoot> overlayRoots = new ArrayList<>();
+        ConcurrentList<ResourcePack> ordered = getResourcePacks(packIds, allPacks);
+        ConcurrentList<OverlayRoot> overlayRoots = Concurrent.newList();
 
         for (ResourcePack pack : ordered) {
             for (String overlayPath : pack.enumerateOverlayRootPaths())
@@ -85,8 +83,8 @@ public final class TexturePackStack {
         return new TexturePackStack(ordered, overlayRoots, stackFingerprint);
     }
 
-    private static @NonNull List<ResourcePack> getResourcePacks(@NonNull List<String> packIds, ConcurrentList<ResourcePack> allPacks) {
-        List<ResourcePack> ordered = new ArrayList<>(packIds.size());
+    private static @NonNull ConcurrentList<ResourcePack> getResourcePacks(@NonNull ConcurrentList<String> packIds, ConcurrentList<ResourcePack> allPacks) {
+        ConcurrentList<ResourcePack> ordered = Concurrent.newList();
 
         for (String packId : packIds) {
             ResourcePack pack = null;

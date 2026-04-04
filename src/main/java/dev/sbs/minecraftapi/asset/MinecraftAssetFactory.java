@@ -9,6 +9,8 @@ import com.google.gson.JsonSyntaxException;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.api.collection.concurrent.ConcurrentSet;
+import dev.sbs.api.collection.concurrent.sorted.ConcurrentSortedMap;
 import dev.sbs.api.math.Vector3f;
 import dev.sbs.api.persistence.JpaConfig;
 import dev.sbs.api.persistence.JpaModel;
@@ -16,6 +18,8 @@ import dev.sbs.api.persistence.RepositoryFactory;
 import dev.sbs.api.persistence.source.Source;
 import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
+import dev.sbs.minecraftapi.asset.context.AssetContext;
+import dev.sbs.minecraftapi.asset.context.PackContext;
 import dev.sbs.minecraftapi.asset.model.BlockInfo;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Element;
@@ -26,11 +30,13 @@ import dev.sbs.minecraftapi.asset.model.BlockModel.Transform;
 import dev.sbs.minecraftapi.asset.model.ItemInfo;
 import dev.sbs.minecraftapi.asset.model.ItemInfo.TintInfo;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
-import dev.sbs.minecraftapi.asset.model.TextureReference;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespace;
+import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import dev.sbs.minecraftapi.asset.selector.ItemModelSelector;
 import dev.sbs.minecraftapi.asset.selector.ItemModelSelectorParser;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
-import dev.sbs.minecraftapi.asset.texture.pack.TexturePackStack;
+import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
+import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.client.mojang.response.PistonManifest;
 import dev.sbs.minecraftapi.client.mojang.response.PistonMetadata;
 import lombok.Getter;
@@ -51,16 +57,9 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.HexFormat;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -101,22 +100,23 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
 
     @Getter private final @NotNull MinecraftAssetOptions options;
     @Getter private final @NotNull String assetsDirectory;
-    @Getter private final @NotNull Map<String, BlockModel> resolvedModels;
+    @Getter private final @NotNull ConcurrentMap<String, BlockModel> resolvedModels;
     @Getter private final @NotNull AssetNamespaceRegistry assetNamespaces;
-    @Getter private final @NotNull List<OverlayRoot> overlayRoots;
-    @Getter private final @NotNull List<String> overlayPaths;
+    @Getter private final @NotNull ConcurrentList<OverlayRoot> overlayRoots;
+    @Getter private final @NotNull ConcurrentList<String> overlayPaths;
     @Setter private @Nullable JpaConfig assetJpaConfig;
+    private final @NotNull ConcurrentMap<String, AssetContext> packContextCache = Concurrent.newMap();
 
     private MinecraftAssetFactory(
         @NotNull MinecraftAssetOptions options,
         @NotNull String assetsDirectory,
-        @NotNull Map<String, BlockModel> resolvedModels,
+        @NotNull ConcurrentMap<String, BlockModel> resolvedModels,
         @NotNull ConcurrentList<BlockInfo> blockInfos,
         @NotNull ConcurrentList<ItemInfo> itemInfos,
         @NotNull ConcurrentList<ResourcePack> resourcePacks,
         @NotNull AssetNamespaceRegistry assetNamespaces,
-        @NotNull List<OverlayRoot> overlayRoots,
-        @NotNull List<String> overlayPaths
+        @NotNull ConcurrentList<OverlayRoot> overlayRoots,
+        @NotNull ConcurrentList<String> overlayPaths
     ) {
         this.options = options;
         this.assetsDirectory = assetsDirectory;
@@ -174,12 +174,12 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
                 assetsDir = downloadAndExtractAssets(versionId, versionDir).toString();
         }
 
-        List<OverlayRoot> overlayRoots = OverlayRoot.discoverFromAssetsDirectory(assetsDir);
+        ConcurrentList<OverlayRoot> overlayRoots = OverlayRoot.discoverFromAssetsDirectory(assetsDir);
         AssetNamespaceRegistry namespaces = AssetNamespaceRegistry.buildFromRoots(assetsDir, overlayRoots);
-        List<String> overlayPaths = OverlayRoot.extractUniquePaths(overlayRoots);
+        ConcurrentList<String> overlayPaths = OverlayRoot.extractUniquePaths(overlayRoots);
 
-        Map<String, BlockModel> rawDefs = loadModelDefinitions(assetsDir, overlayPaths, namespaces);
-        Map<String, BlockModel> resolved = resolveAllModels(rawDefs);
+        ConcurrentMap<String, BlockModel> rawDefs = loadModelDefinitions(assetsDir, overlayPaths, namespaces);
+        ConcurrentMap<String, BlockModel> resolved = resolveAllModels(rawDefs);
         ConcurrentList<BlockInfo> blockInfos = loadBlockInfos(assetsDir, rawDefs, overlayPaths, namespaces);
         ConcurrentList<ItemInfo> itemInfos = loadItemInfos(assetsDir, rawDefs, overlayPaths, namespaces);
         ConcurrentList<ResourcePack> resourcePacks = discoverResourcePacks(options.getTexturePackDirectories());
@@ -201,38 +201,37 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     }
 
     /**
-     * Loads a pack-specific snapshot of asset data by reading from disk with
-     * the given pack stack's overlays applied.
+     * Returns a pack-specific asset context for the given pack stack, loading from disk
+     * on first request and caching the result for subsequent calls.
      * <p>
-     * The H2 database is not modified - it always contains vanilla data. The returned
-     * snapshot is an immutable, self-contained set of pack-overridden models and textures
-     * suitable for caching on a per-pack-stack basis.
+     * The H2 database is not modified - pack-specific data is cached in memory. The returned
+     * context is an immutable, self-contained set of pack-overridden models and textures.
      *
      * @param packIds the ordered list of pack identifiers
-     * @return an immutable snapshot of pack-specific data
+     * @return a pack-specific asset context
      * @throws IOException if asset loading fails
      */
-    public @NotNull PackSnapshot loadPackSnapshot(@NotNull List<String> packIds) throws IOException {
+    public @NotNull AssetContext loadPackContext(@NotNull ConcurrentList<String> packIds) throws IOException {
         TexturePackStack packStack = TexturePackStack.buildPackStack(packIds);
+        String fingerprint = packStack.getFingerprint();
 
-        List<OverlayRoot> packOverlays = new ArrayList<>(overlayRoots);
+        AssetContext cached = packContextCache.get(fingerprint);
+        if (cached != null)
+            return cached;
+
+        ConcurrentList<OverlayRoot> packOverlays = Concurrent.newList(overlayRoots);
         packOverlays.addAll(packStack.getOverlayRoots());
-        AssetNamespaceRegistry packNamespaces = AssetNamespaceRegistry.buildFromRoots(
-            assetsDirectory != null ? java.nio.file.Path.of(assetsDirectory).toAbsolutePath().toString() : "",
-            packOverlays);
-        List<String> packOverlayPaths = OverlayRoot.extractUniquePaths(packOverlays);
+        AssetNamespaceRegistry packNamespaces = AssetNamespaceRegistry.buildFromRoots(Path.of(assetsDirectory).toAbsolutePath().toString(), packOverlays);
+        ConcurrentList<String> packOverlayPaths = OverlayRoot.extractUniquePaths(packOverlays);
 
-        Map<String, BlockModel> rawDefs = loadModelDefinitions(
-            assetsDirectory, packOverlayPaths, packNamespaces);
-        Map<String, BlockModel> resolved = resolveAllModels(rawDefs);
-        ConcurrentList<BlockInfo> blockInfos = loadBlockInfos(
-            assetsDirectory, rawDefs, packOverlayPaths, packNamespaces);
-        ConcurrentList<ItemInfo> itemInfos = loadItemInfos(
-            assetsDirectory, rawDefs, packOverlayPaths, packNamespaces);
+        ConcurrentMap<String, BlockModel> rawDefs = loadModelDefinitions(assetsDirectory, packOverlayPaths, packNamespaces);
+        ConcurrentMap<String, BlockModel> resolved = resolveAllModels(rawDefs);
+        ConcurrentList<BlockInfo> blockInfos = loadBlockInfos(assetsDirectory, rawDefs, packOverlayPaths, packNamespaces);
+        ConcurrentList<ItemInfo> itemInfos = loadItemInfos(assetsDirectory, rawDefs, packOverlayPaths, packNamespaces);
 
-        AssetContext packContext = AssetContext.create(assetsDirectory, overlayRoots, resolved, packStack);
-
-        return new PackSnapshot(packContext, blockInfos, itemInfos);
+        AssetContext packContext = PackContext.create(assetsDirectory, overlayRoots, resolved, packStack, blockInfos, itemInfos);
+        packContextCache.put(fingerprint, packContext);
+        return packContext;
     }
 
     /**
@@ -294,14 +293,11 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
      * @param rawDefinitions the raw model name to definition map
      * @return a new map of model name to fully resolved {@link BlockModel}
      */
-    public static @NotNull Map<String, BlockModel> resolveAllModels(@NotNull Map<String, BlockModel> rawDefinitions) {
-        ConcurrentHashMap<String, BlockModel> definitions = new ConcurrentHashMap<>();
-
-        for (Map.Entry<String, BlockModel> entry : rawDefinitions.entrySet())
-            definitions.put(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue());
-
-        ConcurrentHashMap<String, BlockModel> cache = new ConcurrentHashMap<>();
-        Map<String, BlockModel> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    public static @NotNull ConcurrentMap<String, BlockModel> resolveAllModels(@NotNull Map<String, BlockModel> rawDefinitions) {
+        ConcurrentMap<String, BlockModel> definitions = Concurrent.newMap();
+        rawDefinitions.forEach((name, model) -> definitions.put(name.toLowerCase(Locale.ROOT), model));
+        ConcurrentMap<String, BlockModel> cache = Concurrent.newMap();
+        ConcurrentMap<String, BlockModel> result = Concurrent.newSortedMap(String.CASE_INSENSITIVE_ORDER);
 
         for (String key : rawDefinitions.keySet()) {
             String normalized = BlockModel.normalizeName(key);
@@ -309,14 +305,13 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
 
             if (!cache.containsKey(normalizedLower)) {
                 try {
-                    BlockModel resolved = resolveModelInternal(normalized, new HashSet<>(), definitions, cache);
+                    BlockModel resolved = resolveModelInternal(normalized, Concurrent.newSet(), definitions, cache);
                     result.put(key, resolved);
                 } catch (Exception e) {
                     result.put(key, rawDefinitions.get(key));
                 }
-            } else {
+            } else
                 result.put(key, cache.get(normalizedLower));
-            }
         }
 
         return result;
@@ -324,9 +319,9 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
 
     private static @NotNull BlockModel resolveModelInternal(
         @NotNull String name,
-        @NotNull Set<String> stack,
-        @NotNull ConcurrentHashMap<String, BlockModel> definitions,
-        @NotNull ConcurrentHashMap<String, BlockModel> cache
+        @NotNull ConcurrentSet<String> stack,
+        @NotNull ConcurrentMap<String, BlockModel> definitions,
+        @NotNull ConcurrentMap<String, BlockModel> cache
     ) {
         if (stack.contains(name))
             throw new IllegalStateException("Detected circular model inheritance involving '%s'".formatted(name));
@@ -342,8 +337,8 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
         stack.add(name);
 
         ConcurrentList<String> parentChain = Concurrent.newList();
-        Map<String, TextureReference> textures = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        Map<String, Transform> display = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        ConcurrentMap<String, TextureReference> textures = Concurrent.newSortedMap(String.CASE_INSENSITIVE_ORDER);
+        ConcurrentMap<String, Transform> display = Concurrent.newSortedMap(String.CASE_INSENSITIVE_ORDER);
         ConcurrentList<Element> elements = null;
 
         String parentName = definition.getParent();
@@ -351,12 +346,8 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
             BlockModel parent = resolveModelInternal(BlockModel.normalizeName(parentName), stack, definitions, cache);
             parentChain.addAll(parent.getParentChain());
             parentChain.add(parent.getName());
-
-            for (Map.Entry<String, TextureReference> kvp : parent.getTextures().entrySet())
-                textures.putIfAbsent(kvp.getKey(), kvp.getValue());
-
-            for (Map.Entry<String, Transform> kvp : parent.getDisplay().entrySet())
-                display.put(kvp.getKey(), cloneTransform(kvp.getValue()));
+            parent.getTextures().forEach(textures::putIfAbsent);
+            parent.getDisplay().forEach((k, v) -> display.putIfAbsent(k, cloneTransform(v)));
 
             if (!parent.getElements().isEmpty()) {
                 elements = Concurrent.newList();
@@ -371,12 +362,10 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
             textures.putAll(defTextures);
 
         Map<String, Transform> defDisplay = definition.getDisplay();
-        if (!defDisplay.isEmpty()) {
-            for (Map.Entry<String, Transform> kvp : defDisplay.entrySet())
-                display.put(kvp.getKey(), cloneTransform(kvp.getValue()));
-        }
+        if (!defDisplay.isEmpty())
+            defDisplay.forEach((k, v) -> display.putIfAbsent(k, cloneTransform(v)));
 
-        List<Element> defElements = definition.getElements();
+        ConcurrentList<Element> defElements = definition.getElements();
         if (!defElements.isEmpty()) {
             elements = Concurrent.newList();
 
@@ -411,17 +400,14 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     }
 
     private static @NotNull Element cloneElement(@NotNull Element element) {
-        Map<Face, FaceData> faces = new HashMap<>();
-        for (Map.Entry<Face, FaceData> pair : element.getFaces().entrySet()) {
-            FaceData original = pair.getValue();
-            faces.put(pair.getKey(), new FaceData(
-                original.getTexture(),
-                original.getUv(),
-                original.getRotation(),
-                original.getTintIndex(),
-                original.getCullFace()
-            ));
-        }
+        ConcurrentMap<Face, FaceData> faces = Concurrent.newMap();
+        element.getFaces().forEach((face, data) -> faces.put(face, new FaceData(
+            data.getTexture(),
+            data.getUv(),
+            data.getRotation(),
+            data.getTintIndex(),
+            data.getCullFace()
+        )));
 
         return new Element(
             element.getFrom(),
@@ -538,7 +524,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     // ================================================================
 
     private static @NotNull ConcurrentList<ResourcePack> discoverResourcePacks(@NotNull Iterable<String> directories) {
-        List<String> dirs = new ArrayList<>();
+        ConcurrentList<String> dirs = Concurrent.newList();
         directories.forEach(dirs::add);
         if (dirs.isEmpty())
             return Concurrent.newList();
@@ -563,13 +549,13 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
      * @return a mutable map of model key to definition
      * @throws IOException if an I/O error occurs
      */
-    public static @NotNull Map<String, BlockModel> loadModelDefinitions(
+    public static @NotNull ConcurrentMap<String, BlockModel> loadModelDefinitions(
         @NotNull String assetsRoot,
-        @NotNull List<String> overlayPaths,
+        @NotNull ConcurrentList<String> overlayPaths,
         @NotNull AssetNamespaceRegistry namespaces
     ) throws IOException {
-        List<AssetNamespace> roots = resolveNamespaceRoots(assetsRoot, overlayPaths, namespaces, true);
-        Map<String, BlockModel> definitions = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        ConcurrentList<AssetNamespace> roots = resolveNamespaceRoots(assetsRoot, overlayPaths, namespaces, true);
+        ConcurrentSortedMap<String, BlockModel> definitions = Concurrent.newSortedMap(String.CASE_INSENSITIVE_ORDER);
         boolean hasAnyModels = false;
 
         for (AssetNamespace root : roots) {
@@ -617,12 +603,12 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
      */
     public static @NotNull ConcurrentList<BlockInfo> loadBlockInfos(
         @NotNull String assetsRoot,
-        @NotNull Map<String, BlockModel> models,
-        @NotNull List<String> overlayPaths,
+        @NotNull ConcurrentMap<String, BlockModel> models,
+        @NotNull ConcurrentList<String> overlayPaths,
         @NotNull AssetNamespaceRegistry namespaces
     ) throws IOException {
-        List<String> roots = resolveRootPaths(assetsRoot, overlayPaths, namespaces);
-        Map<String, BlockInfo> entries = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        ConcurrentList<String> roots = resolveRootPaths(assetsRoot, overlayPaths, namespaces);
+        ConcurrentMap<String, BlockInfo> entries = Concurrent.newSortedMap(String.CASE_INSENSITIVE_ORDER);
         boolean hasAnyBlockstates = false;
 
         for (String root : roots) {
@@ -666,11 +652,11 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
      */
     public static @NotNull ConcurrentList<ItemInfo> loadItemInfos(
         @NotNull String assetsRoot,
-        @NotNull Map<String, BlockModel> models,
-        @NotNull List<String> overlayPaths,
+        @NotNull ConcurrentMap<String, BlockModel> models,
+        @NotNull ConcurrentList<String> overlayPaths,
         @NotNull AssetNamespaceRegistry namespaces
     ) throws IOException {
-        Map<String, ItemInfo> entries = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        ConcurrentMap<String, ItemInfo> entries = Concurrent.newSortedMap(String.CASE_INSENSITIVE_ORDER);
 
         // Phase 1: items derived from model definitions with item/ prefix
         for (Map.Entry<String, BlockModel> entry : models.entrySet()) {
@@ -685,12 +671,13 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
             String texture = resolvePrimaryTexture(entry.getValue(), models);
             ItemInfo info = entries.computeIfAbsent(itemName, k -> { ItemInfo i = new ItemInfo(); i.setName(k); return i; });
             info.setModel(key);
+
             if (StringUtil.isEmpty(info.getTexture()) && StringUtil.isNotEmpty(texture))
                 info.setTexture(texture);
         }
 
         // Phase 2: item definitions from items/ directory
-        List<AssetNamespace> nsRoots = resolveNamespaceRoots(assetsRoot, overlayPaths, namespaces, true);
+        ConcurrentList<AssetNamespace> nsRoots = resolveNamespaceRoots(assetsRoot, overlayPaths, namespaces, true);
         for (AssetNamespace nsRoot : nsRoots) {
             Path itemsRoot = Path.of(nsRoot.path(), "items");
             if (!Files.isDirectory(itemsRoot))
@@ -703,7 +690,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
 
                 try {
                     JsonObject rootElement = JsonParser.parseString(Files.readString(file)).getAsJsonObject();
-                    Map<Integer, TintInfo> tintMap = new HashMap<>();
+                    ConcurrentMap<Integer, TintInfo> tintMap = Concurrent.newMap();
                     extractTintInfo(rootElement, tintMap);
                     ItemModelSelector selector = ItemModelSelectorParser.parseFromRoot(rootElement);
                     String modelReference = resolveModelFromItemDefinition(rootElement);
@@ -712,10 +699,13 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
 
                     if (StringUtil.isNotEmpty(modelReference)) {
                         info.setModel(modelReference);
+
                         if (StringUtil.isEmpty(info.getTexture())) {
                             String normalized = normalizeModelReference(modelReference);
+
                             if (StringUtil.isNotEmpty(normalized)) {
                                 BlockModel def = caseInsensitiveGet(models, normalized);
+
                                 if (def != null) {
                                     String texture = resolvePrimaryTexture(def, models);
                                     if (StringUtil.isNotEmpty(texture))
@@ -731,8 +721,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
                     if (!tintMap.isEmpty())
                         tintMap.forEach((k, v) -> info.getLayerTints().put(k, v));
 
-                } catch (JsonSyntaxException | IllegalStateException ignored) {
-                }
+                } catch (JsonSyntaxException | IllegalStateException ignored) { }
             }
         }
 
@@ -743,49 +732,48 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     // Namespace root resolution
     // ================================================================
 
-    private static @NotNull List<AssetNamespace> resolveNamespaceRoots(
+    private static @NotNull ConcurrentList<AssetNamespace> resolveNamespaceRoots(
         @NotNull String primaryRoot,
-        @Nullable List<String> overlayPaths,
+        @Nullable ConcurrentList<String> overlayPaths,
         @Nullable AssetNamespaceRegistry namespaces,
         boolean includeAllNamespaces
     ) {
         if (namespaces != null) {
-            List<AssetNamespace> resolved = includeAllNamespaces
+            ConcurrentList<AssetNamespace> resolved = includeAllNamespaces
                 ? namespaces.getRoots()
                 : namespaces.resolveRoots("minecraft");
 
-            List<AssetNamespace> deduped = deduplicateRoots(resolved);
+            ConcurrentList<AssetNamespace> deduped = deduplicateRoots(resolved);
             if (!deduped.isEmpty())
                 return deduped;
         }
 
-        Set<String> dedupe = new HashSet<>();
-        List<AssetNamespace> results = new ArrayList<>();
+        ConcurrentSet<String> dedupe = Concurrent.newSet();
+        ConcurrentList<AssetNamespace> results = Concurrent.newList();
         tryAddNamespaceRoot(primaryRoot, "minecraft", dedupe, results);
-        if (overlayPaths != null)
+
+        if (overlayPaths != null) {
             for (String overlay : overlayPaths)
                 tryAddNamespaceRoot(overlay, "minecraft", dedupe, results);
+        }
 
         return results;
     }
 
-    private static @NotNull List<String> resolveRootPaths(
-        @NotNull String primaryRoot,
-        @Nullable List<String> overlayPaths,
-        @Nullable AssetNamespaceRegistry namespaces
-    ) {
-        List<AssetNamespace> nsRoots = resolveNamespaceRoots(primaryRoot, overlayPaths, namespaces, false);
-        Set<String> seen = new HashSet<>();
-        List<String> result = new ArrayList<>();
+    private static @NotNull ConcurrentList<String> resolveRootPaths(@NotNull String primaryRoot, @Nullable ConcurrentList<String> overlayPaths, @Nullable AssetNamespaceRegistry namespaces) {
+        ConcurrentList<AssetNamespace> nsRoots = resolveNamespaceRoots(primaryRoot, overlayPaths, namespaces, false);
+        ConcurrentSet<String> seen = Concurrent.newSet();
+        ConcurrentList<String> result = Concurrent.newList();
+
         for (AssetNamespace root : nsRoots) {
             if (seen.add(root.path().toLowerCase(Locale.ROOT)))
                 result.add(root.path());
         }
+
         return result;
     }
 
-    private static void tryAddNamespaceRoot(@Nullable String candidate, @NotNull String namespace,
-                                             @NotNull Set<String> dedupe, @NotNull List<AssetNamespace> results) {
+    private static void tryAddNamespaceRoot(@Nullable String candidate, @NotNull String namespace, @NotNull ConcurrentSet<String> dedupe, @NotNull ConcurrentList<AssetNamespace> results) {
         if (candidate == null || candidate.isBlank())
             return;
 
@@ -797,9 +785,10 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
             results.add(new AssetNamespace(namespace, fullPath.toString(), "external", false));
     }
 
-    private static @NotNull List<AssetNamespace> deduplicateRoots(@NotNull List<AssetNamespace> roots) {
-        List<AssetNamespace> results = new ArrayList<>();
-        Set<String> seen = new HashSet<>();
+    private static @NotNull ConcurrentList<AssetNamespace> deduplicateRoots(@NotNull ConcurrentList<AssetNamespace> roots) {
+        ConcurrentList<AssetNamespace> results = Concurrent.newList();
+        ConcurrentSet<String> seen = Concurrent.newSet();
+
         for (AssetNamespace root : roots) {
             if (root == null || StringUtil.isEmpty(root.path()))
                 continue;
@@ -813,6 +802,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
             if (seen.add(identity))
                 results.add(new AssetNamespace(ns, fullPath.toString(), root.sourceId(), root.vanilla()));
         }
+
         return results;
     }
 
@@ -820,8 +810,8 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     // Directory enumeration
     // ================================================================
 
-    private static @NotNull List<Path> enumerateModelDirectories(@NotNull String root) {
-        List<Path> dirs = new ArrayList<>();
+    private static @NotNull ConcurrentList<Path> enumerateModelDirectories(@NotNull String root) {
+        ConcurrentList<Path> dirs = Concurrent.newList();
         Path modelsRoot = Path.of(root, "models");
         if (Files.isDirectory(modelsRoot))
             dirs.add(modelsRoot);
@@ -833,8 +823,8 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
         return dirs;
     }
 
-    private static @NotNull List<Path> enumerateBlockstateDirectories(@NotNull String root) {
-        List<Path> dirs = new ArrayList<>();
+    private static @NotNull ConcurrentList<Path> enumerateBlockstateDirectories(@NotNull String root) {
+        ConcurrentList<Path> dirs = Concurrent.newList();
         Path blockstatesRoot = Path.of(root, "blockstates");
         if (Files.isDirectory(blockstatesRoot))
             dirs.add(blockstatesRoot);
@@ -846,8 +836,8 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
         return dirs;
     }
 
-    private static @NotNull List<Path> walkJsonFiles(@NotNull Path directory) throws IOException {
-        List<Path> files = new ArrayList<>();
+    private static @NotNull ConcurrentList<Path> walkJsonFiles(@NotNull Path directory) throws IOException {
+        ConcurrentList<Path> files = Concurrent.newList();
         Files.walkFileTree(directory, new SimpleFileVisitor<>() {
             @Override
             public @NotNull FileVisitResult visitFile(@NotNull Path file, @NotNull BasicFileAttributes attrs) {
@@ -924,9 +914,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     // Blockstate to model resolution
     // ================================================================
 
-    private static @Nullable String resolveDefaultModel(
-        @NotNull String blockName, @NotNull JsonObject root, @NotNull Map<String, BlockModel> models
-    ) {
+    private static @Nullable String resolveDefaultModel(@NotNull String blockName, @NotNull JsonObject root, @NotNull Map<String, BlockModel> models) {
         if (root.has("variants") && root.get("variants").isJsonObject()) {
             String resolved = resolveFromVariants(root.getAsJsonObject("variants"), models);
             if (resolved != null && !resolved.isBlank())
@@ -1146,6 +1134,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
         int b = (int) (raw & 0xFF);
         if (a == 0 && raw != 0)
             a = 0xFF;
+
         return new int[]{ r, g, b, a == 0 ? 0xFF : a };
     }
 
@@ -1176,7 +1165,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     // Texture resolution
     // ================================================================
 
-    private static @Nullable String resolveTexture(@Nullable String modelReference, @NotNull Map<String, BlockModel> models) {
+    private static @Nullable String resolveTexture(@Nullable String modelReference, @NotNull ConcurrentMap<String, BlockModel> models) {
         String normalized = normalizeModelReference(modelReference);
         if (StringUtil.isEmpty(normalized))
             return null;
@@ -1185,20 +1174,20 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
         return definition != null ? resolvePrimaryTexture(definition, models) : null;
     }
 
-    private static @Nullable String resolvePrimaryTexture(@NotNull BlockModel definition, @NotNull Map<String, BlockModel> models) {
-        return resolvePrimaryTexture(definition, models, new HashSet<>());
+    private static @Nullable String resolvePrimaryTexture(@NotNull BlockModel definition, @NotNull ConcurrentMap<String, BlockModel> models) {
+        return resolvePrimaryTexture(definition, models, Concurrent.newSet());
     }
 
-    private static @Nullable String resolvePrimaryTexture(
-        @NotNull BlockModel definition, @NotNull Map<String, BlockModel> models, @NotNull Set<String> visited
-    ) {
-        Map<String, TextureReference> textures = definition.getTextures();
+    private static @Nullable String resolvePrimaryTexture(@NotNull BlockModel definition, @NotNull ConcurrentMap<String, BlockModel> models, @NotNull ConcurrentSet<String> visited) {
+        ConcurrentMap<String, TextureReference> textures = definition.getTextures();
         if (!textures.isEmpty()) {
             for (String key : TEXTURE_PREFERENCE_ORDER) {
                 TextureReference ref = caseInsensitiveGet(textures, key);
+
                 if (ref != null && !ref.sprite().isBlank())
                     return ref.sprite();
             }
+
             for (TextureReference ref : textures.values()) {
                 if (ref != null && !ref.sprite().isBlank())
                     return ref.sprite();
@@ -1208,8 +1197,10 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
         String parent = definition.getParent();
         if (parent != null && !parent.isBlank()) {
             String parentKey = normalizeModelReference(parent);
+
             if (!parentKey.isBlank() && visited.add(parentKey.toLowerCase(Locale.ROOT))) {
                 BlockModel parentDef = caseInsensitiveGet(models, parentKey);
+
                 if (parentDef != null)
                     return resolvePrimaryTexture(parentDef, models, visited);
             }
@@ -1225,6 +1216,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     private static boolean isTemplateItem(@NotNull String itemName) {
         if (itemName.toLowerCase(Locale.ROOT).startsWith("template_"))
             return true;
+
         return itemName.equalsIgnoreCase("generated")
             || itemName.equalsIgnoreCase("handheld")
             || itemName.equalsIgnoreCase("handheld_rod")
@@ -1236,23 +1228,28 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     // ================================================================
 
     private static <V> boolean caseInsensitiveContains(@NotNull Map<String, V> map, @NotNull String key) {
-        if (map instanceof TreeMap)
+        if (map instanceof ConcurrentSortedMap)
             return map.containsKey(key);
+
         for (String k : map.keySet()) {
             if (k.equalsIgnoreCase(key))
                 return true;
         }
+
         return false;
     }
 
     private static <V> @Nullable V caseInsensitiveGet(@NotNull Map<String, V> map, @NotNull String key) {
         V direct = map.get(key);
+
         if (direct != null)
             return direct;
+
         for (Map.Entry<String, V> entry : map.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(key))
                 return entry.getValue();
         }
+
         return null;
     }
 }

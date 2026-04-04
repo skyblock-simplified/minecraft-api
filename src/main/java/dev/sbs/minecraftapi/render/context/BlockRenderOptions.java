@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render.context;
 
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.math.Vector3f;
 import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Transform;
@@ -7,8 +8,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * Immutable options for rendering a block or item model to a 2D image.
@@ -33,7 +32,7 @@ public final class BlockRenderOptions {
     private final float additionalScale;
     private final @NotNull Vector3f additionalTranslation;
     private final @Nullable Transform overrideGuiTransform;
-    private final @Nullable List<String> packIds;
+    private final @Nullable ConcurrentList<String> packIds;
     private final @Nullable ItemRenderData itemData;
     private final @Nullable SkullTextureResolver skullTextureResolver;
     private final boolean enableAntiAliasing;
@@ -95,7 +94,7 @@ public final class BlockRenderOptions {
         private float additionalScale = 1f;
         private Vector3f additionalTranslation = Vector3f.ZERO;
         private Transform overrideGuiTransform;
-        private List<String> packIds;
+        private ConcurrentList<String> packIds;
         private ItemRenderData itemData;
         private SkullTextureResolver skullTextureResolver;
         private boolean enableAntiAliasing = true;
@@ -212,7 +211,7 @@ public final class BlockRenderOptions {
          *
          * @param packIds the pack IDs, or null for no pack override
          */
-        public @NotNull Builder withPackIds(@Nullable List<String> packIds) {
+        public @NotNull Builder withPackIds(@Nullable ConcurrentList<String> packIds) {
             this.packIds = packIds;
             return this;
         }

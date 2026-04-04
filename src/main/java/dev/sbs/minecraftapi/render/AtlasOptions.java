@@ -1,5 +1,6 @@
 package dev.sbs.minecraftapi.render;
 
+import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.api.util.builder.ClassBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.List;
 
 /**
  * Immutable options for atlas generation, controlling asset paths, output layout,
@@ -30,13 +30,13 @@ public final class AtlasOptions {
     private final int tileSize;
     private final int columns;
     private final int rows;
-    private final @Nullable List<String> blockFilter;
-    private final @Nullable List<String> itemFilter;
+    private final @Nullable ConcurrentList<String> blockFilter;
+    private final @Nullable ConcurrentList<String> itemFilter;
     private final boolean includeBlocks;
     private final boolean includeItems;
-    private final @Nullable List<String> viewNames;
-    private final @Nullable List<String> texturePackDirectories;
-    private final @Nullable List<String> texturePackIds;
+    private final @Nullable ConcurrentList<String> viewNames;
+    private final @Nullable ConcurrentList<String> texturePackDirectories;
+    private final @Nullable ConcurrentList<String> texturePackIds;
     private final @Nullable String snbtItemDirectory;
     private final @Nullable String hypixelInventoryFile;
     private final boolean generateDebugBlock;
@@ -94,13 +94,13 @@ public final class AtlasOptions {
         private int tileSize = 160;
         private int columns = 12;
         private int rows = 12;
-        private List<String> blockFilter;
-        private List<String> itemFilter;
+        private ConcurrentList<String> blockFilter;
+        private ConcurrentList<String> itemFilter;
         private boolean includeBlocks = true;
         private boolean includeItems = true;
-        private List<String> viewNames;
-        private List<String> texturePackDirectories;
-        private List<String> texturePackIds;
+        private ConcurrentList<String> viewNames;
+        private ConcurrentList<String> texturePackDirectories;
+        private ConcurrentList<String> texturePackIds;
         private String snbtItemDirectory;
         private String hypixelInventoryFile;
         private boolean generateDebugBlock;
@@ -160,7 +160,7 @@ public final class AtlasOptions {
          *
          * @param blockFilter the block name filter, or null for all blocks
          */
-        public @NotNull Builder withBlockFilter(@Nullable List<String> blockFilter) {
+        public @NotNull Builder withBlockFilter(@Nullable ConcurrentList<String> blockFilter) {
             this.blockFilter = blockFilter;
             return this;
         }
@@ -170,7 +170,7 @@ public final class AtlasOptions {
          *
          * @param itemFilter the item name filter, or null for all items
          */
-        public @NotNull Builder withItemFilter(@Nullable List<String> itemFilter) {
+        public @NotNull Builder withItemFilter(@Nullable ConcurrentList<String> itemFilter) {
             this.itemFilter = itemFilter;
             return this;
         }
@@ -200,7 +200,7 @@ public final class AtlasOptions {
          *
          * @param viewNames the view name filter, or null for all views
          */
-        public @NotNull Builder withViewNames(@Nullable List<String> viewNames) {
+        public @NotNull Builder withViewNames(@Nullable ConcurrentList<String> viewNames) {
             this.viewNames = viewNames;
             return this;
         }
@@ -210,7 +210,7 @@ public final class AtlasOptions {
          *
          * @param texturePackDirectories the texture pack directories, or null for none
          */
-        public @NotNull Builder withTexturePackDirectories(@Nullable List<String> texturePackDirectories) {
+        public @NotNull Builder withTexturePackDirectories(@Nullable ConcurrentList<String> texturePackDirectories) {
             this.texturePackDirectories = texturePackDirectories;
             return this;
         }
@@ -220,7 +220,7 @@ public final class AtlasOptions {
          *
          * @param texturePackIds the pack IDs to apply, or null for none
          */
-        public @NotNull Builder withTexturePackIds(@Nullable List<String> texturePackIds) {
+        public @NotNull Builder withTexturePackIds(@Nullable ConcurrentList<String> texturePackIds) {
             this.texturePackIds = texturePackIds;
             return this;
         }

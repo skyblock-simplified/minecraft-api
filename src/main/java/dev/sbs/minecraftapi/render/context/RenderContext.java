@@ -3,13 +3,12 @@ package dev.sbs.minecraftapi.render.context;
 import dev.sbs.api.SimplifiedApi;
 import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.api.collection.concurrent.ConcurrentSet;
 import dev.sbs.api.math.Vector3f;
 import dev.sbs.api.math.Vector4f;
 import dev.sbs.api.tuple.pair.Pair;
 import dev.sbs.api.util.StringUtil;
-import dev.sbs.minecraftapi.asset.AssetContext;
-import dev.sbs.minecraftapi.asset.Namespace;
-import dev.sbs.minecraftapi.asset.PackSnapshot;
+import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.asset.model.BlockInfo;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Element;
@@ -20,10 +19,11 @@ import dev.sbs.minecraftapi.asset.model.BlockModel.Transform;
 import dev.sbs.minecraftapi.asset.model.ItemInfo;
 import dev.sbs.minecraftapi.asset.model.ItemInfo.TintInfo;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
-import dev.sbs.minecraftapi.asset.model.TextureReference;
+import dev.sbs.minecraftapi.asset.namespace.Namespace;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import dev.sbs.minecraftapi.asset.texture.TextureContext;
-import dev.sbs.minecraftapi.asset.texture.pack.TexturePackStack;
+import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
+import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
 import dev.sbs.minecraftapi.render.FaceRenderer;
@@ -156,44 +156,22 @@ public final class RenderContext implements AutoCloseable {
     // ----------------------------------------------------------------
 
     /**
-     * Creates a vanilla render context from a pre-built asset context.
+     * Creates a render context from an asset context.
      * <p>
-     * Block and item info lookups are served from the JPA repository via
-     * {@link SimplifiedApi#getRepository(Class)}.
+     * For vanilla contexts, block and item info lookups are served from the JPA repository.
+     * For pack-specific contexts, they are served from the context's own data.
      *
-     * @param assetContext the loaded asset context from minecraft-api
+     * @param assetContext the loaded asset context (vanilla or pack-specific)
      */
     public RenderContext(@NotNull AssetContext assetContext) {
         this.resolvedModels = assetContext.getResolvedModels();
         this.textureContext = assetContext.getTextureContext();
-        this.blockInfoSupplier = () -> SimplifiedApi.getRepository(BlockInfo.class).findAll();
-        this.itemInfoSupplier = () -> SimplifiedApi.getRepository(ItemInfo.class).findAll();
+        this.blockInfoSupplier = assetContext::getBlockInfos;
+        this.itemInfoSupplier = assetContext::getItemInfos;
         this.assetsDirectory = assetContext.getAssetsDirectory();
         this.playerSkinCacheDirectory = initializePlayerSkinCacheDirectory(assetContext.getAssetsDirectory());
         this.baseOverlayRoots = assetContext.getBaseOverlayRoots();
         this.packAssetContext = assetContext;
-    }
-
-    /**
-     * Creates a pack-specific render context from a pack snapshot.
-     * <p>
-     * Block and item info lookups are served from the snapshot's lists.
-     *
-     * @param snapshot the pack-specific asset snapshot
-     * @param assetsDirectory the assets root directory
-     * @param baseOverlayRoots the base overlay roots
-     */
-    public RenderContext(@NotNull PackSnapshot snapshot,
-                         @Nullable String assetsDirectory,
-                         @NotNull List<OverlayRoot> baseOverlayRoots) {
-        this.resolvedModels = snapshot.assetContext().getResolvedModels();
-        this.textureContext = snapshot.assetContext().getTextureContext();
-        this.blockInfoSupplier = snapshot::blockInfos;
-        this.itemInfoSupplier = snapshot::itemInfos;
-        this.assetsDirectory = assetsDirectory;
-        this.playerSkinCacheDirectory = initializePlayerSkinCacheDirectory(assetsDirectory);
-        this.baseOverlayRoots = baseOverlayRoots;
-        this.packAssetContext = snapshot.assetContext();
     }
 
     // ----------------------------------------------------------------
@@ -289,8 +267,11 @@ public final class RenderContext implements AutoCloseable {
      *
      * @return a list of block names
      */
-    public @NotNull List<String> getKnownBlockNames() {
-        return blockInfoSupplier.get().stream().map(BlockInfo::getName).collect(Concurrent.toList());
+    public @NotNull ConcurrentList<String> getKnownBlockNames() {
+        return blockInfoSupplier.get()
+            .stream()
+            .map(BlockInfo::getName)
+            .toList();
     }
 
     /**
@@ -298,11 +279,14 @@ public final class RenderContext implements AutoCloseable {
      *
      * @return a list of item names, or an empty list if no item data
      */
-    public @NotNull List<String> getKnownItemNames() {
+    public @NotNull ConcurrentList<String> getKnownItemNames() {
         try {
-            return itemInfoSupplier.get().stream().map(ItemInfo::getName).collect(Concurrent.toList());
+            return itemInfoSupplier.get()
+                .stream()
+                .map(ItemInfo::getName)
+                .toList();
         } catch (Exception e) {
-            return Collections.emptyList();
+            return Concurrent.newList();
         }
     }
 
@@ -316,7 +300,7 @@ public final class RenderContext implements AutoCloseable {
      *
      * @param packStacks sequences of pack identifiers representing each stack to preload
      */
-    public void preloadTexturePackStacks(@NotNull Iterable<List<String>> packStacks) {
+    public void preloadTexturePackStacks(@NotNull Iterable<ConcurrentList<String>> packStacks) {
         ensureNotDisposed();
         if (packStacks == null)
             throw new IllegalArgumentException("packStacks cannot be null");
@@ -330,13 +314,15 @@ public final class RenderContext implements AutoCloseable {
             return;
         }
 
-        Set<String> seenStacks = new HashSet<>();
-        for (List<String> packIds : packStacks) {
+        ConcurrentSet<String> seenStacks = Concurrent.newSet();
+        for (ConcurrentList<String> packIds : packStacks) {
             if (packIds == null || packIds.isEmpty())
                 continue;
+
             TexturePackStack stack = TexturePackStack.buildPackStack(packIds);
             if (!seenStacks.add(stack.getFingerprint().toLowerCase()))
                 continue;
+
             PackContextManager.resolveContext(this, packIds);
         }
     }
@@ -349,15 +335,15 @@ public final class RenderContext implements AutoCloseable {
     public void preloadRegisteredPacks(boolean includeDefaultPackStack) {
         ensureNotDisposed();
 
-        List<List<String>> stacksToPreload = new ArrayList<>();
+        ConcurrentList<ConcurrentList<String>> stacksToPreload = Concurrent.newList();
         if (includeDefaultPackStack && !packAssetContext.getPackIds().isEmpty())
-            stacksToPreload.add(new ArrayList<>(packAssetContext.getPackIds()));
+            stacksToPreload.add(Concurrent.newList(packAssetContext.getPackIds()));
 
         if (!hasResourcePacks())
             return;
 
         for (ResourcePack pack : SimplifiedApi.getRepository(ResourcePack.class).findAll())
-            stacksToPreload.add(Collections.singletonList(pack.getId()));
+            stacksToPreload.add(Concurrent.newUnmodifiableList(pack.getId()));
 
         preloadTexturePackStacks(stacksToPreload);
     }
@@ -720,16 +706,14 @@ public final class RenderContext implements AutoCloseable {
     private static int[] sampleBiomeTintColor(BufferedImage colormap, BiomeTint kind) {
         float[] coordinates = kind.getDefaultCoordinates();
 
-        float temperature = Math.max(0f, Math.min(1f, coordinates[0]));
-        float downfall = Math.max(0f, Math.min(1f, coordinates[1]));
-        float rainfall = Math.max(0f, Math.min(1f, downfall * temperature));
-        int x = Math.max(0, Math.min(Math.round((1f - temperature) * (colormap.getWidth() - 1)),
-            colormap.getWidth() - 1));
-        int y = Math.max(0, Math.min(Math.round((1f - rainfall) * (colormap.getHeight() - 1)),
-            colormap.getHeight() - 1));
+        float temperature = Math.clamp(coordinates[0], 0f, 1f);
+        float downfall = Math.clamp(coordinates[1], 0f, 1f);
+        float rainfall = Math.clamp(downfall * temperature, 0f, 1f);
+        int x = Math.max(0, Math.min(Math.round((1f - temperature) * (colormap.getWidth() - 1)), colormap.getWidth() - 1));
+        int y = Math.max(0, Math.min(Math.round((1f - rainfall) * (colormap.getHeight() - 1)), colormap.getHeight() - 1));
 
         int argb = colormap.getRGB(x, y);
-        return new int[]{(argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF};
+        return new int[] { (argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF };
     }
 
     private static String initializePlayerSkinCacheDirectory(@Nullable String assetsDirectory) {
@@ -769,8 +753,7 @@ public final class RenderContext implements AutoCloseable {
     // Item render pipeline - main entry
     // ----------------------------------------------------------------
 
-    private BufferedImage renderGuiItemInternal(String itemName, BlockRenderOptions options,
-                                                @Nullable ItemRenderCapture capture) {
+    private BufferedImage renderGuiItemInternal(String itemName, BlockRenderOptions options, @Nullable ItemRenderCapture capture) {
         options = options.mutate().withPadding(0f).build();
         ensureNotDisposed();
 
@@ -880,21 +863,19 @@ public final class RenderContext implements AutoCloseable {
     // Item render pipeline - texture layer rendering
     // ----------------------------------------------------------------
 
-    private @Nullable BufferedImage tryRenderGuiTextureLayers(String itemName,
-                                                               @Nullable ItemInfo itemInfo,
-                                                               @Nullable BlockModel model,
-                                                               BlockRenderOptions options) {
+    private @Nullable BufferedImage tryRenderGuiTextureLayers(String itemName, @Nullable ItemInfo itemInfo, @Nullable BlockModel model, BlockRenderOptions options) {
         List<String> candidates = new ArrayList<>();
         Set<String> seen = new HashSet<>();
         boolean isBillboard = model != null && ItemModelResolver.isBillboardModel(model);
-        boolean[] hasModelLayer = {false};
+        boolean[] hasModelLayer = { false };
 
         if (model != null) {
-            model.getTextures().entrySet().stream()
-                .filter(kvp -> kvp.getKey().toLowerCase().startsWith("layer"))
-                .sorted(Map.Entry.comparingByKey(String.CASE_INSENSITIVE_ORDER))
-                .forEach(kvp -> {
-                    String value = kvp.getValue().sprite();
+            model.getTextures()
+                .stream()
+                .filterKey(key -> key.toLowerCase().startsWith("layer"))
+                .sortedByKey(String.CASE_INSENSITIVE_ORDER)
+                .forEach((key, texture) -> {
+                    String value = texture.sprite();
 
                     if (value != null && !value.isBlank() && (isBillboard || ItemModelResolver.isGuiTexture(value))) {
                         if (seen.add(value.toLowerCase())) {
@@ -936,10 +917,7 @@ public final class RenderContext implements AutoCloseable {
             candidates.add(candidate);
     }
 
-    private @Nullable BufferedImage tryRenderFlatItemFromIdentifiers(Iterable<String> identifiers,
-                                                                      @Nullable BlockModel model,
-                                                                      BlockRenderOptions options,
-                                                                      @Nullable String tintContext) {
+    private @Nullable BufferedImage tryRenderFlatItemFromIdentifiers(Iterable<String> identifiers, @Nullable BlockModel model, BlockRenderOptions options, @Nullable String tintContext) {
         List<String> resolved = resolveTextureIdentifiers(identifiers, model);
         List<String> available = new ArrayList<>();
 
@@ -958,9 +936,7 @@ public final class RenderContext implements AutoCloseable {
     // Item render pipeline - flat item rendering
     // ----------------------------------------------------------------
 
-    private BufferedImage renderFlatItem(List<String> layerTextureIds,
-                                          BlockRenderOptions options,
-                                          @Nullable String tintContext) {
+    private @NotNull BufferedImage renderFlatItem(List<String> layerTextureIds, @NotNull BlockRenderOptions options, @Nullable String tintContext) {
         int size = options.getSize();
         ItemInfo itemInfo = null;
         String normalizedItemKey = null;

@@ -1,12 +1,14 @@
 package dev.sbs.minecraftapi.render.data;
 
 import dev.sbs.minecraftapi.asset.namespace.Namespace;
+import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Color tinting coordination, resource key normalization, and texture classification.
  */
+@UtilityClass
 public final class ColorUtil {
 
     /**
@@ -14,16 +16,13 @@ public final class ColorUtil {
      */
     public static final float CONSTANT_TINT_STRENGTH = 1.45f;
 
-    private ColorUtil() {
-    }
-
     /**
      * Returns the color for a block name by checking constant colors and block color prefixes.
      *
      * @param blockName the block or texture name
      * @return an RGB triplet, or null if no color applies
      */
-    public static @Nullable int[] getColorFromBlockName(@Nullable String blockName) {
+    public static int @Nullable [] getColorFromBlockName(@Nullable String blockName) {
         if (blockName == null || blockName.isBlank())
             return null;
 
@@ -133,4 +132,5 @@ public final class ColorUtil {
         return lower.contains("/item/") || lower.contains(":item/")
             || lower.contains("/items/") || lower.contains(":items/");
     }
+
 }
