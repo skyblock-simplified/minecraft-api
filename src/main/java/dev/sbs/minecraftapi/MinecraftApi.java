@@ -109,7 +109,6 @@ public class MinecraftApi extends SimplifiedApi {
         // Provide Api Clients
         MojangProxy mojangProxy = new MojangProxy();
         serviceManager.add(MojangProxy.class, mojangProxy);
-        serviceManager.add(MojangClient.class, mojangProxy.getApiClient());
         serviceManager.add(SbsClient.class, new SbsClient());
         serviceManager.add(HypixelClient.class, new HypixelClient());
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
