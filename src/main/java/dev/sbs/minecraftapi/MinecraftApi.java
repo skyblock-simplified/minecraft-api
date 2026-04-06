@@ -2,46 +2,39 @@ package dev.sbs.minecraftapi;
 
 import com.google.gson.Gson;
 import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.client.Client;
-import dev.sbs.api.client.request.Endpoint;
-import dev.sbs.api.io.gson.GsonSettings;
-import dev.sbs.api.persistence.CacheMissingStrategy;
-import dev.sbs.api.persistence.JpaConfig;
-import dev.sbs.api.persistence.JpaModel;
-import dev.sbs.api.persistence.Repository;
-import dev.sbs.api.persistence.SessionManager;
-import dev.sbs.api.persistence.driver.H2MemoryDriver;
-import dev.sbs.api.scheduler.Scheduler;
-import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
 import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
 import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.asset.context.VanillaContext;
 import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.mojang.MojangClient;
 import dev.sbs.minecraftapi.client.mojang.MojangProxy;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
-import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoint;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
-import dev.sbs.minecraftapi.client.sbs.request.SbsEndpoint;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
-import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
-import dev.sbs.minecraftapi.generator.text.segment.TextSegment;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.persistence.SkyBlockFactory;
 import dev.sbs.minecraftapi.persistence.model.Item;
 import dev.sbs.minecraftapi.skyblock.common.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
+import dev.simplified.client.Client;
+import dev.simplified.client.request.Endpoint;
+import dev.simplified.gson.GsonSettings;
+import dev.simplified.persistence.CacheMissingStrategy;
+import dev.simplified.persistence.JpaConfig;
+import dev.simplified.persistence.JpaModel;
+import dev.simplified.persistence.Repository;
+import dev.simplified.persistence.SessionManager;
+import dev.simplified.persistence.driver.H2MemoryDriver;
+import dev.simplified.scheduler.Scheduler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.logging.log4j.Level;
+import dev.simplified.util.Logging;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,8 +51,8 @@ import java.io.IOException;
  *     <li>Registers Minecraft/Hypixel {@link Gson} type adapters for NBT content,
  *         SkyBlock dates, and SBS API response types.</li>
  *     <li>Registers {@link NbtFactory} as a service for reading/writing NBT data.</li>
- *     <li>Registers {@link ClassBuilder ClassBuilder} entries for
- *         {@link SbsClient}, {@link MojangClient}, {@link HypixelClient}, and text segment types.</li>
+ *     <li>Registers {@link SbsClient}, {@link MojangClient}, {@link HypixelClient},
+ *         and text segment type clients.</li>
  *     <li>Instantiates and registers the {@link MojangProxy} (with IPv6 rotation),
  *         {@link SbsClient}, {@link HypixelClient}, and {@link MinecraftServerPing} clients.</li>
  *     <li>Connects an H2 in-memory JPA session that loads JSON model files from
@@ -97,14 +90,6 @@ public class MinecraftApi extends SimplifiedApi {
 
         // Provide Services
         serviceManager.add(NbtFactory.class, new NbtFactory());
-
-        // Provide Builders
-        builderManager.add(SbsEndpoint.class, SbsClient.class);
-        builderManager.add(MojangEndpoint.class, MojangClient.class);
-        builderManager.add(HypixelEndpoint.class, HypixelClient.class);
-        builderManager.add(LineSegment.class, LineSegment.Builder.class);
-        builderManager.add(ColorSegment.class, ColorSegment.Builder.class);
-        builderManager.add(TextSegment.class, TextSegment.Builder.class);
 
         // Provide Api Clients
         MojangProxy mojangProxy = new MojangProxy();
@@ -198,7 +183,7 @@ public class MinecraftApi extends SimplifiedApi {
 
     /**
      * Returns the global {@link SessionManager} that manages all active
-     * {@link dev.sbs.api.persistence.JpaSession JpaSession} instances, including the
+     * {@link dev.simplified.persistence.JpaSession JpaSession} instances, including the
      * H2 session for JSON-backed models bootstrapped by this class.
      *
      * @return the shared {@link SessionManager} instance registered in the {@link #serviceManager}
@@ -220,7 +205,7 @@ public class MinecraftApi extends SimplifiedApi {
                         .withStringType(GsonSettings.StringType.DEFAULT)
                         .build()
                 )
-                .withLogLevel(Level.WARN)
+                .withLogLevel(Logging.Level.WARN)
                 .isUsingQueryCache()
                 .isUsing2ndLevelCache()
                 .withCacheConcurrencyStrategy(CacheConcurrencyStrategy.READ_WRITE)
@@ -257,7 +242,7 @@ public class MinecraftApi extends SimplifiedApi {
                     .withStringType(GsonSettings.StringType.DEFAULT)
                     .build()
             )
-            .withLogLevel(org.apache.logging.log4j.Level.WARN)
+            .withLogLevel(Logging.Level.WARN)
             .isUsingQueryCache()
             .isUsing2ndLevelCache()
             .withCacheConcurrencyStrategy(org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
