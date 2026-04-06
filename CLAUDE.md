@@ -10,7 +10,7 @@ This is a Gradle submodule (Java 21, Gradle 9.4+) of the SkyBlock-Simplified mul
 # Build (from parent root)
 ./gradlew :minecraft-api:build
 
-# Build standalone (from this directory, uses JitPack fallback for :api dependency)
+# Build standalone (from this directory)
 ./gradlew build
 
 # Run all tests
@@ -23,17 +23,18 @@ This is a Gradle submodule (Java 21, Gradle 9.4+) of the SkyBlock-Simplified mul
 ./gradlew test --tests "dev.sbs.minecraftapi.client.SkyBlockIslandTest.getGuildLevels_ok"
 ```
 
-Tests use JUnit 5 with Hamcrest matchers. Many tests require a live database connection and Hypixel API key — they connect via `SimplifiedApi.getSessionManager().connect(JpaConfig.defaultSql())` and must call `disconnect()` in a `finally` block.
+Tests use JUnit 5 with Hamcrest matchers. Many tests require a live database connection and Hypixel API key — they connect via `MinecraftApi.getSessionManager().connect(JpaConfig.defaultSql())` and must call `disconnect()` in a `finally` block.
 
 ## Architecture
 
 ### Entry Point: `MinecraftApi`
 
-`MinecraftApi` extends `SimplifiedApi` (from the `:api` module) and bootstraps everything in a static initializer block:
-- Registers custom Gson type adapters (NBT, SkyBlock dates, SBS responses)
-- Registers `NbtFactory` as a service
-- Registers Feign client builders (`SbsClient`, `MojangClient`, `HypixelClient`)
+`MinecraftApi` is a non-instantiable static service locator that bootstraps everything in a single static initializer block:
+- Registers `Gson` with the `JpaExclusionStrategy` plus all custom type adapters (NBT, SkyBlock dates, SBS responses) in one combined build
+- Registers core services: `Scheduler`, `SessionManager`, `ImageFactory`, `NbtFactory`
+- Registers Feign clients: `MojangProxy`, `SbsClient`, `HypixelClient`, `MinecraftServerPing`
 - Connects an H2-backed JPA session for JSON-sourced models
+- Exposes the global `KeyManager` (case-insensitive) and `ServiceManager` static fields via Lombok `@Getter`
 
 Access pattern: `MinecraftApi.getClient(HypixelClient.class)`, `MinecraftApi.getRepository(Item.class)`, `MinecraftApi.getNbtFactory()`.
 

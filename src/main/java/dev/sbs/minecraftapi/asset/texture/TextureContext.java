@@ -6,7 +6,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
-import dev.sbs.api.SimplifiedApi;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.namespace.AssetNamespace;
 import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;

@@ -142,14 +142,14 @@ public class ExampleApp {
 
 ### Entry Point
 
-`MinecraftApi` extends `SimplifiedApi` and bootstraps all game-related services
-in a static initializer block:
+`MinecraftApi` is a non-instantiable static service locator that bootstraps all
+shared and game-related infrastructure in a single static initializer block:
 
-1. Registers Minecraft/Hypixel Gson type adapters
-2. Registers `NbtFactory` as a service
-3. Registers Feign client builders (`SbsClient`, `MojangClient`, `HypixelClient`)
-4. Instantiates and registers API client instances (including `MojangProxy` with IPv6 rotation)
-5. Connects an H2 in-memory JPA session that loads JSON model files from `skyblock/`
+1. Configures `Gson` with the `JpaExclusionStrategy` plus Minecraft/Hypixel type adapters in one combined build
+2. Registers core services: `Scheduler`, `SessionManager`, `ImageFactory`, `NbtFactory`
+3. Registers Feign clients: `MojangProxy` (with IPv6 rotation), `SbsClient`, `HypixelClient`, `MinecraftServerPing`
+4. Connects an H2 in-memory JPA session that loads JSON model files from `skyblock/`
+5. Exposes static `KeyManager` and `ServiceManager` fields via Lombok `@Getter`
 
 ### HTTP Clients
 
@@ -216,7 +216,7 @@ Bundled fonts: Minecraft (Regular, Bold, Italic, BoldItalic) and ComicSans.
 ```
 minecraft-api/
 ├── src/main/java/dev/sbs/minecraftapi/
-│   ├── MinecraftApi.java               # Entry point (extends SimplifiedApi)
+│   ├── MinecraftApi.java               # Entry point (self-contained service locator)
 │   ├── client/
 │   │   ├── hypixel/                    # Hypixel API v2 client and responses
 │   │   │   └── response/skyblock/      # SkyBlockIsland, SkyBlockMember, etc.

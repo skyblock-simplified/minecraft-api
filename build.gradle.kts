@@ -35,8 +35,19 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.platform.launcher)
 
-    // Projects
-    api("dev.sbs:api:0.1.0")
+    // Simplified Libraries (extracted to github.com/simplified-dev)
+    api("com.github.simplified-dev:collections:master-SNAPSHOT")
+    api("com.github.simplified-dev:utils:master-SNAPSHOT")
+    api("com.github.simplified-dev:reflection:master-SNAPSHOT")
+    api("com.github.simplified-dev:image:68aec439ed")
+    api("com.github.simplified-dev:gson-extras:master-SNAPSHOT")
+    api("com.github.simplified-dev:scheduler:master-SNAPSHOT")
+    api("com.github.simplified-dev:manager:master-SNAPSHOT")
+    api("com.github.simplified-dev:client:master-SNAPSHOT")
+    api("com.github.simplified-dev:persistence:master-SNAPSHOT")
+
+    // Gson (used directly in MinecraftApi static init)
+    api(libs.gson)
 }
 
 idea {
