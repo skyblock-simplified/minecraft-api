@@ -1,6 +1,5 @@
 package dev.sbs.minecraftapi.generator.font;
 
-import dev.sbs.annotation.ResourcePath;
 import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,8 @@ public enum ComicSansFont implements Font {
     private final @NotNull Style style;
     private final float size;
 
-    ComicSansFont(@ResourcePath(base = "minecraft/fonts") @NotNull String fileName, @NotNull Style style, float size) {
+    // @ResourcePath(base = "minecraft/fonts")
+    ComicSansFont(@NotNull String fileName, @NotNull Style style, float size) {
         this(Font.initFont(String.format("minecraft/fonts/%s", fileName), size), style, size);
     }
 

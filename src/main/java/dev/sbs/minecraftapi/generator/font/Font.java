@@ -1,6 +1,5 @@
 package dev.sbs.minecraftapi.generator.font;
 
-import dev.sbs.annotation.ResourcePath;
 import dev.sbs.minecraftapi.generator.image.exception.FontException;
 import dev.simplified.util.SystemUtil;
 import lombok.Cleanup;
@@ -53,7 +52,7 @@ public interface Font {
      * @return the {@link java.awt.Font} object initialized with the specified resource and size
      * @throws FontException if the font file cannot be loaded or is in an invalid format
      */
-    static @NotNull java.awt.Font initFont(@ResourcePath @NotNull String resourcePath, float size) throws FontException {
+    static @NotNull java.awt.Font initFont(/*@ResourcePath */@NotNull String resourcePath, float size) throws FontException {
         try {
             @Cleanup InputStream inputStream = SystemUtil.getResource(resourcePath);
             java.awt.Font font = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, Objects.requireNonNull(inputStream)).deriveFont(size);
