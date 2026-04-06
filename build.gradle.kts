@@ -43,6 +43,13 @@ idea {
     module {
         testSources.from(sourceSets["jmh"].java.srcDirs)
         testResources.from(sourceSets["jmh"].resources.srcDirs)
+        excludeDirs.addAll(listOf(
+            layout.projectDirectory.dir(".gitnexus").asFile,
+            layout.projectDirectory.dir(".schema").asFile,
+            layout.projectDirectory.dir("customdata").asFile,
+            layout.projectDirectory.dir("minecraft").asFile,
+            layout.projectDirectory.dir("texturepacks").asFile
+        ))
     }
 }
 
