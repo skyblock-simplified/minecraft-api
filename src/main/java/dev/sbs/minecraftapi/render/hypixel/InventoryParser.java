@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.render.hypixel;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.nbt.tags.Tag;
 import dev.sbs.minecraftapi.nbt.tags.TagType;
@@ -10,6 +8,8 @@ import dev.sbs.minecraftapi.nbt.tags.collection.ListTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.ByteTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.ShortTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
 import lombok.experimental.UtilityClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

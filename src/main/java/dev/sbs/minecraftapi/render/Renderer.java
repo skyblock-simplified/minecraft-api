@@ -1,6 +1,6 @@
 package dev.sbs.minecraftapi.render;
 
-import dev.sbs.api.io.image.PixelBuffer;
+import dev.simplified.image.PixelBuffer;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

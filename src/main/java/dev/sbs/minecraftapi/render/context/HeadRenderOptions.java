@@ -1,6 +1,5 @@
 package dev.sbs.minecraftapi.render.context;
 
-import dev.sbs.api.util.builder.ClassBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -103,7 +102,7 @@ public final class HeadRenderOptions {
     /**
      * Fluent builder for constructing {@link HeadRenderOptions} instances.
      */
-    public static class Builder implements ClassBuilder<HeadRenderOptions> {
+    public static class Builder {
 
         private int size = 128;
         private float yawInDegrees;
@@ -198,7 +197,6 @@ public final class HeadRenderOptions {
         }
 
         /** {@inheritDoc} */
-        @Override
         public @NotNull HeadRenderOptions build() {
             return new HeadRenderOptions(
                 this.size, this.yawInDegrees, this.pitchInDegrees, this.rollInDegrees,

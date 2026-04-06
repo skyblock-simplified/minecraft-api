@@ -1,6 +1,5 @@
 package dev.sbs.minecraftapi.asset;
 
-import dev.sbs.api.util.builder.ClassBuilder;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +46,7 @@ public final class MinecraftAssetOptions {
     /**
      * Fluent builder for constructing {@link MinecraftAssetOptions} instances.
      */
-    public static final class Builder implements ClassBuilder<MinecraftAssetOptions> {
+    public static final class Builder {
 
         private @Nullable String versionId;
         private @Nullable String assetsDirectory;
@@ -110,7 +109,6 @@ public final class MinecraftAssetOptions {
             return this;
         }
 
-        @Override
         public @NotNull MinecraftAssetOptions build() {
             return new MinecraftAssetOptions(versionId, assetsDirectory, cacheRoot, texturePackDirectories);
         }

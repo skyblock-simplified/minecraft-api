@@ -1,9 +1,6 @@
 package dev.sbs.minecraftapi.asset.context;
 
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
 import dev.sbs.minecraftapi.asset.model.BlockInfo;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
@@ -11,6 +8,9 @@ import dev.sbs.minecraftapi.asset.model.ItemInfo;
 import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import dev.sbs.minecraftapi.asset.texture.TextureContext;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.collection.ConcurrentMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -41,12 +41,12 @@ public final class VanillaContext extends AssetContext {
 
     @Override
     public @NotNull ConcurrentList<BlockInfo> getBlockInfos() {
-        return SimplifiedApi.getRepository(BlockInfo.class).findAll();
+        return MinecraftApi.getRepository(BlockInfo.class).findAll();
     }
 
     @Override
     public @NotNull ConcurrentList<ItemInfo> getItemInfos() {
-        return SimplifiedApi.getRepository(ItemInfo.class).findAll();
+        return MinecraftApi.getRepository(ItemInfo.class).findAll();
     }
 
     /**

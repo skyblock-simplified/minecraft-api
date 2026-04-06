@@ -1,12 +1,12 @@
 package dev.sbs.minecraftapi.render;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.nbt.NbtFactory;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
 import dev.sbs.minecraftapi.render.context.ItemRenderData;
 import dev.sbs.minecraftapi.render.context.RenderContext;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

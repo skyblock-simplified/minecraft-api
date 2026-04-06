@@ -1,9 +1,9 @@
 package dev.sbs.minecraftapi.render;
 
-import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.render.context.RenderContext;
+import dev.simplified.collection.ConcurrentList;
 
 import java.io.File;
 import java.io.IOException;

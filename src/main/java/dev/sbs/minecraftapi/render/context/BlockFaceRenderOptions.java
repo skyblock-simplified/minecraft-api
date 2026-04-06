@@ -1,8 +1,7 @@
 package dev.sbs.minecraftapi.render.context;
 
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Face;
+import dev.simplified.collection.ConcurrentList;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +60,7 @@ public final class BlockFaceRenderOptions {
     /**
      * Fluent builder for constructing {@link BlockFaceRenderOptions} instances.
      */
-    public static class Builder implements ClassBuilder<BlockFaceRenderOptions> {
+    public static class Builder {
 
         private Face direction = Face.UP;
         private int size = 512;
@@ -109,7 +108,6 @@ public final class BlockFaceRenderOptions {
         }
 
         /** {@inheritDoc} */
-        @Override
         public @NotNull BlockFaceRenderOptions build() {
             return new BlockFaceRenderOptions(this.direction, this.size, this.rotation, this.packIds);
         }

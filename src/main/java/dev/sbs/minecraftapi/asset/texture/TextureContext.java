@@ -7,13 +7,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.io.image.AnimatedImageData;
-import dev.sbs.api.io.image.ImageFrame;
-import dev.sbs.api.io.image.PixelBuffer;
-import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.namespace.AssetNamespace;
 import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import dev.sbs.minecraftapi.asset.namespace.Namespace;
+import dev.simplified.image.AnimatedImageData;
+import dev.simplified.image.ImageFrame;
+import dev.simplified.image.PixelBuffer;
+import dev.simplified.util.StringUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -124,7 +125,7 @@ public final class TextureContext implements AutoCloseable {
 
         if (embeddedTextureFile != null && !embeddedTextureFile.isBlank() && Files.exists(Path.of(embeddedTextureFile))) {
             try (Reader reader = Files.newBufferedReader(Path.of(embeddedTextureFile))) {
-                Gson gson = SimplifiedApi.getGson();
+                Gson gson = MinecraftApi.getGson();
                 Type listType = new TypeToken<List<TextureContentEntry>>() {}.getType();
                 List<TextureContentEntry> entries = gson.fromJson(reader, listType);
 

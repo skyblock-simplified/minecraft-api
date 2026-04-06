@@ -124,7 +124,7 @@ public class MinecraftApi extends SimplifiedApi {
      */
     @SneakyThrows
     public static @NotNull File getCurrentDirectory() {
-        return new File(SimplifiedApi.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
+        return new File(MinecraftApi.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParentFile();
     }
 
     /**

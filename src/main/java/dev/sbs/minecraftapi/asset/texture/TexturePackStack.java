@@ -1,10 +1,10 @@
 package dev.sbs.minecraftapi.asset.texture;
 
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.ResourcePackDiscovery;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
@@ -53,7 +53,7 @@ public final class TexturePackStack {
      * Builds an ordered texture pack stack from the given list of pack identifiers.
      *
      * <p>
-     * Queries {@link SimplifiedApi#getRepository(Class)} for each pack ID (case-insensitive).
+     * Queries {@link MinecraftApi#getRepository(Class)} for each pack ID (case-insensitive).
      * Returns an empty stack with a {@code "vanilla"} fingerprint when packIds is empty.
      *
      * @param packIds the ordered list of pack identifiers to include in the stack
@@ -64,7 +64,7 @@ public final class TexturePackStack {
         if (packIds.isEmpty())
             return new TexturePackStack(Concurrent.newUnmodifiableList(), Concurrent.newUnmodifiableList(), "vanilla");
 
-        ConcurrentList<ResourcePack> allPacks = SimplifiedApi.getRepository(ResourcePack.class).findAll();
+        ConcurrentList<ResourcePack> allPacks = MinecraftApi.getRepository(ResourcePack.class).findAll();
         ConcurrentList<ResourcePack> ordered = getResourcePacks(packIds, allPacks);
         ConcurrentList<OverlayRoot> overlayRoots = Concurrent.newList();
 

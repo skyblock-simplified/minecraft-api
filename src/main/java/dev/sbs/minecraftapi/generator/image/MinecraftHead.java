@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.generator.image;
 
-import dev.sbs.api.util.SystemUtil;
 import dev.sbs.minecraftapi.generator.image.exception.ImageException;
+import dev.simplified.util.SystemUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

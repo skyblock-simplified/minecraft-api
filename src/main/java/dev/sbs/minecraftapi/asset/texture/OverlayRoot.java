@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.asset.texture;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentSet;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.collection.ConcurrentSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Files;

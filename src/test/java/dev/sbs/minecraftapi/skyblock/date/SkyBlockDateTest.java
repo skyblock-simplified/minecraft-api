@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.skyblock.date;
 
-import dev.sbs.api.collection.concurrent.ConcurrentList;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.election.Election;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.election.SpecialElection;
+import dev.simplified.collection.ConcurrentList;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

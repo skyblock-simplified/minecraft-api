@@ -1,6 +1,5 @@
 package dev.sbs.minecraftapi.render.resolver;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
 import dev.sbs.minecraftapi.render.BlockRenderer;
@@ -9,6 +8,7 @@ import dev.sbs.minecraftapi.render.ItemRenderer;
 import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
 import dev.sbs.minecraftapi.render.context.ItemRenderData;
 import dev.sbs.minecraftapi.render.context.RenderContext;
+import dev.simplified.collection.Concurrent;
 import lombok.Cleanup;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

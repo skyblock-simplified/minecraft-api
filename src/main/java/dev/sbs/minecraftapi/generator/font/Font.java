@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.generator.font;
 
 import dev.sbs.annotation.ResourcePath;
-import dev.sbs.api.util.SystemUtil;
 import dev.sbs.minecraftapi.generator.image.exception.FontException;
+import dev.simplified.util.SystemUtil;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

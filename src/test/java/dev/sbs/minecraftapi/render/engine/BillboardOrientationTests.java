@@ -1,13 +1,13 @@
 package dev.sbs.minecraftapi.render.engine;
 
-import dev.sbs.api.math.Vector2f;
-import dev.sbs.api.math.Vector3f;
-import dev.sbs.api.math.Vector4f;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Element;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Face;
 import dev.sbs.minecraftapi.asset.model.BlockModel.FaceData;
+import dev.sbs.minecraftapi.math.Vector2f;
+import dev.sbs.minecraftapi.math.Vector3f;
+import dev.sbs.minecraftapi.math.Vector4f;
 import dev.sbs.minecraftapi.render.BlockRenderer;
 import dev.sbs.minecraftapi.render.IntegrationTestBase;
 import dev.sbs.minecraftapi.render.context.RenderContext;

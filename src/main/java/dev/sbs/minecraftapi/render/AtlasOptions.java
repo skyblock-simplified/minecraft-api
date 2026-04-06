@@ -1,7 +1,6 @@
 package dev.sbs.minecraftapi.render;
 
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.util.builder.ClassBuilder;
+import dev.simplified.collection.ConcurrentList;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +86,7 @@ public final class AtlasOptions {
     /**
      * Fluent builder for constructing {@link AtlasOptions} instances.
      */
-    public static class Builder implements ClassBuilder<AtlasOptions> {
+    public static class Builder {
 
         private String assetsDirectory = "";
         private String outputDirectory = Path.of(System.getProperty("user.dir"), "atlases").toString();
@@ -255,7 +254,6 @@ public final class AtlasOptions {
             return this;
         }
 
-        @Override
         public @NotNull AtlasOptions build() {
             return new AtlasOptions(
                 assetsDirectory, outputDirectory, tileSize, columns, rows,

@@ -1,15 +1,14 @@
 package dev.sbs.minecraftapi.nbt;
 
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.util.SystemUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.SkyBlockAuction;
 import dev.sbs.minecraftapi.client.hypixel.response.skyblock.SkyBlockAuctions;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.util.SystemUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
@@ -46,9 +45,9 @@ public class MinecraftNbtTest {
 
     @Test
     public void getAuctionHouse_ok() {
-        SimplifiedApi.getKeyManager().add(SystemUtil.getEnvPair("HYPIXEL_API_KEY"));
+        MinecraftApi.getKeyManager().add(SystemUtil.getEnvPair("HYPIXEL_API_KEY"));
 
-        HypixelEndpoint hypixelEndpoints = SimplifiedApi.getClient(HypixelClient.class).getEndpoint();
+        HypixelEndpoint hypixelEndpoints = MinecraftApi.getClient(HypixelClient.class).getEndpoint();
         SkyBlockAuctions auctionsResponse = hypixelEndpoints.getAuctions();
         ConcurrentList<SkyBlockAuction> auctions = Concurrent.newList(auctionsResponse.getAuctions());
 

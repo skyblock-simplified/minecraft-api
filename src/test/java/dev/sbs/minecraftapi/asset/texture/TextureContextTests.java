@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.asset.texture;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
 import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
+import dev.simplified.collection.Concurrent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,13 +1,6 @@
 package dev.sbs.minecraftapi.render.context;
 
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentSet;
-import dev.sbs.api.math.Vector3f;
-import dev.sbs.api.math.Vector4f;
-import dev.sbs.api.tuple.pair.Pair;
-import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.asset.model.BlockInfo;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
@@ -24,6 +17,8 @@ import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import dev.sbs.minecraftapi.asset.texture.TextureContext;
 import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
 import dev.sbs.minecraftapi.asset.texture.TextureReference;
+import dev.sbs.minecraftapi.math.Vector3f;
+import dev.sbs.minecraftapi.math.Vector4f;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.StringTag;
 import dev.sbs.minecraftapi.render.FaceRenderer;
@@ -41,6 +36,11 @@ import dev.sbs.minecraftapi.render.resolver.ItemModelResolver;
 import dev.sbs.minecraftapi.render.resolver.PackContextManager;
 import dev.sbs.minecraftapi.render.resolver.RenderedResource;
 import dev.sbs.minecraftapi.render.resolver.ResourceIdResult;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.collection.ConcurrentSet;
+import dev.simplified.collection.tuple.pair.Pair;
+import dev.simplified.util.StringUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -342,7 +342,7 @@ public final class RenderContext implements AutoCloseable {
         if (!hasResourcePacks())
             return;
 
-        for (ResourcePack pack : SimplifiedApi.getRepository(ResourcePack.class).findAll())
+        for (ResourcePack pack : MinecraftApi.getRepository(ResourcePack.class).findAll())
             stacksToPreload.add(Concurrent.newUnmodifiableList(pack.getId()));
 
         preloadTexturePackStacks(stacksToPreload);
@@ -538,7 +538,7 @@ public final class RenderContext implements AutoCloseable {
         BlockRenderOptions idOptions = capture.getFinalOptions() != null ? capture.getFinalOptions() : options;
         ResourceIdResult resourceId = PackContextManager.computeResourceId(this, resourceTarget,
             idOptions, capture.toResolution());
-        return new RenderedResource(dev.sbs.api.io.image.StaticImageData.of(image), resourceId);
+        return new RenderedResource(dev.simplified.image.StaticImageData.of(image), resourceId);
     }
 
     /**
@@ -686,7 +686,7 @@ public final class RenderContext implements AutoCloseable {
      */
     public boolean hasResourcePacks() {
         try {
-            return !SimplifiedApi.getRepository(ResourcePack.class).findAll().isEmpty();
+            return !MinecraftApi.getRepository(ResourcePack.class).findAll().isEmpty();
         } catch (Exception e) {
             return false;
         }
@@ -694,7 +694,7 @@ public final class RenderContext implements AutoCloseable {
 
     private @Nullable ResourcePack tryResolveResourcePack(String packId) {
         try {
-            for (ResourcePack candidate : SimplifiedApi.getRepository(ResourcePack.class).findAll()) {
+            for (ResourcePack candidate : MinecraftApi.getRepository(ResourcePack.class).findAll()) {
                 if (candidate.getId().equalsIgnoreCase(packId))
                     return candidate;
             }

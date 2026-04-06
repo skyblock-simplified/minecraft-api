@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi.client.sbs.request;
 
-import dev.sbs.api.client.request.Endpoint;
-import dev.sbs.api.client.route.Route;
 import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
@@ -10,6 +8,8 @@ import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojiData;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
+import dev.simplified.client.request.Endpoint;
+import dev.simplified.client.route.Route;
 import feign.Param;
 import feign.RequestLine;
 import org.jetbrains.annotations.NotNull;

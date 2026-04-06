@@ -1,17 +1,16 @@
 package dev.sbs.minecraftapi.generator.image;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.io.stream.ByteArrayDataOutput;
-import dev.sbs.api.math.Range;
-import dev.sbs.api.util.SystemUtil;
-import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.generator.font.Font;
 import dev.sbs.minecraftapi.generator.font.MinecraftFont;
 import dev.sbs.minecraftapi.generator.image.exception.ImageException;
 import dev.sbs.minecraftapi.generator.text.ChatFormat;
 import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
 import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.stream.ByteArrayDataOutput;
+import dev.simplified.util.Range;
+import dev.simplified.util.SystemUtil;
 import lombok.AccessLevel;
 import lombok.Cleanup;
 import lombok.Getter;
@@ -292,7 +291,7 @@ public class MinecraftText {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class Builder implements ClassBuilder<MinecraftText> {
+    public static class Builder {
 
         private ConcurrentList<LineSegment> lines = Concurrent.newList();
         private ChatFormat defaultColor = ChatFormat.GRAY;
@@ -346,7 +345,6 @@ public class MinecraftText {
             return this;
         }
 
-        @Override
         public @NotNull MinecraftText build() {
             return new MinecraftText(
                 this.lines,

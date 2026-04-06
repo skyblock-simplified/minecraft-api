@@ -1,6 +1,5 @@
 package dev.sbs.minecraftapi.render.benchmark;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
 import dev.sbs.minecraftapi.RendererApi;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.ByteTag;
@@ -10,6 +9,7 @@ import dev.sbs.minecraftapi.render.context.BlockRenderOptions;
 import dev.sbs.minecraftapi.render.context.ItemRenderData;
 import dev.sbs.minecraftapi.render.context.RenderContext;
 import dev.sbs.minecraftapi.render.resolver.ResourceIdResult;
+import dev.simplified.collection.Concurrent;
 import org.openjdk.jmh.annotations.*;
 
 import java.awt.image.BufferedImage;

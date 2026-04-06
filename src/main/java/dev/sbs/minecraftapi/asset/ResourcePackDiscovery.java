@@ -4,12 +4,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.model.ResourcePack;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.collection.ConcurrentMap;
+import dev.simplified.util.StringUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -297,7 +297,7 @@ public final class ResourcePackDiscovery {
 
     private static @NotNull ResourcePack.Meta loadMeta(@NotNull Path path) throws IOException {
         try (java.io.Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-            ResourcePack.Meta meta = SimplifiedApi.getGson().fromJson(reader, ResourcePack.Meta.class);
+            ResourcePack.Meta meta = MinecraftApi.getGson().fromJson(reader, ResourcePack.Meta.class);
             if (meta == null)
                 throw new IllegalStateException("Failed to parse texture pack metadata from '%s'".formatted(path));
             return meta;

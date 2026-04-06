@@ -1,8 +1,5 @@
 package dev.sbs.minecraftapi.asset.context;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
 import dev.sbs.minecraftapi.asset.model.BlockInfo;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
 import dev.sbs.minecraftapi.asset.model.ItemInfo;
@@ -11,6 +8,9 @@ import dev.sbs.minecraftapi.asset.namespace.AssetNamespaceRegistry;
 import dev.sbs.minecraftapi.asset.texture.OverlayRoot;
 import dev.sbs.minecraftapi.asset.texture.TextureContext;
 import dev.sbs.minecraftapi.asset.texture.TexturePackStack;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.collection.ConcurrentMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 

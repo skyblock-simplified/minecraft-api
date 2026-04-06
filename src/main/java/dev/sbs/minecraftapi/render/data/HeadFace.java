@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.render.data;
 
-import dev.sbs.api.math.Vector2f;
-import dev.sbs.api.math.Vector3f;
+import dev.sbs.minecraftapi.math.Vector2f;
+import dev.sbs.minecraftapi.math.Vector3f;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

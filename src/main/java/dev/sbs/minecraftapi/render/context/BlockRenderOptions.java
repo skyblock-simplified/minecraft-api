@@ -1,9 +1,8 @@
 package dev.sbs.minecraftapi.render.context;
 
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.math.Vector3f;
-import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Transform;
+import dev.sbs.minecraftapi.math.Vector3f;
+import dev.simplified.collection.ConcurrentList;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +81,7 @@ public final class BlockRenderOptions {
     /**
      * Fluent builder for constructing {@link BlockRenderOptions} instances.
      */
-    public static class Builder implements ClassBuilder<BlockRenderOptions> {
+    public static class Builder {
 
         private int size = 512;
         private float yawInDegrees;
@@ -254,7 +253,6 @@ public final class BlockRenderOptions {
         }
 
         /** {@inheritDoc} */
-        @Override
         public @NotNull BlockRenderOptions build() {
             return new BlockRenderOptions(
                 this.size, this.yawInDegrees, this.pitchInDegrees, this.rollInDegrees,

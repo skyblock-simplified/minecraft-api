@@ -4,7 +4,7 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import dev.sbs.api.persistence.type.GsonType;
+import dev.simplified.persistence.type.GsonType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

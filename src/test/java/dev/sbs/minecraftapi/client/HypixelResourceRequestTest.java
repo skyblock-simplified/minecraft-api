@@ -1,13 +1,12 @@
 package dev.sbs.minecraftapi.client;
 
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.util.SystemUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceCollections;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceItems;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceSkills;
+import dev.simplified.util.SystemUtil;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,7 @@ public class HypixelResourceRequestTest {
 
     @Test
     public void getSkills_ok() {
-        SimplifiedApi.getKeyManager().add(SystemUtil.getEnvPair("HYPIXEL_API_KEY"));
+        MinecraftApi.getKeyManager().add(SystemUtil.getEnvPair("HYPIXEL_API_KEY"));
         ResourceSkills skills = HYPIXEL_RESOURCE_REQUEST.getSkills();
         MatcherAssert.assertThat(skills.getSkills().size(), Matchers.greaterThan(0));
     }

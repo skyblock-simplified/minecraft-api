@@ -1,12 +1,6 @@
 package dev.sbs.minecraftapi.render;
 
 import com.google.gson.Gson;
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
-import dev.sbs.api.collection.concurrent.ConcurrentSet;
-import dev.sbs.api.util.StringUtil;
 import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
 import dev.sbs.minecraftapi.asset.ResourcePackDiscovery;
@@ -22,6 +16,11 @@ import dev.sbs.minecraftapi.render.hypixel.InventoryParser;
 import dev.sbs.minecraftapi.render.hypixel.LegacyItemMappings;
 import dev.sbs.minecraftapi.render.hypixel.TextureResolver;
 import dev.sbs.minecraftapi.render.resolver.ResourceIdResult;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.collection.ConcurrentMap;
+import dev.simplified.collection.ConcurrentSet;
+import dev.simplified.util.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,7 @@ import java.util.function.BiFunction;
  */
 public final class AtlasGenerator {
 
-    private static final Gson GSON = SimplifiedApi.getGson();
+    private static final Gson GSON = MinecraftApi.getGson();
 
     private AtlasGenerator() {
     }

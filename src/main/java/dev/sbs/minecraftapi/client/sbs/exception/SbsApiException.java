@@ -1,6 +1,7 @@
 package dev.sbs.minecraftapi.client.sbs.exception;
 
-import dev.sbs.api.client.exception.ApiException;
+import dev.sbs.minecraftapi.MinecraftApi;
+import dev.simplified.client.exception.ApiException;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +13,7 @@ public final class SbsApiException extends ApiException {
     public SbsApiException(@NotNull String methodKey, @NotNull feign.Response response) {
         super(methodKey, response, "SBS");
         this.response = this.getBody()
-            .map(json -> super.fromJson(json, SbsErrorResponse.class))
+            .map(json -> super.fromJson(MinecraftApi.getGson(), json, SbsErrorResponse.class))
             .orElse(new SbsErrorResponse.Unknown());
     }
 

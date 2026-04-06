@@ -1,9 +1,5 @@
 package dev.sbs.minecraftapi.render.resolver;
 
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.math.Vector2f;
-import dev.sbs.api.math.Vector3f;
-import dev.sbs.api.math.Vector4f;
 import dev.sbs.minecraftapi.asset.model.BlockModel;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Element;
 import dev.sbs.minecraftapi.asset.model.BlockModel.Face;
@@ -11,6 +7,9 @@ import dev.sbs.minecraftapi.asset.model.BlockModel.FaceData;
 import dev.sbs.minecraftapi.asset.model.ItemInfo;
 import dev.sbs.minecraftapi.asset.model.ItemInfo.TintInfo;
 import dev.sbs.minecraftapi.asset.texture.TextureReference;
+import dev.sbs.minecraftapi.math.Vector2f;
+import dev.sbs.minecraftapi.math.Vector3f;
+import dev.sbs.minecraftapi.math.Vector4f;
 import dev.sbs.minecraftapi.nbt.tags.collection.CompoundTag;
 import dev.sbs.minecraftapi.nbt.tags.collection.ListTag;
 import dev.sbs.minecraftapi.nbt.tags.primitive.ByteTag;
@@ -30,6 +29,7 @@ import dev.sbs.minecraftapi.render.data.ColorUtil;
 import dev.sbs.minecraftapi.render.hypixel.HypixelItemData;
 import dev.sbs.minecraftapi.render.hypixel.HypixelPrefixes;
 import dev.sbs.minecraftapi.render.hypixel.TextureResolver;
+import dev.simplified.collection.Concurrent;
 import org.junit.jupiter.api.Test;
 
 import java.awt.image.BufferedImage;

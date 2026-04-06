@@ -1,8 +1,7 @@
 package dev.sbs.minecraftapi.generator.text;
 
-import dev.sbs.api.util.Preconditions;
-import dev.sbs.api.util.RegexUtil;
-import dev.sbs.api.util.StringUtil;
+import dev.simplified.util.RegexUtil;
+import dev.simplified.util.StringUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,7 +87,8 @@ public enum ChatFormat {
     }
 
     public Color getColor() {
-        Preconditions.checkArgument(this.isColor(), "Format has no color!");
+        if (!this.isColor())
+            throw new IllegalArgumentException("Format has no color!");
         return this.color;
     }
 

@@ -1,11 +1,10 @@
 package dev.sbs.minecraftapi.generator.text.segment;
 
 import com.google.gson.JsonObject;
-import dev.sbs.api.collection.concurrent.Concurrent;
-import dev.sbs.api.collection.concurrent.ConcurrentList;
-import dev.sbs.api.util.StringUtil;
-import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.generator.text.ChatFormat;
+import dev.simplified.collection.Concurrent;
+import dev.simplified.collection.ConcurrentList;
+import dev.simplified.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -218,7 +217,7 @@ public class ColorSegment {
         return TextSegment.fromJson(this.toJson());
     }
 
-    public static class Builder implements ClassBuilder<ColorSegment> {
+    public static class Builder {
 
         protected String text = "";
         protected Optional<ChatFormat> color = Optional.empty();
@@ -287,7 +286,6 @@ public class ColorSegment {
             return this;
         }
 
-        @Override
         public @NotNull ColorSegment build() {
             ColorSegment colorSegment = new ColorSegment(this.text);
             colorSegment.setColor(this.color);

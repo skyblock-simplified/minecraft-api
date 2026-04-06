@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.render.resolver;
 
-import dev.sbs.api.io.image.AnimatedImageData;
-import dev.sbs.api.io.image.ImageFactory;
-import dev.sbs.api.io.image.ImageFormat;
+import dev.simplified.image.AnimatedImageData;
+import dev.simplified.image.ImageFactory;
+import dev.simplified.image.ImageFormat;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

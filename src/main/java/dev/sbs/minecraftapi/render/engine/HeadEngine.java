@@ -1,11 +1,11 @@
 package dev.sbs.minecraftapi.render.engine;
 
-import dev.sbs.api.io.image.PixelBuffer;
-import dev.sbs.api.math.Matrix4f;
-import dev.sbs.api.math.Vector2f;
-import dev.sbs.api.math.Vector3f;
+import dev.sbs.minecraftapi.math.Matrix4f;
+import dev.sbs.minecraftapi.math.Vector2f;
+import dev.sbs.minecraftapi.math.Vector3f;
 import dev.sbs.minecraftapi.render.context.HeadRenderOptions;
 import dev.sbs.minecraftapi.render.data.HeadFace;
+import dev.simplified.image.PixelBuffer;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;

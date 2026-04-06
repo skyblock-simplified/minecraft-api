@@ -1,7 +1,6 @@
 package dev.sbs.minecraftapi.generator;
 
-import dev.sbs.api.SimplifiedApi;
-import dev.sbs.api.util.StringUtil;
+import dev.sbs.minecraftapi.MinecraftApi;
 import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.sbs.SbsClient;
 import dev.sbs.minecraftapi.generator.image.MinecraftHead;
@@ -9,6 +8,7 @@ import dev.sbs.minecraftapi.generator.image.MinecraftText;
 import dev.sbs.minecraftapi.generator.text.ChatFormat;
 import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
 import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
+import dev.simplified.util.StringUtil;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
@@ -22,7 +22,7 @@ public class MinecraftImageGenTest {
     @Test
     public void generateHead() {
         String username = "GoldenDusk";
-        MojangProfile mojangProfile = SimplifiedApi.getClient(SbsClient.class).getEndpoint().getProfileFromUsername(username);
+        MojangProfile mojangProfile = MinecraftApi.getClient(SbsClient.class).getEndpoint().getProfileFromUsername(username);
         String textureUrl = mojangProfile.getTextures().getSkin().orElseThrow().getUrl();
         String base64Skin = mojangProfile.getTextures().getSkin().orElseThrow().getData();
         System.out.println(textureUrl);

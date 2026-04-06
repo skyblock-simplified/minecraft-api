@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.render.engine;
 
-import dev.sbs.api.math.Matrix4f;
-import dev.sbs.api.math.Vector3f;
+import dev.sbs.minecraftapi.math.Matrix4f;
+import dev.sbs.minecraftapi.math.Vector3f;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;

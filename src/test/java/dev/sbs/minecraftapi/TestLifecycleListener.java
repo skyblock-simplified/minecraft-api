@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi;
 
-import dev.sbs.api.scheduler.Scheduler;
 import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
 import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
+import dev.simplified.scheduler.Scheduler;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestPlan;
 

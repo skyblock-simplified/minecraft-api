@@ -1,6 +1,6 @@
 package dev.sbs.minecraftapi.client.sbs.response;
 
-import dev.sbs.api.collection.concurrent.ConcurrentMap;
+import dev.simplified.collection.ConcurrentMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

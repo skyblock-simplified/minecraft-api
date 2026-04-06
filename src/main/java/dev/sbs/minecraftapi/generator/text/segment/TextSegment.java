@@ -2,11 +2,10 @@ package dev.sbs.minecraftapi.generator.text.segment;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.sbs.api.util.StringUtil;
-import dev.sbs.api.util.builder.ClassBuilder;
 import dev.sbs.minecraftapi.generator.text.ChatFormat;
 import dev.sbs.minecraftapi.generator.text.event.ClickEvent;
 import dev.sbs.minecraftapi.generator.text.event.HoverEvent;
+import dev.simplified.util.StringUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -75,7 +74,7 @@ public final class TextSegment extends ColorSegment {
         return fromLegacyHandler(legacyText, symbolSubstitute, () -> new TextSegment(""));
     }
 
-    public static class Builder implements ClassBuilder<TextSegment> {
+    public static class Builder {
 
         protected String text = "";
         protected Optional<ChatFormat> color = Optional.empty();
@@ -164,7 +163,6 @@ public final class TextSegment extends ColorSegment {
             return this;
         }
 
-        @Override
         public @NotNull TextSegment build() {
             TextSegment textSegment = new TextSegment(this.text);
             textSegment.setClickEvent(this.clickEvent);
