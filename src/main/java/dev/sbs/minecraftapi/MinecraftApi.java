@@ -329,9 +329,11 @@ public class MinecraftApi {
      *
      * <p>Equivalent to {@link #connectSkyBlockSession(JpaCacheProvider)} called with
      * {@link JpaCacheProvider#EHCACHE}. See that overload for the canonical Javadoc.</p>
+     *
+     * @return the newly registered SkyBlock {@link JpaSession}
      */
-    public static void connectSkyBlockSession() {
-        connectSkyBlockSession(JpaCacheProvider.EHCACHE);
+    public static @NotNull JpaSession connectSkyBlockSession() {
+        return connectSkyBlockSession(JpaCacheProvider.EHCACHE);
     }
 
     /**
@@ -360,9 +362,10 @@ public class MinecraftApi {
      * model.</p>
      *
      * @param provider the JCache provider that backs the Hibernate second-level cache
+     * @return the newly registered SkyBlock {@link JpaSession}
      */
-    public static void connectSkyBlockSession(@NotNull JpaCacheProvider provider) {
-        getSessionManager().connect(
+    public static @NotNull JpaSession connectSkyBlockSession(@NotNull JpaCacheProvider provider) {
+        return getSessionManager().connect(
             JpaConfig.builder()
                 .withDriver(new H2MemoryDriver())
                 .withSchema("skyblock")
