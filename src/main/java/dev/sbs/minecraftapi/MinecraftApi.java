@@ -30,6 +30,7 @@ import dev.simplified.manager.KeyManager;
 import dev.simplified.manager.Manager;
 import dev.simplified.manager.ServiceManager;
 import dev.simplified.persistence.CacheMissingStrategy;
+import dev.simplified.persistence.JpaCacheProvider;
 import dev.simplified.persistence.JpaConfig;
 import dev.simplified.persistence.JpaExclusionStrategy;
 import dev.simplified.persistence.JpaModel;
@@ -68,9 +69,17 @@ import java.io.IOException;
  *     <li>Registers a {@link Client} for each of {@link SbsContract}, {@link HypixelContract},
  *         and {@link HypixelForumContract}, plus a {@link Proxy} for {@link MojangContract} and
  *         a {@link MinecraftServerPing} utility.</li>
- *     <li>Connects an H2 in-memory JPA session that loads JSON model files from the
- *         {@code skyblock/} classpath resource directory.</li>
+ *     <li>Registers a {@link SkyBlockFactory} as a service provider so the SkyBlock model
+ *         package and JSON {@link dev.simplified.persistence.source.Source} can be reused by
+ *         {@link #connectSkyBlockSession()} or by external services that wire the same
+ *         factory into a {@link JpaConfig} backed by a different
+ *         {@link dev.simplified.persistence.JpaCacheProvider}.</li>
  * </ul>
+ *
+ * <p>The static initializer no longer auto-connects the SkyBlock H2 session - entry-point
+ * code must explicitly call {@link #connectSkyBlockSession()} (or build its own
+ * {@link JpaConfig} via {@link #getSkyBlockFactory()}) before any
+ * {@link #getRepository(Class)} lookup against a SkyBlock model.</p>
  *
  * <p>Two static managers are exposed for registration and lookup:
  * <ul>
@@ -103,8 +112,8 @@ public class MinecraftApi {
      * <p>
      * Pre-populated in the static initializer with {@link Gson}, {@link GsonSettings},
      * {@link Scheduler}, {@link SessionManager}, {@link ImageFactory}, {@link NbtFactory},
-     * a {@link Client} for each registered {@link Contract}, a {@link Proxy} for
-     * {@link MojangContract}, and {@link MinecraftServerPing}. Uses
+     * {@link SkyBlockFactory}, a {@link Client} for each registered {@link Contract},
+     * a {@link Proxy} for {@link MojangContract}, and {@link MinecraftServerPing}. Uses
      * {@link Manager.Mode#UPDATE} mode, allowing both registration and replacement of services.
      */
     @Getter protected static final @NotNull ServiceManager serviceManager = new ServiceManager(Manager.Mode.UPDATE);
@@ -132,6 +141,7 @@ public class MinecraftApi {
         serviceManager.add(SessionManager.class, new SessionManager());
         serviceManager.add(ImageFactory.class, new ImageFactory());
         serviceManager.add(NbtFactory.class, new NbtFactory());
+        serviceManager.add(SkyBlockFactory.class, new SkyBlockFactory());
 
         // Provide Api Clients (keyed by contract class)
         registerContract(SbsContract.class, Client.create(MinecraftClients.sbsOptions(gson)));
@@ -142,9 +152,6 @@ public class MinecraftApi {
         registerContract(HypixelForumContract.class, Client.create(MinecraftClients.hypixelForumOptions(gson)));
         registerContract(MojangContract.class, MinecraftClients.mojangProxy(gson));
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
-
-        // Provide Json Persistence (H2-backed JPA session)
-        connectSkyBlockSession();
     }
 
     /**
@@ -290,8 +297,10 @@ public class MinecraftApi {
     }
 
     /**
-     * Returns the global {@link SessionManager} that manages all active {@link JpaSession}
-     * instances, including the H2 session for JSON-backed models bootstrapped by this class.
+     * Returns the global {@link SessionManager} that owns all active {@link JpaSession}
+     * instances. The SkyBlock H2 session must be connected explicitly via
+     * {@link #connectSkyBlockSession()} before any SkyBlock model lookup; the static
+     * initializer registers the {@link SessionManager} but no longer auto-connects.
      *
      * @return the shared {@link SessionManager} instance registered in the {@link #serviceManager}
      */
@@ -299,12 +308,66 @@ public class MinecraftApi {
         return serviceManager.get(SessionManager.class);
     }
 
+    /**
+     * Returns the registered {@link SkyBlockFactory} that resolves the SkyBlock JPA model
+     * package and the {@code skyblock/} JSON {@link dev.simplified.persistence.source.Source}.
+     *
+     * <p>The factory is registered as a service in the static initializer and is reused by
+     * {@link #connectSkyBlockSession()} as well as any external consumer (e.g. the
+     * {@code simplified-data} service) that needs to wire the same model and source set
+     * into a {@link JpaConfig} backed by a different {@link dev.simplified.persistence.JpaCacheProvider}.</p>
+     *
+     * @return the shared {@link SkyBlockFactory} instance registered in the {@link #serviceManager}
+     */
+    public static @NotNull SkyBlockFactory getSkyBlockFactory() {
+        return serviceManager.get(SkyBlockFactory.class);
+    }
+
+    /**
+     * Connects the SkyBlock H2 in-memory JPA session backed by the default
+     * {@link JpaCacheProvider#EHCACHE} second-level cache provider.
+     *
+     * <p>Equivalent to {@link #connectSkyBlockSession(JpaCacheProvider)} called with
+     * {@link JpaCacheProvider#EHCACHE}. See that overload for the canonical Javadoc.</p>
+     */
     public static void connectSkyBlockSession() {
+        connectSkyBlockSession(JpaCacheProvider.EHCACHE);
+    }
+
+    /**
+     * Connects the SkyBlock H2 in-memory JPA session, registering all SkyBlock JSON-backed
+     * model repositories with the {@link SessionManager} and loading the
+     * {@code skyblock/} classpath JSON resources via the registered {@link SkyBlockFactory}.
+     *
+     * <p>The {@code provider} parameter selects the JCache (JSR-107) backing for the Hibernate
+     * second-level cache. {@link JpaCacheProvider#EHCACHE EHCACHE} is the default for
+     * {@code simplified-bot} / {@code simplified-server} / tests; {@code simplified-data} passes
+     * {@link JpaCacheProvider#HAZELCAST_CLIENT HAZELCAST_CLIENT} to share L2 cache regions
+     * across the cluster, and the {@code minecraft-api} Hazelcast test passes
+     * {@link JpaCacheProvider#HAZELCAST_EMBEDDED HAZELCAST_EMBEDDED} to bootstrap an in-process
+     * Hazelcast member for isolated tests.</p>
+     *
+     * <p>All other settings - driver ({@link H2MemoryDriver}), schema ({@code "skyblock"}),
+     * factory ({@link #getSkyBlockFactory()}), {@link GsonSettings} (mutated to
+     * {@link GsonSettings.StringType#DEFAULT} so empty strings round-trip on
+     * {@code nullable=false} columns), query cache, second-level cache,
+     * {@link CacheConcurrencyStrategy#READ_WRITE}, {@link CacheMissingStrategy#CREATE_WARN},
+     * 30-second query TTL - are fixed across all callers.</p>
+     *
+     * <p>This method is no longer auto-invoked from the static initializer; entry-point
+     * code (e.g. {@code SimplifiedBot.start()}, {@code TestLifecycleListener}) must call
+     * it explicitly before any {@link #getRepository(Class)} lookup against a SkyBlock
+     * model.</p>
+     *
+     * @param provider the JCache provider that backs the Hibernate second-level cache
+     */
+    public static void connectSkyBlockSession(@NotNull JpaCacheProvider provider) {
         getSessionManager().connect(
             JpaConfig.builder()
                 .withDriver(new H2MemoryDriver())
                 .withSchema("skyblock")
-                .withRepositoryFactory(new SkyBlockFactory())
+                .withCacheProvider(provider)
+                .withRepositoryFactory(getSkyBlockFactory())
                 .withGsonSettings(
                     getServiceManager()
                         .get(GsonSettings.class)

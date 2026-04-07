@@ -31,6 +31,7 @@ public class TestLifecycleListener implements TestExecutionListener {
     public void testPlanExecutionStarted(TestPlan testPlan) {
         System.out.println("[TestLifecycleListener] Initializing MinecraftApi");
         MinecraftApi.getSessionManager();
+        MinecraftApi.connectSkyBlockSession();
 
         // Load vanilla assets and discover texture packs
         String assetsDir = findDirectory("minecraft");
