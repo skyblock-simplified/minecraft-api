@@ -1,27 +1,27 @@
 package dev.sbs.minecraftapi.client;
 
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.client.mojang.MojangProxy;
-import dev.sbs.minecraftapi.client.mojang.request.MojangEndpoint;
+import dev.sbs.minecraftapi.client.mojang.request.MojangContract;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
+import dev.simplified.client.Proxy;
 import org.junit.jupiter.api.Test;
 
 public class MojangProxyTest {
 
     @Test
     public void makeMojangRequests_ok() {
-        MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangEndpoint apiRequest = mojangProxy.getEndpoint();
-        MojangUsername usernameResponse = apiRequest.getPlayer("CraftedFury");
+        Proxy<MojangContract> mojangProxy = MinecraftApi.getMojangProxy();
+        MojangContract mojang = mojangProxy.getContract();
+        MojangUsername usernameResponse = mojang.getPlayer("CraftedFury");
         System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId());
     }
 
     @Test
     public void makeMultiMojangRequests_ok() {
-        MojangProxy mojangProxy = MinecraftApi.getMojangProxy();
-        MojangEndpoint apiRequest = mojangProxy.getEndpoint();
-        MojangMultiUsername multiUsernameResponse = apiRequest.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
+        Proxy<MojangContract> mojangProxy = MinecraftApi.getMojangProxy();
+        MojangContract mojang = mojangProxy.getContract();
+        MojangMultiUsername multiUsernameResponse = mojang.getMultipleUniqueIds("CraftedFury", "GoldenDusk");
         multiUsernameResponse.getProfiles().forEach(usernameResponse -> System.out.println(usernameResponse.getUsername() + " : " + usernameResponse.getUniqueId()));
     }
 

@@ -1,9 +1,8 @@
 package dev.sbs.minecraftapi.client;
 
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
 import dev.sbs.minecraftapi.client.hypixel.exception.HypixelApiException;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelContract;
 import dev.simplified.collection.Concurrent;
 import dev.simplified.collection.ConcurrentMap;
 import dev.simplified.collection.tuple.pair.Pair;
@@ -36,7 +35,7 @@ public class SkyBlockIslandTest {
     //@Test
     public void getGuildLevels_ok() {
         try {
-            HypixelEndpoint hypixelEndpoints = MinecraftApi.getClient(HypixelClient.class).getEndpoint();
+            HypixelContract hypixelEndpoints = MinecraftApi.getClient(HypixelContract.class).getContract();
             String guildName = "SkyBlock Simplified";
 
             hypixelEndpoints.getGuildByName(guildName)
@@ -107,7 +106,7 @@ public class SkyBlockIslandTest {
             JpaSession session = MinecraftApi.getSessionManager().connect(JpaConfig.defaultSql());
             System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
             System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
-            HypixelEndpoint hypixelEndpoints = MinecraftApi.getClient(HypixelClient.class).getEndpoints();
+            HypixelContract hypixelEndpoints = MinecraftApi.getClient(HypixelContract.class).getContract();
 
             UUID uniqueId = StringUtil.toUUID("f33f51a7-9691-4076-abda-f66e3d047a71"); // CraftedFury
             //UUID uniqueId = StringUtil.toUUID("df5e1701-809c-48be-9b0d-ef50b83b009e"); // GoldenDusk
@@ -182,7 +181,7 @@ public class SkyBlockIslandTest {
             JpaSession session = MinecraftApi.getSessionManager().connect(JpaConfig.defaultSql());
             System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
             System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
-            HypixelEndpoint hypixelEndpoints = MinecraftApi.getClient(HypixelClient.class).getEndpoints();
+            HypixelContract hypixelEndpoints = MinecraftApi.getClient(HypixelContract.class).getContract();
             ProfileModel pineappleProfile = MinecraftApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE");
             ProfileModel bananaProfile = MinecraftApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA");
 

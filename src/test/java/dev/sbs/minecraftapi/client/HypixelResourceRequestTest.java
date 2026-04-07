@@ -1,8 +1,7 @@
 package dev.sbs.minecraftapi.client;
 
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelEndpoint;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelContract;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceCollections;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceItems;
 import dev.sbs.minecraftapi.client.hypixel.response.resource.ResourceSkills;
@@ -13,10 +12,10 @@ import org.junit.jupiter.api.Test;
 
 public class HypixelResourceRequestTest {
 
-    private static final HypixelEndpoint HYPIXEL_RESOURCE_REQUEST;
+    private static final HypixelContract HYPIXEL_RESOURCE_REQUEST;
 
     static {
-        HYPIXEL_RESOURCE_REQUEST = MinecraftApi.getClient(HypixelClient.class).getEndpoint();
+        HYPIXEL_RESOURCE_REQUEST = MinecraftApi.getClient(HypixelContract.class).getContract();
     }
 
     @Test

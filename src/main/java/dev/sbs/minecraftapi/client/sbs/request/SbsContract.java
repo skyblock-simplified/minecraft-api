@@ -2,13 +2,12 @@ package dev.sbs.minecraftapi.client.sbs.request;
 
 import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
-import dev.sbs.minecraftapi.client.sbs.SbsClient;
 import dev.sbs.minecraftapi.client.sbs.exception.SbsApiException;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojiData;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
-import dev.simplified.client.request.Endpoint;
+import dev.simplified.client.request.Contract;
 import dev.simplified.client.route.Route;
 import feign.Param;
 import feign.RequestLine;
@@ -17,14 +16,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 /**
- * Feign endpoint interface for the SBS API, providing cached Mojang profile
- * lookups and SkyBlock asset data (item emojis, images, and metadata).
+ * Feign contract interface for the SBS API, providing cached Mojang profile lookups and
+ * SkyBlock asset data (item emojis, images, and metadata).
  *
- * @see SbsClient
  * @see <a href="https://api.sbs.dev/">SBS Public API</a>
  */
 @Route("api.sbs.dev")
-public interface SbsEndpoint extends Endpoint {
+public interface SbsContract extends Contract {
 
     /**
      * Fetches a Mojang profile by username via the test endpoint.

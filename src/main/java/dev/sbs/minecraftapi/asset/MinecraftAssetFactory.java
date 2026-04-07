@@ -438,14 +438,14 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
      * @throws IOException if any step fails
      */
     public static @NotNull Path downloadAndExtractAssets(@Nullable String versionId, @NotNull Path outputDir) throws IOException {
-        PistonManifest manifest = MinecraftApi.getMojangProxy().getEndpoint().getVersionManifest();
+        PistonManifest manifest = MinecraftApi.getMojangProxy().getContract().getVersionManifest();
         String resolvedVersion = versionId != null ? versionId : manifest.getLatest().getRelease();
         PistonManifest.Entry entry = manifest.getVersions().findFirstOrNull(PistonManifest.Entry::getVersion, resolvedVersion);
 
         if (entry == null)
             throw new IOException("Minecraft version '%s' not found in manifest".formatted(resolvedVersion));
 
-        PistonMetadata metadata = MinecraftApi.getMojangProxy().getEndpoint().getVersionMetadata(entry);
+        PistonMetadata metadata = MinecraftApi.getMojangProxy().getContract().getVersionMetadata(entry);
         Path jarPath = downloadClientJar(metadata.getDownloads().getClient());
 
         try {
@@ -458,7 +458,7 @@ public final class MinecraftAssetFactory implements RepositoryFactory {
     private static @NotNull Path downloadClientJar(@NotNull PistonMetadata.Downloads.Entry entry) throws IOException {
         Path tempFile = Files.createTempFile("minecraft-client-", ".jar");
 
-        try (InputStream in = MinecraftApi.getMojangProxy().getEndpoint().downloadClientJar(entry);
+        try (InputStream in = MinecraftApi.getMojangProxy().getContract().downloadClientJar(entry);
              OutputStream out = Files.newOutputStream(tempFile)) {
             in.transferTo(out);
         }

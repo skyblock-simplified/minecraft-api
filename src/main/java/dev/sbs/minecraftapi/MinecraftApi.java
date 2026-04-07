@@ -6,12 +6,13 @@ import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
 import dev.sbs.minecraftapi.asset.context.AssetContext;
 import dev.sbs.minecraftapi.asset.context.VanillaContext;
 import dev.sbs.minecraftapi.asset.texture.TextureReference;
-import dev.sbs.minecraftapi.client.hypixel.HypixelClient;
-import dev.sbs.minecraftapi.client.mojang.MojangClient;
-import dev.sbs.minecraftapi.client.mojang.MojangProxy;
+import dev.sbs.minecraftapi.client.MinecraftClients;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelContract;
+import dev.sbs.minecraftapi.client.hypixel.request.HypixelForumContract;
 import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
+import dev.sbs.minecraftapi.client.mojang.request.MojangContract;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
-import dev.sbs.minecraftapi.client.sbs.SbsClient;
+import dev.sbs.minecraftapi.client.sbs.request.SbsContract;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
@@ -21,7 +22,8 @@ import dev.sbs.minecraftapi.persistence.model.Item;
 import dev.sbs.minecraftapi.skyblock.common.NbtContent;
 import dev.sbs.minecraftapi.skyblock.date.SkyBlockDate;
 import dev.simplified.client.Client;
-import dev.simplified.client.request.Endpoint;
+import dev.simplified.client.Proxy;
+import dev.simplified.client.request.Contract;
 import dev.simplified.gson.GsonSettings;
 import dev.simplified.image.ImageFactory;
 import dev.simplified.manager.KeyManager;
@@ -48,26 +50,26 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Non-instantiable central service locator that bootstraps and exposes the core
- * infrastructure shared across all Minecraft- and Hypixel-related modules: managers,
- * serialization, scheduling, persistence, Feign clients, and an H2-backed JPA session
- * for JSON-sourced game models.
+ * Non-instantiable central service locator that bootstraps and exposes the core infrastructure
+ * shared across all Minecraft- and Hypixel-related modules: managers, serialization, scheduling,
+ * persistence, Feign clients, and an H2-backed JPA session for JSON-sourced game models.
  * <p>
  * All bootstrapping happens in a single static initializer block:
  * <ul>
- *     <li>Configures a {@link Gson} instance with the {@link JpaExclusionStrategy}
- *         and Minecraft/Hypixel type adapters for {@link NbtContent},
- *         {@link MojangMultiUsername}, {@link SkyBlockDate.RealTime},
- *         {@link SkyBlockDate.SkyBlockTime}, {@link SkyBlockEmojis},
- *         {@link SkyBlockImages}, {@link TextureReference}, and {@link SkyBlockItems}.</li>
+ *     <li>Configures a {@link Gson} instance with the {@link JpaExclusionStrategy} and
+ *         Minecraft/Hypixel type adapters for {@link NbtContent}, {@link MojangMultiUsername},
+ *         {@link SkyBlockDate.RealTime}, {@link SkyBlockDate.SkyBlockTime},
+ *         {@link SkyBlockEmojis}, {@link SkyBlockImages}, {@link TextureReference}, and
+ *         {@link SkyBlockItems}.</li>
  *     <li>Registers a {@link Scheduler} for asynchronous and recurring tasks.</li>
  *     <li>Registers a {@link SessionManager} for managing JPA database sessions.</li>
  *     <li>Registers an {@link ImageFactory} for reading and writing images.</li>
  *     <li>Registers an {@link NbtFactory} for reading and writing Minecraft NBT data.</li>
- *     <li>Registers {@link MojangProxy} (with IPv6 rotation), {@link SbsClient},
- *         {@link HypixelClient}, and {@link MinecraftServerPing} clients.</li>
- *     <li>Connects an H2 in-memory JPA session that loads JSON model files from
- *         the {@code skyblock/} classpath resource directory.</li>
+ *     <li>Registers a {@link Client} for each of {@link SbsContract}, {@link HypixelContract},
+ *         and {@link HypixelForumContract}, plus a {@link Proxy} for {@link MojangContract} and
+ *         a {@link MinecraftServerPing} utility.</li>
+ *     <li>Connects an H2 in-memory JPA session that loads JSON model files from the
+ *         {@code skyblock/} classpath resource directory.</li>
  * </ul>
  *
  * <p>Two static managers are exposed for registration and lookup:
@@ -78,7 +80,7 @@ import java.io.IOException;
  *
  * <p>Typical access patterns:
  * <pre>{@code
- * MinecraftApi.getClient(HypixelClient.class);
+ * MinecraftApi.getClient(HypixelContract.class);
  * MinecraftApi.getRepository(Item.class);
  * MinecraftApi.getNbtFactory();
  * MinecraftApi.getMojangProxy();
@@ -101,9 +103,9 @@ public class MinecraftApi {
      * <p>
      * Pre-populated in the static initializer with {@link Gson}, {@link GsonSettings},
      * {@link Scheduler}, {@link SessionManager}, {@link ImageFactory}, {@link NbtFactory},
-     * {@link MojangProxy}, {@link SbsClient}, {@link HypixelClient}, and
-     * {@link MinecraftServerPing}. Uses {@link Manager.Mode#UPDATE} mode, allowing both
-     * registration and replacement of services.
+     * a {@link Client} for each registered {@link Contract}, a {@link Proxy} for
+     * {@link MojangContract}, and {@link MinecraftServerPing}. Uses
+     * {@link Manager.Mode#UPDATE} mode, allowing both registration and replacement of services.
      */
     @Getter protected static final @NotNull ServiceManager serviceManager = new ServiceManager(Manager.Mode.UPDATE);
 
@@ -122,7 +124,8 @@ public class MinecraftApi {
             .withTypeAdapter(SkyBlockItems.class, new SkyBlockItems.Deserializer())
             .build();
         serviceManager.add(GsonSettings.class, gsonSettings);
-        serviceManager.add(Gson.class, gsonSettings.create());
+        Gson gson = gsonSettings.create();
+        serviceManager.add(Gson.class, gson);
 
         // Provide Core Services
         serviceManager.add(Scheduler.class, new Scheduler());
@@ -130,10 +133,14 @@ public class MinecraftApi {
         serviceManager.add(ImageFactory.class, new ImageFactory());
         serviceManager.add(NbtFactory.class, new NbtFactory());
 
-        // Provide Api Clients
-        serviceManager.add(MojangProxy.class, new MojangProxy());
-        serviceManager.add(SbsClient.class, new SbsClient());
-        serviceManager.add(HypixelClient.class, new HypixelClient());
+        // Provide Api Clients (keyed by contract class)
+        registerContract(SbsContract.class, Client.create(MinecraftClients.sbsOptions(gson)));
+        registerContract(
+            HypixelContract.class,
+            Client.create(MinecraftClients.hypixelOptions(gson, keyManager.getSupplier("HYPIXEL_API_KEY")))
+        );
+        registerContract(HypixelForumContract.class, Client.create(MinecraftClients.hypixelForumOptions(gson)));
+        registerContract(MojangContract.class, MinecraftClients.mojangProxy(gson));
         serviceManager.add(MinecraftServerPing.class, new MinecraftServerPing());
 
         // Provide Json Persistence (H2-backed JPA session)
@@ -141,18 +148,51 @@ public class MinecraftApi {
     }
 
     /**
-     * Retrieves a registered {@link Client} instance for the given client class.
+     * Stores the given client or proxy under its contract class as the service-manager key.
      * <p>
-     * Available clients include {@link HypixelClient}, {@link MojangClient},
-     * {@link SbsClient}, and {@link MinecraftServerPing}.
+     * The {@link ServiceManager} signature requires {@code Class<T>} to match the value type, but
+     * we want to use the {@link Contract} interface as the lookup key for both {@link Client} and
+     * {@link Proxy} values. The cast is unchecked but consistent: every registration goes through
+     * this method, and every lookup goes through {@link #getClient(Class)} or
+     * {@link #getProxy(Class)}, both of which apply the inverse cast.
      *
-     * @param tClass the client class to look up in the {@link #serviceManager}
-     * @param <T> the endpoint type the client operates on
-     * @param <A> the client type
-     * @return the registered client instance
+     * @param contractClass the contract interface class used as the key
+     * @param instance the client or proxy instance to register
+     * @param <T> the contract type
      */
-    public static <T extends Endpoint, A extends Client<T>> @NotNull A getClient(@NotNull Class<A> tClass) {
-        return serviceManager.get(tClass);
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static <T extends Contract> void registerContract(@NotNull Class<T> contractClass, @NotNull Object instance) {
+        serviceManager.add((Class) contractClass, instance);
+    }
+
+    /**
+     * Retrieves the registered {@link Client} for the given contract class.
+     * <p>
+     * Throws {@link ClassCastException} at the call site if the contract is registered as a
+     * {@link Proxy} (e.g. {@link MojangContract}); use {@link #getProxy(Class)} for those.
+     *
+     * @param contractClass the contract interface class to look up
+     * @param <T> the contract type
+     * @return the registered client
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <T extends Contract> @NotNull Client<T> getClient(@NotNull Class<T> contractClass) {
+        return (Client<T>) serviceManager.get((Class) contractClass);
+    }
+
+    /**
+     * Retrieves the registered {@link Proxy} for the given contract class.
+     * <p>
+     * Throws {@link ClassCastException} at the call site if the contract is registered as a
+     * direct {@link Client}; use {@link #getClient(Class)} for those.
+     *
+     * @param contractClass the contract interface class to look up
+     * @param <T> the contract type
+     * @return the registered proxy
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <T extends Contract> @NotNull Proxy<T> getProxy(@NotNull Class<T> contractClass) {
+        return (Proxy<T>) serviceManager.get((Class) contractClass);
     }
 
     /**
@@ -186,13 +226,34 @@ public class MinecraftApi {
     }
 
     /**
-     * Returns the {@link MojangProxy} that manages a pool of {@link MojangClient} instances
-     * with IPv6 rotation to avoid Mojang API rate limits.
+     * Returns the {@link Proxy} that manages a pool of Mojang {@link Client} instances with
+     * optional IPv6 rotation to avoid Mojang API rate limits.
+     * <p>
+     * The pool's IPv6 rotation prefix is configured via {@link #setInet6NetworkPrefix(String)}
+     * at startup; without it, the proxy still serves requests from a single client bound to the
+     * system default local address.
      *
-     * @return the shared {@link MojangProxy} instance
+     * @return the shared Mojang proxy instance
      */
-    public static @NotNull MojangProxy getMojangProxy() {
-        return serviceManager.get(MojangProxy.class);
+    public static @NotNull Proxy<MojangContract> getMojangProxy() {
+        return getProxy(MojangContract.class);
+    }
+
+    /**
+     * Replaces the registered Mojang {@link Proxy} with one that rotates outbound source
+     * addresses across the given IPv6 CIDR prefix.
+     * <p>
+     * Constructs a fresh proxy via {@link MinecraftClients#mojangProxy(Gson, String)} and stores
+     * it under {@link MojangContract} in the {@link #serviceManager}, replacing any previously
+     * registered Mojang proxy. Intended to be called once at application startup once the
+     * runtime IPv6 prefix is known.
+     *
+     * @param cidrPrefix an IPv6 network prefix in CIDR notation (e.g. {@code "2000:444:33ff::/48"})
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static void setInet6NetworkPrefix(@NotNull String cidrPrefix) {
+        Proxy<MojangContract> proxy = MinecraftClients.mojangProxy(getGson(), cidrPrefix);
+        serviceManager.put((Class) MojangContract.class, proxy);
     }
 
     /**
