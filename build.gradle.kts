@@ -84,4 +84,10 @@ tasks {
         classpath = sourceSets["test"].runtimeClasspath
         args = listOf(layout.projectDirectory.dir(".schema").asFile.absolutePath)
     }
+    register<JavaExec>("generateAuctionFixture") {
+        description = "Fetches the full SkyBlock auction house and writes the JMH benchmark fixture. Requires HYPIXEL_API_KEY env var. Idempotent."
+        group = "jmh"
+        mainClass.set("dev.sbs.minecraftapi.nbt.AuctionFixtureGenerator")
+        classpath = sourceSets["test"].runtimeClasspath
+    }
 }
