@@ -426,7 +426,7 @@ public final class PackContextManager {
         }
         if (tag instanceof IntArrayTag intArray) {
             StringBuilder sb = new StringBuilder("[");
-            Integer[] values = intArray.getValue();
+            int[] values = intArray.getValue();
             for (int i = 0; i < values.length; i++) {
                 if (i > 0) sb.append(',');
                 sb.append(values[i]);
@@ -436,7 +436,7 @@ public final class PackContextManager {
         }
         if (tag instanceof LongArrayTag longArray) {
             StringBuilder sb = new StringBuilder("[");
-            Long[] values = longArray.getValue();
+            long[] values = longArray.getValue();
             for (int i = 0; i < values.length; i++) {
                 if (i > 0) sb.append(',');
                 sb.append(values[i]);
@@ -446,7 +446,7 @@ public final class PackContextManager {
         }
         if (tag instanceof ByteArrayTag byteArray) {
             StringBuilder sb = new StringBuilder("[");
-            Byte[] values = byteArray.getValue();
+            byte[] values = byteArray.getValue();
             for (int i = 0; i < values.length; i++) {
                 if (i > 0) sb.append(',');
                 sb.append(values[i]);

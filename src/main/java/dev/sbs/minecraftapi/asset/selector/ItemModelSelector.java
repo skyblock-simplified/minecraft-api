@@ -306,20 +306,23 @@ public sealed interface ItemModelSelector
         }
 
         private static List<Double> toDoubleList(ByteArrayTag array) {
-            List<Double> result = new ArrayList<>(array.getValue().length);
-            for (Byte v : array.getValue()) result.add((double) v);
+            byte[] values = array.getValue();
+            List<Double> result = new ArrayList<>(values.length);
+            for (byte v : values) result.add((double) v);
             return result;
         }
 
         private static List<Double> toDoubleList(IntArrayTag array) {
-            List<Double> result = new ArrayList<>(array.getValue().length);
-            for (Integer v : array.getValue()) result.add((double) v);
+            int[] values = array.getValue();
+            List<Double> result = new ArrayList<>(values.length);
+            for (int v : values) result.add((double) v);
             return result;
         }
 
         private static List<Double> toDoubleList(LongArrayTag array) {
-            List<Double> result = new ArrayList<>(array.getValue().length);
-            for (Long v : array.getValue()) result.add((double) v);
+            long[] values = array.getValue();
+            List<Double> result = new ArrayList<>(values.length);
+            for (long v : values) result.add((double) v);
             return result;
         }
 

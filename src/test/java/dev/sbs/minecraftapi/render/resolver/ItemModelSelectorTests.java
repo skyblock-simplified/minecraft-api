@@ -176,7 +176,7 @@ class ItemModelSelectorTests extends IntegrationTestBase {
         propertyCompound.put("value", textureValue);
 
         CompoundTag profile = new CompoundTag();
-        profile.put("id", new IntArrayTag(new Integer[]{123456789, 987654321, -135792468, 246813579}));
+        profile.put("id", new IntArrayTag(123456789, 987654321, -135792468, 246813579));
         profile.put("properties", new ListTag<>(List.of(propertyCompound)));
 
         ItemRenderData itemData = new ItemRenderData(
