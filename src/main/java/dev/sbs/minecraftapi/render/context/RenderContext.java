@@ -1394,8 +1394,8 @@ public final class RenderContext implements AutoCloseable {
     private BufferedImage renderSkyblockDescriptor(String descriptorPayload,
                                                     BlockRenderOptions options) {
         var parsed = parseDescriptorPayload(descriptorPayload);
-        String skyblockId = parsed.getLeft();
-        Map<String, String> parameters = parsed.getRight();
+        String skyblockId = parsed.left();
+        Map<String, String> parameters = parsed.right();
 
         if (skyblockId == null || skyblockId.isBlank())
             return renderGuiItemInternal("minecraft:player_head", options, null);

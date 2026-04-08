@@ -157,7 +157,7 @@ public final class TextureContext implements AutoCloseable {
         if (overrideContext != null) {
             ImageFrame overrideFrame = overrideContext.tryGetFrame(normalized);
             if (overrideFrame != null)
-                return overrideFrame.getImage();
+                return overrideFrame.image();
         }
 
         return cache.computeIfAbsent(normalized, this::loadTextureInternal);
@@ -629,7 +629,7 @@ public final class TextureContext implements AutoCloseable {
             return spriteSheet;
 
         animationCache.put(normalizedKey, animation);
-        return PixelBuffer.wrap(animation.getFrames().getFirst().getImage()).toBufferedImage();
+        return PixelBuffer.wrap(animation.getFrames().getFirst().image()).toBufferedImage();
     }
 
     @Nullable
@@ -891,7 +891,7 @@ public final class TextureContext implements AutoCloseable {
                 .sorted((a, b) -> String.CASE_INSENSITIVE_ORDER.compare(a.getKey(), b.getKey()))
                 .forEach(e -> {
                     if (!sb.isEmpty()) sb.append('|');
-                    sb.append(e.getKey()).append(':').append(e.getValue().getDelayMs());
+                    sb.append(e.getKey()).append(':').append(e.getValue().delayMs());
                 });
         return sb.toString();
     }

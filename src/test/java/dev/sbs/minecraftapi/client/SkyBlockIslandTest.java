@@ -63,10 +63,10 @@ public class SkyBlockIslandTest {
                             ))
                         )
                         .flatMap(Optional::stream)
-                        .sorted(Comparator.comparingInt(Pair::getRight))
+                        .sorted(Comparator.comparingInt(Pair::right))
                         .collect(Concurrent.toMap());
 
-                    playerLevels.forEach((pair, level) -> System.out.println(pair.getRight() + ": " + level + " (" + pair.getLeft().toString() + ")"));
+                    playerLevels.forEach((pair, level) -> System.out.println(pair.right() + ": " + level + " (" + pair.left().toString() + ")"));
                     System.out.println("---");
                     double averageLevel = playerLevels.stream()
                         .filter(entry -> entry.getValue() > 0)
@@ -86,7 +86,7 @@ public class SkyBlockIslandTest {
                     System.out.println("---");
                     playerLevels.stream()
                         .filter(entry -> entry.getValue() == 0)
-                        .forEach(entry -> System.out.println(entry.getKey().getRight() + ": " + entry.getValue() + " (" + entry.getKey().getLeft().toString() + ")"));
+                        .forEach(entry -> System.out.println(entry.getKey().right() + ": " + entry.getValue() + " (" + entry.getKey().left().toString() + ")"));
                 });
         } catch (HypixelApiException hypixelApiException) {
             hypixelApiException.printStackTrace();
@@ -179,8 +179,8 @@ public class SkyBlockIslandTest {
         try {
             System.out.println("Database Starting... ");
             JpaSession session = MinecraftApi.getSessionManager().connect(JpaConfig.defaultSql());
-            System.out.println("Database initialized in " + session.getInitialization().getDurationMillis() + "ms");
-            System.out.println("Database started in " + session.getRepositoryCache().getDurationMillis() + "ms");
+            System.out.println("Database initialized in " + session.getInitialization().durationMillis() + "ms");
+            System.out.println("Database started in " + session.getRepositoryCache().durationMillis() + "ms");
             HypixelContract hypixelEndpoints = MinecraftApi.getClient(HypixelContract.class).getContract();
             ProfileModel pineappleProfile = MinecraftApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "PINEAPPLE");
             ProfileModel bananaProfile = MinecraftApi.getRepository(ProfileModel.class).findFirstOrNull(ProfileModel::getKey, "BANANA");
@@ -203,7 +203,7 @@ public class SkyBlockIslandTest {
             MatcherAssert.assertThat(profiles.isSuccess(), Matchers.equalTo(true));
 
             //SkyBlockIsland island = profiles.getSelected(); // Bingo Profile = 0
-            Optional<SkyBlockIsland> pineappleIsland = profiles.getIsland(checkThis.getRight().getKey());
+            Optional<SkyBlockIsland> pineappleIsland = profiles.getIsland(checkThis.right().getKey());
             assert pineappleIsland.isPresent();
             SkyBlockIsland island = pineappleIsland.get();
             SkyBlockMember member = island.getMembers().get(checkThis.getKey());

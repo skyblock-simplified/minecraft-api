@@ -79,8 +79,8 @@ public class TestSkyBlockIsland {
 
                 // @Split on last_caught
                 assertThat("last caught should be present", trophyFish.getLastCaught().isPresent(), is(true));
-                assertThat("last caught fish should be a Fish", trophyFish.getLastCaught().getLeft(), notNullValue());
-                assertThat("last caught tier should be a Tier", trophyFish.getLastCaught().getRight(), notNullValue());
+                assertThat("last caught fish should be a Fish", trophyFish.getLastCaught().left(), notNullValue());
+                assertThat("last caught tier should be a Tier", trophyFish.getLastCaught().right(), notNullValue());
 
                 // @Capture with bare-entry grouping
                 assertThat("fish map should contain all 18 fish", trophyFish.getFish().size(), is(TrophyFish.values().length));
