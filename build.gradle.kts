@@ -35,6 +35,9 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.platform.launcher)
 
+    // Projects
+    api("dev.sbs:minecraft-renderer:0.1.0")
+
     // Simplified Libraries (extracted to github.com/simplified-dev)
     api("com.github.simplified-dev:collections:master-SNAPSHOT")
     api("com.github.simplified-dev:utils:master-SNAPSHOT")
