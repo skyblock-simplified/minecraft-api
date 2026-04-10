@@ -1,11 +1,11 @@
 package dev.sbs.minecraftapi.generator.image;
 
-import dev.sbs.minecraftapi.generator.font.Font;
-import dev.sbs.minecraftapi.generator.font.MinecraftFont;
 import dev.sbs.minecraftapi.generator.image.exception.ImageException;
-import dev.sbs.minecraftapi.generator.text.ChatFormat;
-import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
+import dev.sbs.renderer.font.Font;
+import dev.sbs.renderer.font.MinecraftFont;
+import dev.sbs.renderer.text.ChatFormat;
+import dev.sbs.renderer.text.segment.ColorSegment;
+import dev.sbs.renderer.text.segment.LineSegment;
 import dev.simplified.collection.Concurrent;
 import dev.simplified.collection.ConcurrentList;
 import dev.simplified.stream.ByteArrayDataOutput;

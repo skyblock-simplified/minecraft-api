@@ -5,9 +5,9 @@ import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.sbs.request.SbsContract;
 import dev.sbs.minecraftapi.generator.image.MinecraftHead;
 import dev.sbs.minecraftapi.generator.image.MinecraftText;
-import dev.sbs.minecraftapi.generator.text.ChatFormat;
-import dev.sbs.minecraftapi.generator.text.segment.ColorSegment;
-import dev.sbs.minecraftapi.generator.text.segment.LineSegment;
+import dev.sbs.renderer.text.ChatFormat;
+import dev.sbs.renderer.text.segment.ColorSegment;
+import dev.sbs.renderer.text.segment.LineSegment;
 import dev.simplified.util.StringUtil;
 import org.junit.jupiter.api.Test;
 

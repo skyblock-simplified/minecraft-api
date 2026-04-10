@@ -1,7 +1,5 @@
 package dev.sbs.minecraftapi;
 
-import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
-import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
 import dev.simplified.scheduler.Scheduler;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestPlan;
@@ -32,32 +30,6 @@ public class TestLifecycleListener implements TestExecutionListener {
         System.out.println("[TestLifecycleListener] Initializing MinecraftApi");
         MinecraftApi.getSessionManager();
         MinecraftApi.connectSkyBlockSession();
-
-        // Load vanilla assets and discover texture packs
-        String assetsDir = findDirectory("minecraft");
-        if (assetsDir == null) {
-            try {
-                Path projectRoot = Path.of(System.getProperty("user.dir"));
-                System.out.println("[TestLifecycleListener] Minecraft assets not found - downloading...");
-                Path minecraftDir = MinecraftAssetFactory.downloadAndExtractAssets(null, projectRoot);
-                assetsDir = minecraftDir.toAbsolutePath().toString();
-            } catch (Exception e) {
-                System.err.println("[TestLifecycleListener] Failed to download assets: " + e.getMessage());
-            }
-        }
-
-        if (assetsDir != null && Files.isDirectory(Path.of(assetsDir))) {
-            try {
-                List<String> packDirs = discoverPackDirectories();
-                MinecraftApi.loadAssets(MinecraftAssetOptions.builder()
-                    .withAssetsDirectory(assetsDir)
-                    .withTexturePackDirectories(packDirs).build());
-                System.out.println("[TestLifecycleListener] Assets loaded from: " + assetsDir
-                    + " with " + packDirs.size() + " texture pack directories");
-            } catch (IOException e) {
-                System.err.println("[TestLifecycleListener] Failed to load assets: " + e.getMessage());
-            }
-        }
     }
 
     @Override
