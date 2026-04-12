@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.render.data;
+package dev.sbs.minecraftapi.generator.image;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
