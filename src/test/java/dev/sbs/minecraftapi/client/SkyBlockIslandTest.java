@@ -1,8 +1,8 @@
 package dev.sbs.minecraftapi.client;
 
 import dev.sbs.minecraftapi.MinecraftApi;
+import dev.sbs.minecraftapi.client.hypixel.HypixelContract;
 import dev.sbs.minecraftapi.client.hypixel.exception.HypixelApiException;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelContract;
 import dev.simplified.collection.Concurrent;
 import dev.simplified.collection.ConcurrentMap;
 import dev.simplified.collection.tuple.pair.Pair;

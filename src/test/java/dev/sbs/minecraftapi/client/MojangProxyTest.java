@@ -1,7 +1,7 @@
 package dev.sbs.minecraftapi.client;
 
 import dev.sbs.minecraftapi.MinecraftApi;
-import dev.sbs.minecraftapi.client.mojang.request.MojangContract;
+import dev.sbs.minecraftapi.client.mojang.MojangContract;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
 import dev.simplified.client.Proxy;

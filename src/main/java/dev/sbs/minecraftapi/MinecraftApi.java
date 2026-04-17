@@ -2,12 +2,12 @@ package dev.sbs.minecraftapi;
 
 import com.google.gson.Gson;
 import dev.sbs.minecraftapi.client.MinecraftClients;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelContract;
-import dev.sbs.minecraftapi.client.hypixel.request.HypixelForumContract;
-import dev.sbs.minecraftapi.client.mojang.request.MinecraftServerPing;
-import dev.sbs.minecraftapi.client.mojang.request.MojangContract;
+import dev.sbs.minecraftapi.client.hypixel.HypixelContract;
+import dev.sbs.minecraftapi.client.hypixel.HypixelForumContract;
+import dev.sbs.minecraftapi.client.mojang.MinecraftServerPing;
+import dev.sbs.minecraftapi.client.mojang.MojangContract;
 import dev.sbs.minecraftapi.client.mojang.response.MojangMultiUsername;
-import dev.sbs.minecraftapi.client.sbs.request.SbsContract;
+import dev.sbs.minecraftapi.client.sbs.SbsContract;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;

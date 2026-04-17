@@ -1,4 +1,4 @@
-package dev.sbs.minecraftapi.client.sbs.request;
+package dev.sbs.minecraftapi.client.sbs;
 
 import dev.sbs.minecraftapi.client.mojang.response.MojangProfile;
 import dev.sbs.minecraftapi.client.mojang.response.MojangUsername;
