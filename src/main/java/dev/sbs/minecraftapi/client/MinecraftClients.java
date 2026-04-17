@@ -58,7 +58,7 @@ public final class MinecraftClients {
      */
     public static @NotNull ClientConfig<HypixelContract> hypixelOptions(@NotNull Gson gson, @NotNull Supplier<Optional<String>> apiKeySupplier) {
         return ClientConfig.builder(HypixelContract.class, gson)
-            .withErrorDecoder((methodKey, response) -> { throw new HypixelApiException(methodKey, response); })
+            .withErrorDecoder(HypixelApiException::new)
             .withDynamicHeader("API-Key", apiKeySupplier)
             .build();
     }
@@ -71,7 +71,7 @@ public final class MinecraftClients {
      */
     public static @NotNull ClientConfig<SbsContract> sbsOptions(@NotNull Gson gson) {
         return ClientConfig.builder(SbsContract.class, gson)
-            .withErrorDecoder((methodKey, response) -> { throw new SbsApiException(methodKey, response); })
+            .withErrorDecoder(SbsApiException::new)
             .build();
     }
 
@@ -107,7 +107,7 @@ public final class MinecraftClients {
      */
     public static @NotNull ClientConfig<MojangContract> mojangOptions(@NotNull Gson gson) {
         return ClientConfig.builder(MojangContract.class, gson)
-            .withErrorDecoder((methodKey, response) -> { throw new MojangApiException(methodKey, response); })
+            .withErrorDecoder(MojangApiException::new)
             .build();
     }
 

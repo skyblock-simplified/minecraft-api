@@ -1,11 +1,9 @@
 package dev.sbs.minecraftapi.client.sbs.response;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import dev.sbs.minecraftapi.MinecraftApi;
 import dev.simplified.collection.Concurrent;
 import dev.simplified.collection.ConcurrentMap;
 import dev.simplified.collection.tuple.pair.Pair;
@@ -14,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -55,9 +54,7 @@ public class SkyBlockEmojis {
     public static class Deserializer implements JsonDeserializer<SkyBlockEmojis> {
 
         @Override
-        public SkyBlockEmojis deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
-            Gson gson = MinecraftApi.getGson();
-
+        public SkyBlockEmojis deserialize(@NonNull JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
             return new SkyBlockEmojis(
                 jsonElement.getAsJsonObject()
                     .entrySet()
@@ -65,8 +62,8 @@ public class SkyBlockEmojis {
                     .map(entry -> Pair.of(
                         entry.getKey(),
                         Concurrent.newMap(
-                            Pair.of(false, gson.fromJson(entry.getValue().getAsJsonObject().get("normal"), Emoji.class)),
-                            Pair.of(true, gson.fromJson(entry.getValue().getAsJsonObject().get("enchanted"), Emoji.class))
+                            Pair.of(false, jdc.deserialize(entry.getValue().getAsJsonObject().get("normal"), Emoji.class)),
+                            Pair.of(true, (Emoji) jdc.deserialize(entry.getValue().getAsJsonObject().get("enchanted"), Emoji.class))
                         )
                     ))
                     .collect(Concurrent.toUnmodifiableMap())

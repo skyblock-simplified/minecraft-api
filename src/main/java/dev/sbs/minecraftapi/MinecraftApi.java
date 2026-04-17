@@ -1,11 +1,6 @@
 package dev.sbs.minecraftapi;
 
 import com.google.gson.Gson;
-import dev.sbs.minecraftapi.asset.MinecraftAssetFactory;
-import dev.sbs.minecraftapi.asset.MinecraftAssetOptions;
-import dev.sbs.minecraftapi.asset.context.AssetContext;
-import dev.sbs.minecraftapi.asset.context.VanillaContext;
-import dev.sbs.minecraftapi.asset.texture.TextureReference;
 import dev.sbs.minecraftapi.client.MinecraftClients;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelContract;
 import dev.sbs.minecraftapi.client.hypixel.request.HypixelForumContract;
@@ -16,7 +11,6 @@ import dev.sbs.minecraftapi.client.sbs.request.SbsContract;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
-import lib.minecraft.nbt.NbtFactory;
 import dev.sbs.minecraftapi.persistence.SkyBlockFactory;
 import dev.sbs.minecraftapi.persistence.model.Item;
 import dev.sbs.minecraftapi.skyblock.common.NbtContent;
@@ -41,6 +35,7 @@ import dev.simplified.persistence.driver.H2MemoryDriver;
 import dev.simplified.scheduler.Scheduler;
 import dev.simplified.util.Logging;
 import dev.simplified.util.SystemUtil;
+import lib.minecraft.nbt.NbtFactory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,7 +43,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * Non-instantiable central service locator that bootstraps and exposes the core infrastructure
@@ -60,8 +54,7 @@ import java.io.IOException;
  *     <li>Configures a {@link Gson} instance with the {@link JpaExclusionStrategy} and
  *         Minecraft/Hypixel type adapters for {@link NbtContent}, {@link MojangMultiUsername},
  *         {@link SkyBlockDate.RealTime}, {@link SkyBlockDate.SkyBlockTime},
- *         {@link SkyBlockEmojis}, {@link SkyBlockImages}, {@link TextureReference}, and
- *         {@link SkyBlockItems}.</li>
+ *         {@link SkyBlockEmojis}, {@link SkyBlockImages}, and {@link SkyBlockItems}.</li>
  *     <li>Registers a {@link Scheduler} for asynchronous and recurring tasks.</li>
  *     <li>Registers a {@link SessionManager} for managing JPA database sessions.</li>
  *     <li>Registers an {@link ImageFactory} for reading and writing images.</li>
@@ -129,7 +122,6 @@ public class MinecraftApi {
             .withTypeAdapter(SkyBlockDate.SkyBlockTime.class, new SkyBlockDate.SkyBlockTime.Adapter())
             .withTypeAdapter(SkyBlockEmojis.class, new SkyBlockEmojis.Deserializer())
             .withTypeAdapter(SkyBlockImages.class, new SkyBlockImages.Deserializer())
-            .withTypeAdapter(TextureReference.class, new TextureReference.Adapter())
             .withTypeAdapter(SkyBlockItems.class, new SkyBlockItems.Deserializer())
             .build();
         serviceManager.add(GsonSettings.class, gsonSettings);
@@ -386,56 +378,6 @@ public class MinecraftApi {
                 .withQueryResultsTTL(30)
                 .build()
         );
-    }
-
-    // ---- Asset loading ----
-
-    /**
-     * Loads Minecraft assets using the given options, connects the H2 asset session, and
-     * registers the factory and asset context in the service manager.
-     *
-     * @param options the asset loading configuration
-     * @return the initialized asset factory
-     * @throws IOException if asset loading fails
-     */
-    public static @NotNull MinecraftAssetFactory loadAssets(@NotNull MinecraftAssetOptions options) throws IOException {
-        MinecraftAssetFactory factory = MinecraftAssetFactory.initialize(options);
-
-        serviceManager.put(MinecraftAssetFactory.class, factory);
-        AssetContext assetContext = VanillaContext.fromFactory(factory);
-        serviceManager.put(AssetContext.class, assetContext);
-
-        GsonSettings gsonSettings = serviceManager.get(GsonSettings.class);
-        JpaConfig assetJpaConfig = JpaConfig.builder()
-            .withDriver(new H2MemoryDriver())
-            .withSchema("assets")
-            .withRepositoryFactory(factory)
-            .withGsonSettings(
-                gsonSettings.mutate()
-                    .withStringType(GsonSettings.StringType.DEFAULT)
-                    .build()
-            )
-            .withLogLevel(Logging.Level.WARN)
-            .isUsingQueryCache()
-            .isUsing2ndLevelCache()
-            .withCacheConcurrencyStrategy(org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE)
-            .withCacheMissingStrategy(CacheMissingStrategy.CREATE_WARN)
-            .withQueryResultsTTL(30)
-            .build();
-
-        factory.setAssetJpaConfig(assetJpaConfig);
-        getSessionManager().connect(assetJpaConfig);
-
-        return factory;
-    }
-
-    /**
-     * Returns the registered asset factory instance.
-     *
-     * @return the asset factory
-     */
-    public static @NotNull MinecraftAssetFactory getAssetFactory() {
-        return serviceManager.get(MinecraftAssetFactory.class);
     }
 
 }

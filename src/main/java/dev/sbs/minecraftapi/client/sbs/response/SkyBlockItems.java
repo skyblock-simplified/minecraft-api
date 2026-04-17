@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
@@ -36,7 +37,7 @@ public class SkyBlockItems {
     public static class Deserializer implements JsonDeserializer<SkyBlockItems> {
 
         @Override
-        public SkyBlockItems deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
+        public SkyBlockItems deserialize(@NonNull JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
             return new SkyBlockItems(
                 jsonElement.getAsJsonObject()
                     .entrySet()

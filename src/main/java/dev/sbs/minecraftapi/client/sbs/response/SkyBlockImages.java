@@ -10,6 +10,7 @@ import dev.simplified.collection.tuple.pair.Pair;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NonNull;
 
 import java.lang.reflect.Type;
 
@@ -31,7 +32,7 @@ public class SkyBlockImages {
     public static class Deserializer implements JsonDeserializer<SkyBlockImages> {
 
         @Override
-        public SkyBlockImages deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
+        public SkyBlockImages deserialize(@NonNull JsonElement jsonElement, Type type, JsonDeserializationContext jdc) throws JsonParseException {
             return new SkyBlockImages(
                 jsonElement.getAsJsonObject()
                     .entrySet()
