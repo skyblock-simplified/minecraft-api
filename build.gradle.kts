@@ -1,6 +1,5 @@
 plugins {
     id("java-library")
-    alias(libs.plugins.jmh)
     idea
 }
 
@@ -38,6 +37,9 @@ dependencies {
     // Projects
     api("dev.sbs:asset-renderer:0.1.0")
 
+    // Minecraft-Library (extracted to github.com/minecraft-library)
+    api("com.github.minecraft-library:nbt-factory:master-SNAPSHOT")
+
     // Simplified Libraries (extracted to github.com/simplified-dev)
     api("com.github.simplified-dev:collections:master-SNAPSHOT")
     api("com.github.simplified-dev:utils:master-SNAPSHOT")
@@ -55,8 +57,6 @@ dependencies {
 
 idea {
     module {
-        testSources.from(sourceSets["jmh"].java.srcDirs)
-        testResources.from(sourceSets["jmh"].resources.srcDirs)
         excludeDirs.addAll(listOf(
             layout.projectDirectory.dir(".gitnexus").asFile,
             layout.projectDirectory.dir(".schema").asFile,
@@ -86,11 +86,5 @@ tasks {
         mainClass.set("dev.sbs.minecraftapi.schema.SchemaExporter")
         classpath = sourceSets["test"].runtimeClasspath
         args = listOf(layout.projectDirectory.dir(".schema").asFile.absolutePath)
-    }
-    register<JavaExec>("generateAuctionFixture") {
-        description = "Fetches the full SkyBlock auction house and writes the JMH benchmark fixture. Requires HYPIXEL_API_KEY env var. Idempotent."
-        group = "jmh"
-        mainClass.set("dev.sbs.minecraftapi.nbt.AuctionFixtureGenerator")
-        classpath = sourceSets["test"].runtimeClasspath
     }
 }

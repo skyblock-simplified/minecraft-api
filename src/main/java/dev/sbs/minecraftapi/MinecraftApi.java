@@ -16,7 +16,7 @@ import dev.sbs.minecraftapi.client.sbs.request.SbsContract;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockEmojis;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockImages;
 import dev.sbs.minecraftapi.client.sbs.response.SkyBlockItems;
-import dev.sbs.minecraftapi.nbt.NbtFactory;
+import lib.minecraft.nbt.NbtFactory;
 import dev.sbs.minecraftapi.persistence.SkyBlockFactory;
 import dev.sbs.minecraftapi.persistence.model.Item;
 import dev.sbs.minecraftapi.skyblock.common.NbtContent;
