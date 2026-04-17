@@ -11,7 +11,7 @@ import dev.sbs.minecraftapi.client.mojang.request.MojangContract;
 import dev.sbs.minecraftapi.client.mojang.request.MojangDomain;
 import dev.sbs.minecraftapi.client.sbs.exception.SbsApiException;
 import dev.sbs.minecraftapi.client.sbs.request.SbsContract;
-import dev.simplified.client.ClientOptions;
+import dev.simplified.client.ClientConfig;
 import dev.simplified.client.Proxy;
 import dev.simplified.client.codec.RssTreeTransformers;
 import dev.simplified.client.codec.XmlDecoder;
@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
- * Static factory holder that produces {@link ClientOptions} for every Minecraft/Hypixel API the
+ * Static factory holder that produces {@link ClientConfig} for every Minecraft/Hypixel API the
  * project talks to, plus the {@link Proxy} variants for APIs that need pooled IPv6 rotation.
  * <p>
  * Each factory takes the configured {@link Gson} instance (and any other runtime-supplied inputs
@@ -37,7 +37,7 @@ import java.util.function.Supplier;
  * Mojang is wrapped in a {@code Proxy<MojangContract>} so that callers can spread requests across
  * a pool of clients with rotating IPv6 source addresses to avoid per-IP rate limits.
  *
- * @see ClientOptions
+ * @see ClientConfig
  * @see Proxy
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,7 +47,7 @@ public final class MinecraftClients {
     private static final @NotNull XmlMapper FORUM_XML_MAPPER = XmlDecoder.defaultXmlMapper();
 
     /**
-     * Builds the {@link ClientOptions} for the Hypixel Public API v2.
+     * Builds the {@link ClientConfig} for the Hypixel Public API v2.
      * <p>
      * The {@code apiKeySupplier} is invoked at request time on every outbound call; returning
      * {@link Optional#empty()} omits the {@code API-Key} header for that request.
@@ -56,27 +56,27 @@ public final class MinecraftClients {
      * @param apiKeySupplier the dynamic supplier of the {@code API-Key} header value
      * @return immutable Hypixel client options
      */
-    public static @NotNull ClientOptions<HypixelContract> hypixelOptions(@NotNull Gson gson, @NotNull Supplier<Optional<String>> apiKeySupplier) {
-        return ClientOptions.builder(HypixelContract.class, gson)
+    public static @NotNull ClientConfig<HypixelContract> hypixelOptions(@NotNull Gson gson, @NotNull Supplier<Optional<String>> apiKeySupplier) {
+        return ClientConfig.builder(HypixelContract.class, gson)
             .withErrorDecoder((methodKey, response) -> { throw new HypixelApiException(methodKey, response); })
             .withDynamicHeader("API-Key", apiKeySupplier)
             .build();
     }
 
     /**
-     * Builds the {@link ClientOptions} for the SBS Public API.
+     * Builds the {@link ClientConfig} for the SBS Public API.
      *
      * @param gson the configured {@link Gson} instance
      * @return immutable SBS client options
      */
-    public static @NotNull ClientOptions<SbsContract> sbsOptions(@NotNull Gson gson) {
-        return ClientOptions.builder(SbsContract.class, gson)
+    public static @NotNull ClientConfig<SbsContract> sbsOptions(@NotNull Gson gson) {
+        return ClientConfig.builder(SbsContract.class, gson)
             .withErrorDecoder((methodKey, response) -> { throw new SbsApiException(methodKey, response); })
             .build();
     }
 
     /**
-     * Builds the {@link ClientOptions} for the Hypixel forum RSS feeds.
+     * Builds the {@link ClientConfig} for the Hypixel forum RSS feeds.
      * <p>
      * The XML codec pair routes responses through Jackson's {@link XmlMapper#readTree} into a
      * Gson tree before binding, applying {@link RssTreeTransformers#ATOM_SELF_LINK_COLLISION_FIX}
@@ -88,15 +88,15 @@ public final class MinecraftClients {
      * @param gson the configured {@link Gson} instance
      * @return immutable Hypixel forum client options
      */
-    public static @NotNull ClientOptions<HypixelForumContract> hypixelForumOptions(@NotNull Gson gson) {
-        return ClientOptions.builder(HypixelForumContract.class, gson)
+    public static @NotNull ClientConfig<HypixelForumContract> hypixelForumOptions(@NotNull Gson gson) {
+        return ClientConfig.builder(HypixelForumContract.class, gson)
             .withDecoderFactory(g -> new XmlDecoder(g, FORUM_XML_MAPPER, RssTreeTransformers.ATOM_SELF_LINK_COLLISION_FIX))
             .withEncoderFactory(g -> XmlEncoder.of(HypixelForum.class, HypixelForum::toSyndFeed))
             .build();
     }
 
     /**
-     * Builds the base {@link ClientOptions} for the Mojang/Minecraft contract.
+     * Builds the base {@link ClientConfig} for the Mojang/Minecraft contract.
      * <p>
      * Used as the seed for {@link #mojangProxy(Gson)} and {@link #mojangProxy(Gson, String)};
      * generally not registered as a single client because Mojang traffic should flow through the
@@ -105,8 +105,8 @@ public final class MinecraftClients {
      * @param gson the configured {@link Gson} instance
      * @return immutable Mojang client options
      */
-    public static @NotNull ClientOptions<MojangContract> mojangOptions(@NotNull Gson gson) {
-        return ClientOptions.builder(MojangContract.class, gson)
+    public static @NotNull ClientConfig<MojangContract> mojangOptions(@NotNull Gson gson) {
+        return ClientConfig.builder(MojangContract.class, gson)
             .withErrorDecoder((methodKey, response) -> { throw new MojangApiException(methodKey, response); })
             .build();
     }
